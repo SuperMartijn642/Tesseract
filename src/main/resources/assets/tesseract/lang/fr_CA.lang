@@ -1,0 +1,7 @@
+tile.tesseract:tesseract.name=Tesseract
+gui.tesseract.items=TESSERACT - ARTICLES
+gui.tesseract.fluid=TESSERACT - FLUIDE
+gui.tesseract.energy=TESSERACT - ÉNERGIE
+gui.tesseract.set=CHOISIR
+gui.tesseract.remove=SUPPRIMER
+gui.tesseract.add=AJOUTER

@@ -1,0 +1,16 @@
+[
+{
+  "modid": "tesseract",
+  "name": "Tesseract",
+  "description": "TODO",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["SuperMartijn642"],
+  "credits": "",
+  "logoFile": "tesseract.png",
+  "screenshots": [],
+  "dependencies": ["forge"]
+}
+]
