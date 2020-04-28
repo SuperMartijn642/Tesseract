@@ -24,14 +24,11 @@ import javax.annotation.Nullable;
  */
 public class BlockTesseract extends Block implements ITileEntityProvider {
 
-    private static final PropertyBool ON = PropertyBool.create("on");
-
     public BlockTesseract(){
         super(Material.ANVIL, MapColor.GREEN);
         this.setUnlocalizedName(Tesseract.MODID + ":tesseract");
         this.setRegistryName("tesseract");
         this.setCreativeTab(CreativeTabs.SEARCH);
-        this.setDefaultState(this.getDefaultState().withProperty(ON, false));
         this.translucent = true;
         this.setSoundType(SoundType.METAL);
     }
@@ -62,20 +59,5 @@ public class BlockTesseract extends Block implements ITileEntityProvider {
     @Override
     public boolean canEntitySpawn(IBlockState state, Entity entityIn){
         return false;
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState(){
-        return new BlockStateContainer(this, ON);
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state){
-        return state.getValue(ON) ? 1 : 0;
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta){
-        return this.getDefaultState().withProperty(ON, meta == 1);
     }
 }

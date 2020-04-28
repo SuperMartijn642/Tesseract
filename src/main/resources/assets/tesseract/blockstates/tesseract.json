@@ -1,6 +1,5 @@
 {
     "variants": {
-        "on=false": { "model": "tesseract:on" },
-        "on=true": { "model": "tesseract:on" }
+        "normal": { "model": "tesseract:on" }
     }
 }

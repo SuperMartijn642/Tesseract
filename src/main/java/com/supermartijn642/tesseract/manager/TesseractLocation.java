@@ -46,7 +46,7 @@ public class TesseractLocation {
 
     public boolean isValid(){
         World world = this.getWorld();
-        return world != null && this.getWorld().getBlockState(this.pos).getBlock() == Tesseract.tesseract;
+        return world != null && world.getBlockState(this.pos).getBlock() == Tesseract.tesseract;
     }
 
     public TesseractTile getTesseract(){
