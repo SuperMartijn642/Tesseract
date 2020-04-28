@@ -18,7 +18,7 @@ public class ClientProxy {
 
     @SubscribeEvent
     public static void setup(FMLClientSetupEvent e){
-        ClientRegistry.bindTileEntityRenderer(Tesseract.tesseract_tile,TesseractTileRenderer::new);
+        ClientRegistry.bindTileEntityRenderer(Tesseract.tesseract_tile, TesseractTileRenderer::new);
     }
 
     public static void openScreen(BlockPos pos){

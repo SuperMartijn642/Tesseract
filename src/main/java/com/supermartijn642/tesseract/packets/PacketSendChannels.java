@@ -51,7 +51,10 @@ public class PacketSendChannels {
             int id;
             try{
                 id = Integer.parseInt(key);
-            }catch(Exception e){e.printStackTrace(); continue;}
+            }catch(Exception e){
+                e.printStackTrace();
+                continue;
+            }
             channels.add(new Channel(id, type, channelTag.getCompound(key)));
         }
 

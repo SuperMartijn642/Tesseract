@@ -143,8 +143,8 @@ public class TesseractScreen extends Screen {
         this.renderBackground();
 
         RenderSystem.pushMatrix();
-        RenderSystem.translated(this.left,this.top,0);
-        RenderSystem.color4f(1,1,1,1);
+        RenderSystem.translated(this.left, this.top, 0);
+        RenderSystem.color4f(1, 1, 1, 1);
 
         this.drawBackground();
         this.drawTabs();
