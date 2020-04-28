@@ -30,7 +30,7 @@ authors="SuperMartijn642" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description='''TODO'''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.movingelevators]] #optional
+[[dependencies.tesseract]] #optional
     # the modid of the dependency
     modId="forge" #mandatory
     # Does this dependency have to exist - if not, ordering below must be specified
@@ -42,7 +42,7 @@ description='''TODO'''
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
     side="BOTH"
 # Here's another dependency
-[[dependencies.movingelevators]]
+[[dependencies.tesseract]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.14,)"

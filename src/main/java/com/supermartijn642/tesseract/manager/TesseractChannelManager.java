@@ -5,6 +5,7 @@ import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.packets.PacketSendChannels;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -21,6 +22,8 @@ import java.util.UUID;
  * Created 3/20/2020 by SuperMartijn642
  */
 public class TesseractChannelManager {
+
+    public static MinecraftServer minecraftServer;
 
     private static File directory;
 
@@ -100,6 +103,7 @@ public class TesseractChannelManager {
     public static void onLoad(WorldEvent.Load e){
         if(e.getWorld().isRemote() || e.getWorld().getDimension().getType() != DimensionType.OVERWORLD)
             return;
+        minecraftServer = ((ServerWorld)e.getWorld()).getServer();
         directory = new File(((ServerWorld)e.getWorld()).getSaveHandler().getWorldDirectory(), "tesseract");
         for(EnumChannelType type : EnumChannelType.values()){
             ChannelList list = new ChannelList(type);

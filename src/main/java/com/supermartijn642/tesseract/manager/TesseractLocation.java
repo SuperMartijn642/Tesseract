@@ -30,8 +30,7 @@ public class TesseractLocation {
     }
 
     public TesseractLocation(CompoundNBT compound){
-        this.dimension = compound.getInt("dim");
-        this.pos = new BlockPos(compound.getInt("posx"), compound.getInt("posy"), compound.getInt("posz"));
+        this(compound.getInt("dim"), new BlockPos(compound.getInt("posx"), compound.getInt("posy"), compound.getInt("posz")));
     }
 
     public int getDimension(){
@@ -39,7 +38,10 @@ public class TesseractLocation {
     }
 
     public World getWorld(){
-        return DimensionManager.getWorld(null, DimensionType.getById(this.dimension),false,true); //TODO
+        DimensionType type = DimensionType.getById(this.dimension);
+        if(type == null || TesseractChannelManager.minecraftServer == null)
+            return null;
+        return DimensionManager.getWorld(TesseractChannelManager.minecraftServer, type,false,true);
     }
 
     public BlockPos getPos(){

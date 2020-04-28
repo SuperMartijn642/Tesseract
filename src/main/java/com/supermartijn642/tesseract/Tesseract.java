@@ -1,5 +1,6 @@
 package com.supermartijn642.tesseract;
 
+import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.packets.PacketAddChannel;
 import com.supermartijn642.tesseract.packets.PacketRemoveChannel;
 import com.supermartijn642.tesseract.packets.PacketSendChannels;
@@ -10,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -23,7 +25,7 @@ import net.minecraftforge.registries.ObjectHolder;
 @Mod("tesseract")
 public class Tesseract {
 
-    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(new ResourceLocation("movingelevators", "main"), () -> "1", "1"::equals, "1"::equals);
+    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(new ResourceLocation("tesseract", "main"), () -> "1", "1"::equals, "1"::equals);
 
     @ObjectHolder("tesseract:tesseract")
     public static BlockTesseract tesseract;
@@ -31,6 +33,7 @@ public class Tesseract {
     public static TileEntityType<TesseractTile> tesseract_tile;
 
     public Tesseract(){
+        MinecraftForge.EVENT_BUS.register(TesseractChannelManager.class);
         CHANNEL.registerMessage(0, PacketSendChannels.class, PacketSendChannels::encode, PacketSendChannels::decode, PacketSendChannels::handle);
         CHANNEL.registerMessage(1, PacketAddChannel.class, PacketAddChannel::encode, PacketAddChannel::decode, PacketAddChannel::handle);
         CHANNEL.registerMessage(2, PacketRemoveChannel.class, PacketRemoveChannel::encode, PacketRemoveChannel::decode, PacketRemoveChannel::handle);

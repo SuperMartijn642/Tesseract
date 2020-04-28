@@ -197,12 +197,12 @@ public class TesseractScreen extends Screen {
         for(int i = 0; i < 11 && i + this.scrollOffset < channels.size(); i++){
             Channel channel = channels.get(i + this.scrollOffset);
             if(tile.getChannelId(type) == channel.id)
-                this.drawColoredRect(15, 28 + 25 + i * channelHeight, 135, 28 + 25 + 13 + i * channelHeight, 0x69007050);
+                this.drawColoredRect(15, 28 + 25 + i * channelHeight, 120, channelHeight, 0x69007050);
             if(this.selectedChannel == channel.id){
-                this.drawColoredRect(15, 28 + 25 + i * channelHeight, 135, 28 + 25 + i * channelHeight + 1, 0xffffffff);
-                this.drawColoredRect(15, 28 + 25 + i * channelHeight + 12, 135, 28 + 25 + i * channelHeight + 13, 0xffffffff);
-                this.drawColoredRect(15, 28 + 25 + i * channelHeight, 16, 28 + 25 + i * channelHeight + 13, 0xffffffff);
-                this.drawColoredRect(134, 28 + 25 + i * channelHeight, 135, 28 + 25 + i * channelHeight + 13, 0xffffffff);
+                this.drawColoredRect(15, 28 + 25 + i * channelHeight, 120, 1, 0xffffffff);
+                this.drawColoredRect(15, 28 + 25 + i * channelHeight + 12, 120, 1, 0xffffffff);
+                this.drawColoredRect(15, 28 + 25 + i * channelHeight, 1, channelHeight, 0xffffffff);
+                this.drawColoredRect(134, 28 + 25 + i * channelHeight, 1, channelHeight, 0xffffffff);
             }
             this.font.drawString(channel.name, 15 + 3, 28 + 25 + 3 + i * channelHeight, 0xffffffff);
             if(channel.creator.equals(Minecraft.getInstance().player.getUniqueID())){
@@ -253,7 +253,13 @@ public class TesseractScreen extends Screen {
     }
 
     private void drawColoredRect(int x, int y, int width, int height, int color){
-        int red = (color & 0x00ff0000) << 4, green = (color & 0x0000ff00) << 8, blue = (color & 0x000000ff) << 16, alpha = color & 0xff000000;
+        GlStateManager.disableTexture();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlphaTest();
+        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.shadeModel(7425);
+
+        int red = (color & 0x00ff0000) >> 16, green = (color & 0x0000ff00) >> 8, blue = (color & 0x000000ff), alpha = 256 + ((color & 0xff000000) >> 24);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
@@ -262,6 +268,11 @@ public class TesseractScreen extends Screen {
         bufferbuilder.pos(x + width, y, 0).color(red, green, blue, alpha).endVertex();
         bufferbuilder.pos(x, y, 0).color(red, green, blue, alpha).endVertex();
         tessellator.draw();
+
+        GlStateManager.shadeModel(7424);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlphaTest();
+        GlStateManager.enableTexture();
     }
 
     public void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height){
@@ -277,39 +288,38 @@ public class TesseractScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton){
-        System.out.println("mouseX: " + mouseX + " mouseY: " + mouseY);
-//        int screenX = mouseX - this.left, screenY = mouseY - this.top;
-//        if(mouseButton == 0){
-//            if(screenY >= 2 && screenY < 2 + 26){ // tabs
-//                if(screenX >= 6 && screenX < 6 + 28 && type != EnumChannelType.ITEMS)
-//                    this.setChannelType(EnumChannelType.ITEMS);
-//                else if(screenX >= 35 && screenX < 35 + 28 && type != EnumChannelType.ENERGY)
-//                    this.setChannelType(EnumChannelType.ENERGY);
-//                else if(screenX >= 64 && screenX < 64 + 28 && type != EnumChannelType.FLUID)
-//                    this.setChannelType(EnumChannelType.FLUID);
-//            }else if(screenX >= 15 && screenX < 135 && screenY >= 28 + 25 && screenY < 28 + 25 + 143){ // channels
-//                int index = (screenY - (28 + 25)) / (143 / 11) + this.scrollOffset;
-//                List<Channel> channels = TesseractChannelManager.CLIENT.getChannels(TesseractScreen.type);
-//                if(index < channels.size()){
-//                    TesseractTile tile = this.getTileOrClose();
-//                    if(tile != null){
-//                        this.selectedChannel = channels.get(index + this.scrollOffset).id;
-//                        this.setButton.active = tile.getChannelId(type) != this.selectedChannel;
-//                        this.removeButton.active = channels.get(index + this.scrollOffset).creator.equals(Minecraft.getInstance().player.getUniqueID());
-//                    }
-//                }else{
-//                    this.selectedChannel = -1;
-//                    this.setButton.active = false;
-//                    this.removeButton.active = false;
-//                }
-//            }
-//        }else if(mouseButton == 1){ // text field
-//            if(mouseX >= this.textField.x && mouseX < this.textField.x + this.textField.getWidth()
-//                && mouseY >= this.textField.y && mouseY < this.textField.y + this.textField.getHeight())
-//                this.textField.setText("");
-//        }
-//        super.mouseClicked(mouseX, mouseY, mouseButton);
-//        this.textField.mouseClicked(mouseX, mouseY, mouseButton);
+        double screenX = mouseX - this.left, screenY = mouseY - this.top;
+        if(mouseButton == 0){
+            if(screenY >= 2 && screenY < 2 + 26){ // tabs
+                if(screenX >= 6 && screenX < 6 + 28 && type != EnumChannelType.ITEMS)
+                    this.setChannelType(EnumChannelType.ITEMS);
+                else if(screenX >= 35 && screenX < 35 + 28 && type != EnumChannelType.ENERGY)
+                    this.setChannelType(EnumChannelType.ENERGY);
+                else if(screenX >= 64 && screenX < 64 + 28 && type != EnumChannelType.FLUID)
+                    this.setChannelType(EnumChannelType.FLUID);
+            }else if(screenX >= 15 && screenX < 135 && screenY >= 28 + 25 && screenY < 28 + 25 + 143){ // channels
+                int index = ((int)screenY - (28 + 25)) / (143 / 11) + this.scrollOffset;
+                List<Channel> channels = TesseractChannelManager.CLIENT.getChannels(TesseractScreen.type);
+                if(index < channels.size()){
+                    TesseractTile tile = this.getTileOrClose();
+                    if(tile != null){
+                        this.selectedChannel = channels.get(index + this.scrollOffset).id;
+                        this.setButton.active = tile.getChannelId(type) != this.selectedChannel;
+                        this.removeButton.active = channels.get(index + this.scrollOffset).creator.equals(Minecraft.getInstance().player.getUniqueID());
+                    }
+                }else{
+                    this.selectedChannel = -1;
+                    this.setButton.active = false;
+                    this.removeButton.active = false;
+                }
+            }
+        }else if(mouseButton == 1){ // text field
+            if(mouseX >= this.textField.x && mouseX < this.textField.x + this.textField.getWidth()
+                && mouseY >= this.textField.y && mouseY < this.textField.y + this.textField.getHeight())
+                this.textField.setText("");
+        }
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+        this.textField.mouseClicked(mouseX, mouseY, mouseButton);
         return false;
     }
 
@@ -337,10 +347,11 @@ public class TesseractScreen extends Screen {
         if(super.mouseScrolled(mouseX, mouseY, scroll))
             return true;
 
-        System.out.println("scroll: " + scroll);
+        if(mouseX >= 15 && mouseX < 135 && mouseY >= 28 + 25 && mouseY < 28 + 25 + 143){
+            this.scroll(-(int)scroll);
+            return true;
+        }
 
         return false;
-//        if(mouseX >= 15 && mouseX < 135 && mouseY >= 28 + 25 && mouseY < 28 + 25 + 143)
-//            this.scroll(- (int)scroll / 120);
     }
 }

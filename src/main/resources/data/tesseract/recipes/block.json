@@ -1,5 +1,5 @@
 {
-  "type": "forge:ore_shaped",
+  "type": "minecraft:crafting_shaped",
   "pattern": [
     "#O#",
     "OCO",
@@ -14,8 +14,7 @@
         "item": "minecraft:obsidian"
       },
       {
-        "type": "forge:ore_dict",
-        "ore": "blockObsidian"
+        "tag": "forge:obsidian"
       }
     ],
     "C": [
@@ -23,13 +22,11 @@
         "item": "minecraft:diamond_block"
       },
       {
-        "type": "forge:ore_dict",
-        "ore": "blockDiamond"
+        "tag": "forge:storage_blocks/diamond"
       }
     ]
   },
   "result": {
-    "item": "tesseract:tesseract",
-    "count": 1
+    "item": "tesseract:tesseract"
   }
 }
