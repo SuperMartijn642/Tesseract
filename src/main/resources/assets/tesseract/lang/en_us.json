@@ -1,0 +1,10 @@
+{
+  "block.tesseract.tesseract": "Tesseract",
+  "gui.tesseract.title": "Tesseract",
+  "gui.tesseract.items": "TESSERACT - ITEMS",
+  "gui.tesseract.fluid": "TESSERACT - FLUID",
+  "gui.tesseract.energy": "TESSERACT - ENERGY",
+  "gui.tesseract.set": "SET",
+  "gui.tesseract.remove": "REMOVE",
+  "gui.tesseract.add": "ADD"
+}
