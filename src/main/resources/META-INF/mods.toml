@@ -28,7 +28,7 @@ logoFile="tesseract.png" #optional
 # A text field displayed in the mod UI
 authors="SuperMartijn642" #optional
 # The description text for the mod (multi line!) (#mandatory)
-description='''TODO'''
+description='''Tesseract allows you to transport Items, Fluid and Energy. Tesseracts work at any distance and even across dimensions! Use multiple channels to have different groups of Tesseracts!'''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.tesseract]] #optional
     # the modid of the dependency
@@ -36,7 +36,7 @@ description='''TODO'''
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="[28.2,)" #mandatory
+    versionRange="[30.0,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER

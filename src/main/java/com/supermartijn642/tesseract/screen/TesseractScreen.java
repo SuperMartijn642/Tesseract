@@ -1,6 +1,7 @@
 package com.supermartijn642.tesseract.screen;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractTile;
@@ -141,15 +142,15 @@ public class TesseractScreen extends Screen {
     public void render(int mouseX, int mouseY, float partialTicks){
         this.renderBackground();
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translated(this.left, this.top, 0);
-        GlStateManager.color4f(1, 1, 1, 1);
+        RenderSystem.pushMatrix();
+        RenderSystem.translated(this.left,this.top,0);
+        RenderSystem.color4f(1,1,1,1);
 
         this.drawBackground();
         this.drawTabs();
         this.drawChannels();
 
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
 
         super.render(mouseX, mouseY, partialTicks);
         this.textField.render(mouseX, mouseY, partialTicks);
@@ -241,6 +242,8 @@ public class TesseractScreen extends Screen {
     }
 
     private void drawTexture(ResourceLocation texture, double x, double y, double width, double height){
+        GlStateManager.enableAlphaTest();
+
         Minecraft.getInstance().getTextureManager().bindTexture(texture);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
@@ -256,7 +259,7 @@ public class TesseractScreen extends Screen {
         GlStateManager.disableTexture();
         GlStateManager.enableBlend();
         GlStateManager.disableAlphaTest();
-        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
         GlStateManager.shadeModel(7425);
 
         int red = (color & 0x00ff0000) >> 16, green = (color & 0x0000ff00) >> 8, blue = (color & 0x000000ff), alpha = 256 + ((color & 0xff000000) >> 24);
@@ -276,6 +279,8 @@ public class TesseractScreen extends Screen {
     }
 
     public void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height){
+        GlStateManager.enableAlphaTest();
+
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
@@ -347,7 +352,7 @@ public class TesseractScreen extends Screen {
         if(super.mouseScrolled(mouseX, mouseY, scroll))
             return true;
 
-        if(mouseX >= 15 && mouseX < 135 && mouseY >= 28 + 25 && mouseY < 28 + 25 + 143){
+        if(mouseX >= this.left + 15 && mouseX < this.left + 135 && mouseY >= this.top + 28 + 25 && mouseY < this.top + 28 + 25 + 143){
             this.scroll(-(int)scroll);
             return true;
         }

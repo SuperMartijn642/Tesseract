@@ -33,6 +33,7 @@ public class PacketAddChannel {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
+        ctx.get().setPacketHandled(true);
         TesseractChannelManager.SERVER.addChannel(this.type, ctx.get().getSender().getUniqueID(), this.isPrivate, this.name);
     }
 }
