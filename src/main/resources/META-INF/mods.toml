@@ -28,7 +28,7 @@ logoFile="tesseract.png" #optional
 # A text field displayed in the mod UI
 authors="SuperMartijn642" #optional
 # The description text for the mod (multi line!) (#mandatory)
-description='''TODO'''
+description='''Tesseract allows you to transport Items, Fluid and Energy. Tesseracts work at any distance and even across dimensions! Use multiple channels to have different groups of Tesseracts!'''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.tesseract]] #optional
     # the modid of the dependency

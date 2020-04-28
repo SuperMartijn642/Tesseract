@@ -37,6 +37,7 @@ public class PacketSetChannel {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
+        ctx.get().setPacketHandled(true);
         PlayerEntity player = ctx.get().getSender();
         if(player == null)
             return;

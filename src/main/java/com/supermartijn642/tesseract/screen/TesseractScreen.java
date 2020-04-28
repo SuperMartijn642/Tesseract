@@ -241,6 +241,8 @@ public class TesseractScreen extends Screen {
     }
 
     private void drawTexture(ResourceLocation texture, double x, double y, double width, double height){
+        GlStateManager.enableAlphaTest();
+
         Minecraft.getInstance().getTextureManager().bindTexture(texture);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
@@ -276,6 +278,8 @@ public class TesseractScreen extends Screen {
     }
 
     public void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height){
+        GlStateManager.enableAlphaTest();
+
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
@@ -347,7 +351,7 @@ public class TesseractScreen extends Screen {
         if(super.mouseScrolled(mouseX, mouseY, scroll))
             return true;
 
-        if(mouseX >= 15 && mouseX < 135 && mouseY >= 28 + 25 && mouseY < 28 + 25 + 143){
+        if(mouseX >= this.left + 15 && mouseX < this.left + 135 && mouseY >= this.top + 28 + 25 && mouseY < this.top + 28 + 25 + 143){
             this.scroll(-(int)scroll);
             return true;
         }

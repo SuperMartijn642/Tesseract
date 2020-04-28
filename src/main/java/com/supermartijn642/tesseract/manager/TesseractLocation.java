@@ -7,7 +7,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.common.DimensionManager;
 
 import java.util.Objects;
@@ -41,7 +40,7 @@ public class TesseractLocation {
         DimensionType type = DimensionType.getById(this.dimension);
         if(type == null || TesseractChannelManager.minecraftServer == null)
             return null;
-        return DimensionManager.getWorld(TesseractChannelManager.minecraftServer, type,false,true);
+        return DimensionManager.getWorld(TesseractChannelManager.minecraftServer, type, false, true);
     }
 
     public BlockPos getPos(){

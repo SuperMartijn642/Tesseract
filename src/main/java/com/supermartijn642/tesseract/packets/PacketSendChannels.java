@@ -51,7 +51,10 @@ public class PacketSendChannels {
             int id;
             try{
                 id = Integer.parseInt(key);
-            }catch(Exception e){e.printStackTrace(); continue;}
+            }catch(Exception e){
+                e.printStackTrace();
+                continue;
+            }
             channels.add(new Channel(id, type, channelTag.getCompound(key)));
         }
 
@@ -59,6 +62,7 @@ public class PacketSendChannels {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
+        ctx.get().setPacketHandled(true);
         TesseractChannelManager.CLIENT.clear(this.type);
         this.channels.forEach(TesseractChannelManager.CLIENT::addChannel);
         TesseractChannelManager.CLIENT.sortChannels(ClientProxy.getPlayer(), this.type);

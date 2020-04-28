@@ -32,6 +32,7 @@ public class PacketRemoveChannel {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
+        ctx.get().setPacketHandled(true);
         TesseractChannelManager.SERVER.removeChannel(this.type, this.id);
         Tesseract.CHANNEL.send(PacketDistributor.ALL.noArg(), new PacketSendChannels(this.type));
     }
