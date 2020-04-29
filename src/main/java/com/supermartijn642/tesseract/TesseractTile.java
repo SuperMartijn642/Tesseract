@@ -134,7 +134,6 @@ public class TesseractTile extends TileEntity {
     public void setChannel(EnumChannelType type, int channel){
         if(channel == this.channels.get(type))
             return;
-        this.hasChanged = true;
         Channel oldChannel = this.getChannel(type);
         this.channels.put(type, channel);
         if(oldChannel != null)
@@ -142,8 +141,10 @@ public class TesseractTile extends TileEntity {
         Channel newChannel = this.getChannel(type);
         if(newChannel != null)
             newChannel.addTesseract(this);
+        this.hasChanged = true;
         BlockState state = this.world.getBlockState(this.pos);
         this.world.notifyBlockUpdate(this.pos, state, state, 2);
+        this.markDirty();
     }
 
     public boolean renderOn(){
@@ -260,8 +261,13 @@ public class TesseractTile extends TileEntity {
         if(this.channels.get(type) < 0 || this.world == null)
             return null;
         Channel channel = (this.world.isRemote ? TesseractChannelManager.CLIENT : TesseractChannelManager.SERVER).getChannelById(type, this.channels.get(type));
-        if(channel == null && !this.world.isRemote)
+        if(channel == null && !this.world.isRemote){
             this.channels.put(type, -1);
+            this.hasChanged = true;
+            BlockState state = this.world.getBlockState(this.pos);
+            this.world.notifyBlockUpdate(this.pos, state, state, 2);
+            this.markDirty();
+        }
         return channel;
     }
 }
