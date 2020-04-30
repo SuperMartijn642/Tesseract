@@ -323,7 +323,6 @@ public class TesseractScreen extends Screen {
                 this.textField.setText("");
         }
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        this.textField.mouseClicked(mouseX, mouseY, mouseButton);
         return false;
     }
 
