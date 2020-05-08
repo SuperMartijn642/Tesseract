@@ -16,6 +16,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -92,7 +93,7 @@ public class TesseractChannelManager {
         if(e.getWorld().isRemote() || e.getWorld().getDimension().getType() != DimensionType.OVERWORLD)
             return;
         for(ChannelList list : SERVER.types.values()){
-            File folder = new File(directory, list.type.name().toLowerCase());
+            File folder = new File(directory, list.type.name().toLowerCase(Locale.ENGLISH));
             if(!folder.exists())
                 folder.mkdirs();
             list.write(folder);
@@ -108,7 +109,7 @@ public class TesseractChannelManager {
         for(EnumChannelType type : EnumChannelType.values()){
             ChannelList list = new ChannelList(type);
             SERVER.types.put(type, list);
-            File folder = new File(directory, type.name().toLowerCase());
+            File folder = new File(directory, type.name().toLowerCase(Locale.ENGLISH));
             list.read(folder);
         }
     }

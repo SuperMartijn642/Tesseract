@@ -26,6 +26,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
@@ -159,7 +160,7 @@ public class TesseractScreen extends Screen {
         Minecraft.getInstance().getTextureManager().bindTexture(BACKGROUND);
         this.drawTexturedModalRect(0, 0, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
-        String s = new TranslationTextComponent("gui.tesseract." + type.name().toLowerCase()).getFormattedText();
+        String s = new TranslationTextComponent("gui.tesseract." + type.name().toLowerCase(Locale.ENGLISH)).getFormattedText();
         this.font.drawStringWithShadow(s, (BACKGROUND_WIDTH - this.font.getStringWidth(s)) / 2f, 28 + 10, 0xffffffff);
     }
 
