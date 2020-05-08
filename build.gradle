@@ -96,6 +96,9 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
     }
+//    flatDir {
+//        dirs "libs"
+//    }
 }
 
 dependencies {
@@ -121,6 +124,9 @@ dependencies {
     // For more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+//    compileOnly fg.deobf(fileTree(dir: 'libs', include: ['*.jar']))
+//    runtimeOnly fg.deobf(fileTree(dir: 'libs', include: ['*.jar']))
 
     // compile against the JEI API but do not include it at runtime
     compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2:api")
