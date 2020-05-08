@@ -27,6 +27,7 @@ import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
@@ -138,7 +139,7 @@ public class TesseractScreen extends GuiScreen {
         Minecraft.getMinecraft().getTextureManager().bindTexture(BACKGROUND);
         this.drawTexturedModalRect(0, 0, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
-        String s = I18n.format("gui.tesseract." + type.name().toLowerCase());
+        String s = I18n.format("gui.tesseract." + type.name().toLowerCase(Locale.ENGLISH));
         this.fontRenderer.drawStringWithShadow(s, (BACKGROUND_WIDTH - this.fontRenderer.getStringWidth(s)) / 2f, 28 + 10, 0xffffffff);
     }
 
