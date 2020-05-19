@@ -2,7 +2,6 @@ package com.supermartijn642.tesseract.packets;
 
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractTile;
-import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;

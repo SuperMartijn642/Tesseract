@@ -1,7 +1,6 @@
 package com.supermartijn642.tesseract.packets;
 
 import com.supermartijn642.tesseract.EnumChannelType;
-import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -53,7 +52,7 @@ public class PacketAddChannel implements IMessage, IMessageHandler<PacketAddChan
     @Override
     public IMessage onMessage(PacketAddChannel message, MessageContext ctx){
         ctx.getServerHandler().player.getServerWorld().addScheduledTask(() ->
-            TesseractChannelManager.SERVER.addChannel(message.type,ctx.getServerHandler().player.getUniqueID(),message.isPrivate,message.name)
+            TesseractChannelManager.SERVER.addChannel(message.type, ctx.getServerHandler().player.getUniqueID(), message.isPrivate, message.name)
         );
         return null;
     }

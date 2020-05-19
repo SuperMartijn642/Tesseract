@@ -29,7 +29,7 @@ public class TesseractLocation {
 
     public TesseractLocation(NBTTagCompound compound){
         this.dimension = compound.getInteger("dim");
-        this.pos = new BlockPos(compound.getInteger("posx"),compound.getInteger("posy"),compound.getInteger("posz"));
+        this.pos = new BlockPos(compound.getInteger("posx"), compound.getInteger("posy"), compound.getInteger("posz"));
     }
 
     public int getDimension(){
@@ -55,10 +55,10 @@ public class TesseractLocation {
 
     public NBTTagCompound write(){
         NBTTagCompound compound = new NBTTagCompound();
-        compound.setInteger("dim",this.dimension);
-        compound.setInteger("posx",this.pos.getX());
-        compound.setInteger("posy",this.pos.getY());
-        compound.setInteger("posz",this.pos.getZ());
+        compound.setInteger("dim", this.dimension);
+        compound.setInteger("posx", this.pos.getX());
+        compound.setInteger("posy", this.pos.getY());
+        compound.setInteger("posz", this.pos.getZ());
         return compound;
     }
 

@@ -35,7 +35,10 @@ public class PacketSendChannels implements IMessage, IMessageHandler<PacketSendC
         NBTTagCompound compound;
         try{
             compound = ByteBufUtils.readTag(buf);
-        }catch(Exception e){e.printStackTrace();return;}
+        }catch(Exception e){
+            e.printStackTrace();
+            return;
+        }
         if(compound == null || !compound.hasKey("type") || !compound.hasKey("channels"))
             return;
         this.type = EnumChannelType.valueOf(compound.getString("type"));
@@ -44,8 +47,11 @@ public class PacketSendChannels implements IMessage, IMessageHandler<PacketSendC
             int id;
             try{
                 id = Integer.parseInt(key);
-            }catch(Exception e){e.printStackTrace();continue;}
-            this.channels.add(new Channel(id,this.type,channels.getCompoundTag(key)));
+            }catch(Exception e){
+                e.printStackTrace();
+                continue;
+            }
+            this.channels.add(new Channel(id, this.type, channels.getCompoundTag(key)));
         }
     }
 
@@ -56,7 +62,7 @@ public class PacketSendChannels implements IMessage, IMessageHandler<PacketSendC
         NBTTagCompound channels = new NBTTagCompound();
         this.channels.forEach(channel -> channels.setTag(Integer.toString(channel.id), channel.write()));
         compound.setTag("channels", channels);
-        ByteBufUtils.writeTag(buf,compound);
+        ByteBufUtils.writeTag(buf, compound);
     }
 
     @Override

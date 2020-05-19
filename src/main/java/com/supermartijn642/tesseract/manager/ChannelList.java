@@ -81,7 +81,7 @@ public class ChannelList {
     }
 
     public List<Channel> getChannelsCreatedBy(UUID creator){
-        return this.channelsByCreator.getOrDefault(creator,Collections.emptyList());
+        return this.channelsByCreator.getOrDefault(creator, Collections.emptyList());
     }
 
     public void write(File folder){

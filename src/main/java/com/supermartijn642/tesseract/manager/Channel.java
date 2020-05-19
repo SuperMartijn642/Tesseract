@@ -64,7 +64,7 @@ public class Channel {
         NBTTagCompound tesseractCompound = new NBTTagCompound();
         for(int a = 0; a < this.tesseracts.size(); a++)
             tesseractCompound.setTag(Integer.toString(a), this.tesseracts.get(a).write());
-        compound.setTag("tesseracts",tesseractCompound);
+        compound.setTag("tesseracts", tesseractCompound);
         return compound;
     }
 
@@ -100,6 +100,6 @@ public class Channel {
 
     public void delete(){
         for(TesseractLocation location : this.tesseracts)
-            location.getTesseract().setChannel(this.type,-1);
+            location.getTesseract().setChannel(this.type, -1);
     }
 }

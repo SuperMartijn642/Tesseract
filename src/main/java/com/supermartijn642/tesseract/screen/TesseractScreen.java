@@ -311,6 +311,6 @@ public class TesseractScreen extends GuiScreen {
         int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1 - this.top;
 
         if(mouseX >= 15 && mouseX < 135 && mouseY >= 28 + 25 && mouseY < 28 + 25 + 143)
-            this.scroll(- Mouse.getEventDWheel() / 120);
+            this.scroll(-Mouse.getEventDWheel() / 120);
     }
 }
