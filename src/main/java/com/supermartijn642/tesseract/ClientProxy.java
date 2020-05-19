@@ -17,7 +17,7 @@ import net.minecraftforge.fml.relauncher.Side;
  * Created 3/19/2020 by SuperMartijn642
  */
 @Mod.EventBusSubscriber(Side.CLIENT)
-public class ClientProxy extends CommonProxy {
+public class ClientProxy {
 
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent e){
