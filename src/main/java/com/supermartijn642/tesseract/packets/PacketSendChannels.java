@@ -63,8 +63,10 @@ public class PacketSendChannels {
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         ctx.get().setPacketHandled(true);
-        TesseractChannelManager.CLIENT.clear(this.type);
-        this.channels.forEach(TesseractChannelManager.CLIENT::addChannel);
-        TesseractChannelManager.CLIENT.sortChannels(ClientProxy.getPlayer(), this.type);
+        ctx.get().enqueueWork(() -> {
+            TesseractChannelManager.CLIENT.clear(this.type);
+            this.channels.forEach(TesseractChannelManager.CLIENT::addChannel);
+            TesseractChannelManager.CLIENT.sortChannels(ClientProxy.getPlayer(), this.type);
+        });
     }
 }

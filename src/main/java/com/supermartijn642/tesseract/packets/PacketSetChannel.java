@@ -44,8 +44,10 @@ public class PacketSetChannel {
         World world = player.world;
         if(world == null)
             return;
-        TileEntity tile = world.getTileEntity(this.pos);
-        if(tile instanceof TesseractTile)
-            ((TesseractTile)tile).setChannel(this.type, this.id);
+        ctx.get().enqueueWork(() -> {
+            TileEntity tile = world.getTileEntity(this.pos);
+            if(tile instanceof TesseractTile)
+                ((TesseractTile)tile).setChannel(this.type, this.id);
+        });
     }
 }
