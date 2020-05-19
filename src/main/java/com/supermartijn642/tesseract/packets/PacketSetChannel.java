@@ -56,9 +56,11 @@ public class PacketSetChannel implements IMessage, IMessageHandler<PacketSetChan
         World world = ctx.getServerHandler().player.world;
         if(world == null)
             return null;
-        TileEntity tile = world.getTileEntity(message.pos);
-        if(tile instanceof TesseractTile)
-            ((TesseractTile)tile).setChannel(message.type, message.id);
+        ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
+            TileEntity tile = world.getTileEntity(message.pos);
+            if(tile instanceof TesseractTile)
+                ((TesseractTile)tile).setChannel(message.type, message.id);
+        });
         return null;
     }
 }

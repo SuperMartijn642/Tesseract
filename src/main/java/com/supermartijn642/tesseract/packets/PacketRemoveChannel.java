@@ -44,8 +44,10 @@ public class PacketRemoveChannel implements IMessage, IMessageHandler<PacketRemo
 
     @Override
     public IMessage onMessage(PacketRemoveChannel message, MessageContext ctx){
-        TesseractChannelManager.SERVER.removeChannel(message.type, message.id);
-        Tesseract.channel.sendToAll(new PacketSendChannels(message.type));
+        ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
+            TesseractChannelManager.SERVER.removeChannel(message.type, message.id);
+            Tesseract.channel.sendToAll(new PacketSendChannels(message.type));
+        });
         return null;
     }
 }

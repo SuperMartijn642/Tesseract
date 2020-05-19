@@ -52,7 +52,9 @@ public class PacketAddChannel implements IMessage, IMessageHandler<PacketAddChan
 
     @Override
     public IMessage onMessage(PacketAddChannel message, MessageContext ctx){
-        TesseractChannelManager.SERVER.addChannel(message.type,ctx.getServerHandler().player.getUniqueID(),message.isPrivate,message.name);
+        ctx.getServerHandler().player.getServerWorld().addScheduledTask(() ->
+            TesseractChannelManager.SERVER.addChannel(message.type,ctx.getServerHandler().player.getUniqueID(),message.isPrivate,message.name)
+        );
         return null;
     }
 }

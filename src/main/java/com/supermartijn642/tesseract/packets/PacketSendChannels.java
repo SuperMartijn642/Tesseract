@@ -61,9 +61,11 @@ public class PacketSendChannels implements IMessage, IMessageHandler<PacketSendC
 
     @Override
     public IMessage onMessage(PacketSendChannels message, MessageContext ctx){
-        TesseractChannelManager.CLIENT.clear(message.type);
-        message.channels.forEach(TesseractChannelManager.CLIENT::addChannel);
-        TesseractChannelManager.CLIENT.sortChannels(ClientProxy.getPlayer(), message.type);
+        ClientProxy.scheduleTask(() -> {
+            TesseractChannelManager.CLIENT.clear(message.type);
+            message.channels.forEach(TesseractChannelManager.CLIENT::addChannel);
+            TesseractChannelManager.CLIENT.sortChannels(ClientProxy.getPlayer(), message.type);
+        });
         return null;
     }
 }

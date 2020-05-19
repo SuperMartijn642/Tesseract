@@ -1,5 +1,6 @@
 package com.supermartijn642.tesseract;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.supermartijn642.tesseract.screen.TesseractScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -31,5 +32,9 @@ public class ClientProxy {
 
     public static EntityPlayer getPlayer(){
         return Minecraft.getMinecraft().player;
+    }
+
+    public static ListenableFuture<Object> scheduleTask(Runnable task){
+        return Minecraft.getMinecraft().addScheduledTask(task);
     }
 }
