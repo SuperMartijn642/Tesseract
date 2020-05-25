@@ -100,6 +100,7 @@ public class Channel {
 
     public void delete(){
         for(TesseractLocation location : this.tesseracts)
-            location.getTesseract().setChannel(this.type, -1);
+            if(location.isValid())
+                location.getTesseract().setChannel(this.type, -1);
     }
 }
