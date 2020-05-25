@@ -32,7 +32,7 @@ public class CombinedFluidHandler implements IFluidHandler {
                     tanks += Math.max(handler.getTanks(), 0);
             }
         }
-        return 0;
+        return tanks;
     }
 
     @Nonnull
