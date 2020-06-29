@@ -57,12 +57,12 @@ public class CombinedFluidHandler implements IFluidHandler {
             return 0;
         FluidStack fluid = resource.copy();
         int amount = 0;
-        for(TesseractLocation location : this.tesseracts){
+        loop: for(TesseractLocation location : this.tesseracts){
             if(location.isValid() && location.getTesseract() != this.requester && location.canReceive(EnumChannelType.FLUID)){
                 for(IFluidHandler handler : location.getTesseract().getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
                     amount += handler.fill(fluid, doFill);
                     if(amount >= resource.amount)
-                        break;
+                        break loop;
                     fluid.amount = resource.amount - amount;
                 }
             }
@@ -76,7 +76,7 @@ public class CombinedFluidHandler implements IFluidHandler {
         if(!this.requester.canReceive(EnumChannelType.FLUID) || resource == null || resource.amount <= 0)
             return null;
         FluidStack fluid = resource.copy();
-        for(TesseractLocation location : this.tesseracts){
+        loop: for(TesseractLocation location : this.tesseracts){
             if(location.isValid() && location.getTesseract() != this.requester && location.canSend(EnumChannelType.FLUID)){
                 for(IFluidHandler handler : location.getTesseract().getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
                     FluidStack stack = handler.drain(fluid.copy(), false);
@@ -86,7 +86,7 @@ public class CombinedFluidHandler implements IFluidHandler {
                         fluid.amount -= stack.amount;
                     }
                     if(fluid.amount <= 0)
-                        break;
+                        break loop;
                 }
             }
         }
@@ -102,7 +102,7 @@ public class CombinedFluidHandler implements IFluidHandler {
         if(!this.requester.canReceive(EnumChannelType.FLUID) || maxDrain <= 0)
             return null;
         FluidStack fluid = null;
-        for(TesseractLocation location : this.tesseracts){
+        loop: for(TesseractLocation location : this.tesseracts){
             if(location.isValid() && location.getTesseract() != this.requester && location.canSend(EnumChannelType.FLUID)){
                 for(IFluidHandler handler : location.getTesseract().getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
                     if(fluid == null){
@@ -121,7 +121,7 @@ public class CombinedFluidHandler implements IFluidHandler {
                             fluid.amount -= stack.amount;
                         }
                         if(fluid.amount <= 0)
-                            break;
+                            break loop;
                     }
                 }
             }

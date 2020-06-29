@@ -27,7 +27,7 @@ public class CombinedItemHandler implements IItemHandler {
     public int getSlots(){
         int slots = 0;
         for(TesseractLocation location : this.tesseracts){
-            if(location.isValid()){
+            if(location.isValid() && location.getTesseract() != this.requester){
                 for(IItemHandler handler : location.getTesseract().getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY))
                     slots += handler.getSlots();
             }
@@ -55,7 +55,7 @@ public class CombinedItemHandler implements IItemHandler {
     @Nonnull
     @Override
     public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate){
-        if(!this.requester.canSend(EnumChannelType.ITEMS))
+        if(!this.requester.canSend(EnumChannelType.ITEMS) || stack.isEmpty())
             return stack;
         int slots = 0;
         for(TesseractLocation location : this.tesseracts){
@@ -74,7 +74,7 @@ public class CombinedItemHandler implements IItemHandler {
     @Nonnull
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate){
-        if(!this.requester.canReceive(EnumChannelType.ITEMS))
+        if(!this.requester.canReceive(EnumChannelType.ITEMS) || amount <= 0)
             return ItemStack.EMPTY;
         int slots = 0;
         for(TesseractLocation location : this.tesseracts){
@@ -97,7 +97,7 @@ public class CombinedItemHandler implements IItemHandler {
             if(location.isValid() && location.getTesseract() != this.requester){
                 for(IItemHandler handler : location.getTesseract().getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
                     if(slot - slots < handler.getSlots())
-                        return handler.getSlotLimit(slot);
+                        return handler.getSlotLimit(slot - slots);
                     else
                         slots += handler.getSlots();
                 }
@@ -106,4 +106,19 @@ public class CombinedItemHandler implements IItemHandler {
         return 0;
     }
 
+    @Override
+    public boolean isItemValid(int slot, @Nonnull ItemStack stack){
+        int slots = 0;
+        for(TesseractLocation location : this.tesseracts){
+            if(location.isValid() && location.getTesseract() != this.requester){
+                for(IItemHandler handler : location.getTesseract().getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+                    if(slot - slots < handler.getSlots())
+                        return handler.isItemValid(slot - slots, stack);
+                    else
+                        slots += handler.getSlots();
+                }
+            }
+        }
+        return false;
+    }
 }
