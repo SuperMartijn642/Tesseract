@@ -1,5 +1,6 @@
 package com.supermartijn642.tesseract.screen;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.supermartijn642.tesseract.EnumChannelType;
@@ -23,6 +24,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
@@ -68,49 +71,49 @@ public class TesseractScreen extends Screen {
     }
 
     @Override
-    public void init(){
-        this.left = (this.width - BACKGROUND_WIDTH) / 2;
-        this.top = (this.height - BACKGROUND_HEIGHT) / 2;
+    public void func_231160_c_(){
+        this.left = (this.field_230708_k_ - BACKGROUND_WIDTH) / 2;
+        this.top = (this.field_230709_l_ - BACKGROUND_HEIGHT) / 2;
 
         // set button
-        boolean enabled = this.setButton != null && this.setButton.active;
-        this.setButton = this.addButton(new Button(this.left + 140, this.top + 28 + 25, 80, 20, new TranslationTextComponent("gui.tesseract.set").getFormattedText(), button -> {
+        boolean enabled = this.setButton != null && this.setButton.field_230693_o_;
+        this.setButton = this.func_230480_a_(new Button(this.left + 140, this.top + 28 + 25, 80, 20, new TranslationTextComponent("gui.tesseract.set"), button -> {
             Tesseract.CHANNEL.sendToServer(new PacketSetChannel(type, this.selectedChannel, this.pos));
             this.selectedChannel = -1;
-            this.setButton.active = false;
-            this.removeButton.active = false;
+            this.setButton.field_230693_o_ = false;
+            this.removeButton.field_230693_o_ = false;
         }));
-        this.setButton.active = enabled;
+        this.setButton.field_230693_o_ = enabled;
 
         // remove button
-        enabled = this.removeButton != null && this.removeButton.active;
-        this.removeButton = this.addButton(new Button(this.left + 140, this.top + 28 + 50, 80, 20, new TranslationTextComponent("gui.tesseract.remove").getFormattedText(), buttons -> {
+        enabled = this.removeButton != null && this.removeButton.field_230693_o_;
+        this.removeButton = this.func_230480_a_(new Button(this.left + 140, this.top + 28 + 50, 80, 20, new TranslationTextComponent("gui.tesseract.remove"), buttons -> {
             Tesseract.CHANNEL.sendToServer(new PacketRemoveChannel(type, this.selectedChannel));
             this.selectedChannel = -1;
-            this.setButton.active = false;
-            this.removeButton.active = false;
+            this.setButton.field_230693_o_ = false;
+            this.removeButton.field_230693_o_ = false;
         }));
-        this.removeButton.active = enabled;
-
-        // add button
-        enabled = this.addButton != null && this.addButton.active;
-        this.addButton = this.addButton(new Button(this.left + 165, this.top + 28 + 173, 55, 20, new TranslationTextComponent("gui.tesseract.add").getFormattedText(), button -> {
-            Tesseract.CHANNEL.sendToServer(new PacketAddChannel(type, this.lastText.trim(), this.privateButton.isLocked()));
-            this.textField.setText("");
-        }));
-        this.addButton.active = enabled;
+        this.removeButton.field_230693_o_ = enabled;
 
         // private button
         enabled = this.privateButton != null && this.privateButton.isLocked();
-        this.privateButton = this.addButton(new LockIconButton(this.left + 140, this.top + 28 + 173, button ->
+        this.privateButton = this.func_230480_a_(new LockIconButton(this.left + 140, this.top + 28 + 173, button ->
             this.privateButton.setLocked(!this.privateButton.isLocked())
         ));
         this.privateButton.setLocked(enabled);
 
+        // add button
+        enabled = this.addButton != null && this.addButton.field_230693_o_;
+        this.addButton = this.func_230480_a_(new Button(this.left + 165, this.top + 28 + 173, 55, 20, new TranslationTextComponent("gui.tesseract.add"), button -> {
+            Tesseract.CHANNEL.sendToServer(new PacketAddChannel(type, this.lastText.trim(), this.privateButton.isLocked()));
+            this.textField.setText("");
+        }));
+        this.addButton.field_230693_o_ = enabled;
+
         // text field
-        enabled = this.textField != null && this.textField.isFocused();
+        enabled = this.textField != null && this.textField.func_230999_j_();
         String text = this.textField == null ? "" : this.textField.getText();
-        this.children.add(this.textField = new TextFieldWidget(this.font, this.left + 15, this.top + 28 + 173, 120, 20, ""));
+        this.field_230705_e_.add(this.textField = new TextFieldWidget(this.field_230712_o_, this.left + 15, this.top + 28 + 173, 120, 20, new StringTextComponent("")));
         this.textField.setFocused2(enabled);
         this.textField.setText(text);
         this.textField.setCanLoseFocus(true);
@@ -118,13 +121,13 @@ public class TesseractScreen extends Screen {
     }
 
     @Override
-    public void tick(){
+    public void func_231023_e_(){
         this.getTileOrClose();
         this.textField.tick();
         if(!this.lastText.equals(this.textField.getText())){
             this.lastText = this.textField.getText();
             if(this.lastText.trim().isEmpty())
-                this.addButton.active = false;
+                this.addButton.field_230693_o_ = false;
             else{
                 List<Channel> channels = TesseractChannelManager.CLIENT.getChannelsCreatedBy(type, Minecraft.getInstance().player.getUniqueID());
                 boolean enabled = true;
@@ -134,35 +137,35 @@ public class TesseractScreen extends Screen {
                         break;
                     }
                 }
-                this.addButton.active = enabled;
+                this.addButton.field_230693_o_ = enabled;
             }
         }
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks){
-        this.renderBackground();
+    public void func_230430_a_(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks){
+        this.func_230446_a_(matrixStack);
 
         RenderSystem.pushMatrix();
         RenderSystem.translated(this.left, this.top, 0);
         RenderSystem.color4f(1, 1, 1, 1);
 
-        this.drawBackground();
+        this.drawBackground(matrixStack);
         this.drawTabs();
-        this.drawChannels();
+        this.drawChannels(matrixStack);
 
         RenderSystem.popMatrix();
 
-        super.render(mouseX, mouseY, partialTicks);
-        this.textField.render(mouseX, mouseY, partialTicks);
+        super.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
+        this.textField.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
     }
 
-    private void drawBackground(){
+    private void drawBackground(MatrixStack matrixStack){
         Minecraft.getInstance().getTextureManager().bindTexture(BACKGROUND);
         this.drawTexturedModalRect(0, 0, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
-        String s = new TranslationTextComponent("gui.tesseract." + type.name().toLowerCase(Locale.ENGLISH)).getFormattedText();
-        this.font.drawStringWithShadow(s, (BACKGROUND_WIDTH - this.font.getStringWidth(s)) / 2f, 28 + 10, 0xffffffff);
+        TextComponent s = new TranslationTextComponent("gui.tesseract." + type.name().toLowerCase(Locale.ENGLISH));
+        this.field_230712_o_.func_238407_a_(matrixStack, s, (BACKGROUND_WIDTH - this.field_230712_o_.getStringWidth(s.func_230532_e_().getString())) / 2f, 28 + 10, 0xffffffff);
     }
 
     private void drawTabs(){
@@ -185,7 +188,7 @@ public class TesseractScreen extends Screen {
         this.drawTexture(icon, iconX, iconY, width, height);
     }
 
-    private void drawChannels(){
+    private void drawChannels(MatrixStack matrixStack){
         TesseractTile tile = this.getTileOrClose();
         if(tile == null)
             return;
@@ -206,16 +209,16 @@ public class TesseractScreen extends Screen {
                 this.drawColoredRect(15, 28 + 25 + i * channelHeight, 1, channelHeight, 0xffffffff);
                 this.drawColoredRect(134, 28 + 25 + i * channelHeight, 1, channelHeight, 0xffffffff);
             }
-            this.font.drawString(channel.name, 15 + 3, 28 + 25 + 3 + i * channelHeight, 0xffffffff);
+            this.field_230712_o_.func_238422_b_(matrixStack, new StringTextComponent(channel.name), 15 + 3, 28 + 25 + 3 + i * channelHeight, 0xffffffff);
             if(channel.creator.equals(Minecraft.getInstance().player.getUniqueID())){
-                int width = this.font.getStringWidth(channel.name);
+                int width = this.field_230712_o_.getStringWidth(channel.name);
                 this.drawTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF, 15 + 6 + width, 28 + 25 + 2 + i * channelHeight, 9, 9);
             }
         }
     }
 
     @Override
-    public boolean isPauseScreen(){
+    public boolean func_231177_au__(){
         return false;
     }
 
@@ -236,10 +239,10 @@ public class TesseractScreen extends Screen {
         this.scrollOffset = 0;
         this.lastText = "";
         this.textField.setText("");
-        this.addButton.active = false;
+        this.addButton.field_230693_o_ = false;
         this.selectedChannel = -1;
-        this.setButton.active = false;
-        this.removeButton.active = false;
+        this.setButton.field_230693_o_ = false;
+        this.removeButton.field_230693_o_ = false;
     }
 
     private void drawTexture(ResourceLocation texture, double x, double y, double width, double height){
@@ -293,7 +296,7 @@ public class TesseractScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton){
+    public boolean func_231044_a_(double mouseX, double mouseY, int mouseButton){
         double screenX = mouseX - this.left, screenY = mouseY - this.top;
         if(mouseButton == 0){
             if(screenY >= 2 && screenY < 2 + 26){ // tabs
@@ -310,30 +313,30 @@ public class TesseractScreen extends Screen {
                     TesseractTile tile = this.getTileOrClose();
                     if(tile != null){
                         this.selectedChannel = channels.get(index + this.scrollOffset).id;
-                        this.setButton.active = tile.getChannelId(type) != this.selectedChannel;
-                        this.removeButton.active = channels.get(index + this.scrollOffset).creator.equals(Minecraft.getInstance().player.getUniqueID());
+                        this.setButton.field_230693_o_ = tile.getChannelId(type) != this.selectedChannel;
+                        this.removeButton.field_230693_o_ = channels.get(index + this.scrollOffset).creator.equals(Minecraft.getInstance().player.getUniqueID());
                     }
                 }else{
                     this.selectedChannel = -1;
-                    this.setButton.active = false;
-                    this.removeButton.active = false;
+                    this.setButton.field_230693_o_ = false;
+                    this.removeButton.field_230693_o_ = false;
                 }
             }
         }else if(mouseButton == 1){ // text field
-            if(mouseX >= this.textField.x && mouseX < this.textField.x + this.textField.getWidth()
-                && mouseY >= this.textField.y && mouseY < this.textField.y + this.textField.getHeight())
+            if(mouseX >= this.textField.field_230690_l_ && mouseX < this.textField.field_230690_l_ + this.textField.func_230998_h_()
+                && mouseY >= this.textField.field_230691_m_ && mouseY < this.textField.field_230691_m_ + this.textField.getHeight())
                 this.textField.setText("");
         }
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+        super.func_231044_a_(mouseX, mouseY, mouseButton);
         return false;
     }
 
     @Override
-    public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_){
-        if(super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_))
+    public boolean func_231046_a_(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_){
+        if(super.func_231046_a_(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_))
             return true;
         InputMappings.Input mouseKey = InputMappings.getInputByCode(p_keyPressed_1_, p_keyPressed_2_);
-        if(!this.textField.isFocused() && (p_keyPressed_1_ == 256 || Minecraft.getInstance().gameSettings.keyBindInventory.isActiveAndMatches(mouseKey))){
+        if(!this.textField.func_230999_j_() && (p_keyPressed_1_ == 256 || Minecraft.getInstance().gameSettings.keyBindInventory.isActiveAndMatches(mouseKey))){
             Minecraft.getInstance().player.closeScreen();
             return true;
         }
@@ -348,8 +351,8 @@ public class TesseractScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double scroll){
-        if(super.mouseScrolled(mouseX, mouseY, scroll))
+    public boolean func_231043_a_(double mouseX, double mouseY, double scroll){
+        if(super.func_231043_a_(mouseX, mouseY, scroll))
             return true;
 
         if(mouseX >= this.left + 15 && mouseX < this.left + 135 && mouseY >= this.top + 28 + 25 && mouseY < this.top + 28 + 25 + 143){

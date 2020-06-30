@@ -6,8 +6,9 @@ import com.supermartijn642.tesseract.packets.PacketSendChannels;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.FolderName;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -90,7 +91,7 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onSave(WorldEvent.Save e){
-        if(e.getWorld().isRemote() || e.getWorld().getDimension().getType() != DimensionType.OVERWORLD)
+        if(e.getWorld().isRemote() || e.getWorld().getWorld().func_234923_W_() != World.field_234918_g_)
             return;
         for(ChannelList list : SERVER.types.values()){
             File folder = new File(directory, list.type.name().toLowerCase(Locale.ENGLISH));
@@ -102,10 +103,10 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onLoad(WorldEvent.Load e){
-        if(e.getWorld().isRemote() || e.getWorld().getDimension().getType() != DimensionType.OVERWORLD)
+        if(e.getWorld().isRemote() || e.getWorld().getWorld().func_234923_W_() != World.field_234918_g_)
             return;
         minecraftServer = ((ServerWorld)e.getWorld()).getServer();
-        directory = new File(((ServerWorld)e.getWorld()).getSaveHandler().getWorldDirectory(), "tesseract");
+        directory = new File(((ServerWorld)e.getWorld()).getServer().func_240776_a_(FolderName.field_237253_i_).toFile(), "tesseract");
         for(EnumChannelType type : EnumChannelType.values()){
             ChannelList list = new ChannelList(type);
             SERVER.types.put(type, list);

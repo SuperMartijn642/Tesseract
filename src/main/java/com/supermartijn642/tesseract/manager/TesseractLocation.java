@@ -4,10 +4,11 @@ import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractTile;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.DimensionManager;
 
 import java.util.Objects;
 
@@ -16,31 +17,31 @@ import java.util.Objects;
  */
 public class TesseractLocation {
 
-    private final int dimension;
+    private final String dimension;
     private final BlockPos pos;
 
-    public TesseractLocation(int dimension, BlockPos pos){
+    public TesseractLocation(String dimension, BlockPos pos){
         this.dimension = dimension;
         this.pos = pos;
     }
 
     public TesseractLocation(World world, BlockPos pos){
-        this(world.dimension.getType().getId(), pos);
+        this(world.func_234923_W_().func_240901_a_().toString(), pos);
     }
 
     public TesseractLocation(CompoundNBT compound){
-        this(compound.getInt("dim"), new BlockPos(compound.getInt("posx"), compound.getInt("posy"), compound.getInt("posz")));
+        this(compound.getString("dim"), new BlockPos(compound.getInt("posx"), compound.getInt("posy"), compound.getInt("posz")));
     }
 
-    public int getDimension(){
+    public String getDimension(){
         return this.dimension;
     }
 
     public World getWorld(){
-        DimensionType type = DimensionType.getById(this.dimension);
-        if(type == null || TesseractChannelManager.minecraftServer == null)
+        if(TesseractChannelManager.minecraftServer == null)
             return null;
-        return DimensionManager.getWorld(TesseractChannelManager.minecraftServer, type, false, true);
+        RegistryKey<World> key = RegistryKey.func_240903_a_(Registry.field_239699_ae_, new ResourceLocation(this.dimension));
+        return TesseractChannelManager.minecraftServer.getWorld(key);
     }
 
     public BlockPos getPos(){
@@ -58,7 +59,7 @@ public class TesseractLocation {
 
     public CompoundNBT write(){
         CompoundNBT compound = new CompoundNBT();
-        compound.putInt("dim", this.dimension);
+        compound.putString("dim", this.dimension);
         compound.putInt("posx", this.pos.getX());
         compound.putInt("posy", this.pos.getY());
         compound.putInt("posz", this.pos.getZ());
@@ -83,7 +84,7 @@ public class TesseractLocation {
 
     @Override
     public int hashCode(){
-        int result = dimension;
+        int result = dimension.hashCode();
         result = 31 * result + (pos != null ? pos.hashCode() : 0);
         return result;
     }
