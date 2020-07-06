@@ -29,6 +29,7 @@ import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -50,6 +51,8 @@ public class TesseractScreen extends Screen {
     private static final ResourceLocation SCROLL_BUTTONS = new ResourceLocation("minecraft", "textures/gui/server_selection.png");
     private static final ResourceLocation LOCK_ON = new ResourceLocation("tesseract", "textures/gui/lock_on.png");
     private static final ResourceLocation LOCK_OFF = new ResourceLocation("tesseract", "textures/gui/lock_off.png");
+    private static final ResourceLocation REDSTONE_TAB = new ResourceLocation("tesseract", "textures/gui/redstone_tab.png");
+    private static final ResourceLocation SIDE_TAB = new ResourceLocation("tesseract", "textures/gui/side_tab.png");
 
     private static EnumChannelType type = EnumChannelType.ITEMS;
     private BlockPos pos;
@@ -62,6 +65,9 @@ public class TesseractScreen extends Screen {
     private TextFieldWidget textField;
     private String lastText = "";
 
+    private TransferButton transferButton;
+    private RedstoneButton redstoneButton;
+
     private int selectedChannel = -1;
     private int scrollOffset = 0;
 
@@ -72,6 +78,10 @@ public class TesseractScreen extends Screen {
 
     @Override
     public void func_231160_c_(){
+        TesseractTile tile = this.getTileOrClose();
+        if(tile == null)
+            return;
+
         this.left = (this.field_230708_k_ - BACKGROUND_WIDTH) / 2;
         this.top = (this.field_230709_l_ - BACKGROUND_HEIGHT) / 2;
 
@@ -118,11 +128,18 @@ public class TesseractScreen extends Screen {
         this.textField.setText(text);
         this.textField.setCanLoseFocus(true);
         this.textField.setMaxStringLength(CHANNEL_MAX_CHARACTERS);
+
+        this.transferButton = this.func_230480_a_(new TransferButton(this.left + 236, this.top + 47));
+        this.transferButton.update(tile, type);
+        this.redstoneButton = this.func_230480_a_(new RedstoneButton(this.left + 240, this.top + 198));
+        this.redstoneButton.update(tile);
     }
 
     @Override
     public void func_231023_e_(){
-        this.getTileOrClose();
+        TesseractTile tile = this.getTileOrClose();
+        if(tile == null)
+            return;
         this.textField.tick();
         if(!this.lastText.equals(this.textField.getText())){
             this.lastText = this.textField.getText();
@@ -140,6 +157,8 @@ public class TesseractScreen extends Screen {
                 this.addButton.field_230693_o_ = enabled;
             }
         }
+        this.transferButton.update(tile, type);
+        this.redstoneButton.update(tile);
     }
 
     @Override
@@ -158,6 +177,11 @@ public class TesseractScreen extends Screen {
 
         super.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
         this.textField.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
+
+        if(this.transferButton.func_230449_g_())
+            this.func_238654_b_(matrixStack, Collections.singletonList(this.transferButton.state.translate()), mouseX, mouseY);
+        if(this.redstoneButton.func_230449_g_())
+            this.func_238654_b_(matrixStack, Collections.singletonList(this.redstoneButton.state.translate()), mouseX, mouseY);
     }
 
     private void drawBackground(MatrixStack matrixStack){
@@ -177,6 +201,12 @@ public class TesseractScreen extends Screen {
 
         // fluid
         this.drawTab(EnumChannelType.FLUID, 64, FLUID_ICON);
+
+        // transfer
+        this.drawTexture(SIDE_TAB, 232, 41, 30, 32);
+
+        // redstone
+        this.drawTexture(REDSTONE_TAB, 235, 192, 30, 32);
     }
 
     private void drawTab(EnumChannelType type, int x, ResourceLocation icon){

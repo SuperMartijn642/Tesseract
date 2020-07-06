@@ -124,11 +124,16 @@ public class TesseractTile extends TileEntity {
 
     private final HashMap<EnumChannelType,Integer> channels = new HashMap<>();
     private boolean hasChanged = false;
+    private final HashMap<EnumChannelType,TransferState> transferState = new HashMap<>();
+    private RedstoneState redstoneState = RedstoneState.DISABLED;
+    private boolean redstone;
 
     public TesseractTile(){
         super(Tesseract.tesseract_tile);
-        for(EnumChannelType type : EnumChannelType.values())
+        for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, -1);
+            this.transferState.put(type, TransferState.BOTH);
+        }
     }
 
     public void setChannel(EnumChannelType type, int channel){
@@ -148,7 +153,7 @@ public class TesseractTile extends TileEntity {
     }
 
     public boolean renderOn(){
-        return true;
+        return this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW);
     }
 
     @Nonnull
@@ -191,15 +196,52 @@ public class TesseractTile extends TileEntity {
     }
 
     public boolean canSend(EnumChannelType type){
-        return true;
+        return this.transferState.get(type).canSend() &&
+            this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW);
     }
 
     public boolean canReceive(EnumChannelType type){
-        return true;
+        return this.transferState.get(type).canReceive() &&
+            this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW);
     }
 
     public int getChannelId(EnumChannelType type){
         return this.channels.get(type);
+    }
+
+    public TransferState getTransferState(EnumChannelType type){
+        return this.transferState.get(type);
+    }
+
+    public void cycleTransferState(EnumChannelType type){
+        TransferState transferState = this.transferState.get(type);
+        this.transferState.put(type, transferState == TransferState.BOTH ? TransferState.SEND : transferState == TransferState.SEND ? TransferState.RECEIVE : TransferState.BOTH);
+        this.hasChanged = true;
+        BlockState state = this.world.getBlockState(this.pos);
+        this.world.notifyBlockUpdate(this.pos, state, state, 2);
+        this.markDirty();
+    }
+
+    public RedstoneState getRedstoneState(){
+        return this.redstoneState;
+    }
+
+    public void cycleRedstoneState(){
+        this.redstoneState = this.redstoneState == RedstoneState.DISABLED ? RedstoneState.HIGH : this.redstoneState == RedstoneState.HIGH ? RedstoneState.LOW : RedstoneState.DISABLED;
+        this.hasChanged = true;
+        BlockState state = this.world.getBlockState(this.pos);
+        this.world.notifyBlockUpdate(this.pos, state, state, 2);
+        this.markDirty();
+    }
+
+    public void setPowered(boolean powered){
+        if(this.redstone != powered){
+            this.redstone = powered;
+
+            this.hasChanged = true;
+            BlockState state = this.world.getBlockState(this.pos);
+            this.world.notifyBlockUpdate(this.pos, state, state, 2);
+        }
     }
 
     @Override
@@ -247,14 +289,25 @@ public class TesseractTile extends TileEntity {
 
     public CompoundNBT getData(){
         CompoundNBT compound = new CompoundNBT();
-        for(EnumChannelType type : EnumChannelType.values())
+        for(EnumChannelType type : EnumChannelType.values()){
             compound.putInt(type.name(), this.channels.get(type));
+            compound.putString("transferState" + type.name(), this.transferState.get(type).name());
+        }
+        compound.putString("redstoneState", this.redstoneState.name());
+        compound.putBoolean("powered", this.redstone);
         return compound;
     }
 
     public void handleData(CompoundNBT compound){
-        for(EnumChannelType type : EnumChannelType.values())
+        for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, compound.getInt(type.name()));
+            if(compound.contains("transferState" + type.name()))
+                this.transferState.put(type, TransferState.valueOf(compound.getString("transferState" + type.name())));
+        }
+        if(compound.contains("redstoneState"))
+            this.redstoneState = RedstoneState.valueOf(compound.getString("redstoneState"));
+        if(compound.contains("powered"))
+            this.redstone = compound.getBoolean("powered");
     }
 
     private Channel getChannel(EnumChannelType type){
