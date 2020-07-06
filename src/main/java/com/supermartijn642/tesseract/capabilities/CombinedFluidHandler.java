@@ -90,7 +90,8 @@ public class CombinedFluidHandler implements IFluidHandler {
             return 0;
         FluidStack fluid = resource.copy();
         int amount = 0;
-        loop: for(TesseractLocation location : this.tesseracts){
+        loop:
+        for(TesseractLocation location : this.tesseracts){
             if(location.isValid() && location.getTesseract() != this.requester && location.canReceive(EnumChannelType.FLUID)){
                 for(IFluidHandler handler : location.getTesseract().getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
                     amount += handler.fill(fluid, action);
@@ -109,7 +110,8 @@ public class CombinedFluidHandler implements IFluidHandler {
         if(!this.requester.canReceive(EnumChannelType.FLUID) || resource == null || resource.isEmpty())
             return FluidStack.EMPTY;
         FluidStack fluid = resource.copy();
-        loop: for(TesseractLocation location : this.tesseracts){
+        loop:
+        for(TesseractLocation location : this.tesseracts){
             if(location.isValid() && location.getTesseract() != this.requester && location.canSend(EnumChannelType.FLUID)){
                 for(IFluidHandler handler : location.getTesseract().getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
                     FluidStack stack = handler.drain(fluid.copy(), FluidAction.SIMULATE);
@@ -135,7 +137,8 @@ public class CombinedFluidHandler implements IFluidHandler {
         if(!this.requester.canReceive(EnumChannelType.FLUID) || maxDrain <= 0)
             return FluidStack.EMPTY;
         FluidStack fluid = null;
-        loop: for(TesseractLocation location : this.tesseracts){
+        loop:
+        for(TesseractLocation location : this.tesseracts){
             if(location.isValid() && location.getTesseract() != this.requester && location.canSend(EnumChannelType.FLUID)){
                 for(IFluidHandler handler : location.getTesseract().getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
                     if(fluid == null){

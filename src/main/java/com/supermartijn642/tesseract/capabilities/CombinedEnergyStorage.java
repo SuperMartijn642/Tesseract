@@ -26,7 +26,8 @@ public class CombinedEnergyStorage implements IEnergyStorage {
         if(!this.requester.canSend(EnumChannelType.ENERGY) || maxReceive <= 0)
             return 0;
         int amount = maxReceive;
-        loop: for(TesseractLocation location : this.tesseracts){
+        loop:
+        for(TesseractLocation location : this.tesseracts){
             if(location.isValid() && location.getTesseract() != this.requester && location.canReceive(EnumChannelType.ENERGY)){
                 for(IEnergyStorage storage : location.getTesseract().getSurroundingCapabilities(CapabilityEnergy.ENERGY)){
                     if(!storage.canReceive())
@@ -47,7 +48,8 @@ public class CombinedEnergyStorage implements IEnergyStorage {
         if(!this.requester.canReceive(EnumChannelType.ENERGY) || maxExtract <= 0)
             return 0;
         int amount = maxExtract;
-        loop: for(TesseractLocation location : this.tesseracts){
+        loop:
+        for(TesseractLocation location : this.tesseracts){
             if(location.isValid() && location.getTesseract() != this.requester && location.canSend(EnumChannelType.ENERGY)){
                 for(IEnergyStorage storage : location.getTesseract().getSurroundingCapabilities(CapabilityEnergy.ENERGY)){
                     if(!storage.canExtract())
