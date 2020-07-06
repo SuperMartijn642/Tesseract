@@ -56,4 +56,11 @@ public class BlockTesseract extends Block {
     public boolean canEntitySpawn(BlockState state, IBlockReader worldIn, BlockPos pos, EntityType<?> type){
         return false;
     }
+
+    @Override
+    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving){
+        TileEntity tile = worldIn.getTileEntity(pos);
+        if(tile instanceof TesseractTile)
+            ((TesseractTile)tile).setPowered(worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(pos.up()));
+    }
 }

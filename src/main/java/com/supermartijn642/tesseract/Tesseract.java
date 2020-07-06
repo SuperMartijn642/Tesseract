@@ -1,10 +1,7 @@
 package com.supermartijn642.tesseract;
 
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import com.supermartijn642.tesseract.packets.PacketAddChannel;
-import com.supermartijn642.tesseract.packets.PacketRemoveChannel;
-import com.supermartijn642.tesseract.packets.PacketSendChannels;
-import com.supermartijn642.tesseract.packets.PacketSetChannel;
+import com.supermartijn642.tesseract.packets.*;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -38,6 +35,8 @@ public class Tesseract {
         CHANNEL.registerMessage(1, PacketAddChannel.class, PacketAddChannel::encode, PacketAddChannel::decode, PacketAddChannel::handle);
         CHANNEL.registerMessage(2, PacketRemoveChannel.class, PacketRemoveChannel::encode, PacketRemoveChannel::decode, PacketRemoveChannel::handle);
         CHANNEL.registerMessage(3, PacketSetChannel.class, PacketSetChannel::encode, PacketSetChannel::decode, PacketSetChannel::handle);
+        CHANNEL.registerMessage(4, PacketCycleRedstoneState.class, PacketCycleRedstoneState::encode, PacketCycleRedstoneState::decode, PacketCycleRedstoneState::handle);
+        CHANNEL.registerMessage(5, PacketCycleTransferState.class, PacketCycleTransferState::encode, PacketCycleTransferState::decode, PacketCycleTransferState::handle);
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)

@@ -6,5 +6,11 @@
   "gui.tesseract.energy": "TESSERACT - ENERGIE",
   "gui.tesseract.set": "SELECTEER",
   "gui.tesseract.remove": "VERWIJDER",
-  "gui.tesseract.add": "VOEG TOE"
+  "gui.tesseract.add": "VOEG TOE",
+  "gui.tesseract.transfer.send": "ALLEEN STUREN",
+  "gui.tesseract.transfer.receive": "ALLEEN ONTVANGEN",
+  "gui.tesseract.transfer.both": "STUREN EN ONTVANGEN",
+  "gui.tesseract.redstone.disabled": "UIT",
+  "gui.tesseract.redstone.high": "STERK",
+  "gui.tesseract.redstone.low": "ZWAK"
 }
