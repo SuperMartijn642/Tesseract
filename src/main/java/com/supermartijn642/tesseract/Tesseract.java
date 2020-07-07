@@ -1,10 +1,7 @@
 package com.supermartijn642.tesseract;
 
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import com.supermartijn642.tesseract.packets.PacketAddChannel;
-import com.supermartijn642.tesseract.packets.PacketRemoveChannel;
-import com.supermartijn642.tesseract.packets.PacketSendChannels;
-import com.supermartijn642.tesseract.packets.PacketSetChannel;
+import com.supermartijn642.tesseract.packets.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -43,6 +40,8 @@ public class Tesseract {
         channel.registerMessage(PacketAddChannel.class, PacketAddChannel.class, 1, Side.SERVER);
         channel.registerMessage(PacketRemoveChannel.class, PacketRemoveChannel.class, 2, Side.SERVER);
         channel.registerMessage(PacketSetChannel.class, PacketSetChannel.class, 3, Side.SERVER);
+        channel.registerMessage(PacketCycleRedstoneState.class, PacketCycleRedstoneState.class, 4, Side.SERVER);
+        channel.registerMessage(PacketCycleTransferState.class, PacketCycleTransferState.class, 5, Side.SERVER);
     }
 
     @Mod.EventHandler

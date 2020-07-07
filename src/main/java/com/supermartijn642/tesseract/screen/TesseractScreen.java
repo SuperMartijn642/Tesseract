@@ -26,6 +26,7 @@ import net.minecraft.world.World;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -47,6 +48,8 @@ public class TesseractScreen extends GuiScreen {
     private static final ResourceLocation SCROLL_BUTTONS = new ResourceLocation("minecraft", "textures/gui/server_selection.png");
     private static final ResourceLocation LOCK_ON = new ResourceLocation(Tesseract.MODID, "textures/gui/lock_on.png");
     private static final ResourceLocation LOCK_OFF = new ResourceLocation(Tesseract.MODID, "textures/gui/lock_off.png");
+    private static final ResourceLocation REDSTONE_TAB = new ResourceLocation(Tesseract.MODID, "textures/gui/redstone_tab.png");
+    private static final ResourceLocation SIDE_TAB = new ResourceLocation(Tesseract.MODID, "textures/gui/side_tab.png");
 
     private static EnumChannelType type = EnumChannelType.ITEMS;
     private BlockPos pos;
@@ -59,6 +62,9 @@ public class TesseractScreen extends GuiScreen {
     private GuiTextField textField;
     private String lastText = "";
 
+    private TransferButton transferButton;
+    private RedstoneButton redstoneButton;
+
     private int selectedChannel = -1;
     private int scrollOffset = 0;
 
@@ -68,6 +74,10 @@ public class TesseractScreen extends GuiScreen {
 
     @Override
     public void initGui(){
+        TesseractTile tile = this.getTileOrClose();
+        if(tile == null)
+            return;
+
         this.left = (this.width - BACKGROUND_WIDTH) / 2;
         this.top = (this.height - BACKGROUND_HEIGHT) / 2;
 
@@ -91,11 +101,18 @@ public class TesseractScreen extends GuiScreen {
         this.textField.setText(text);
         this.textField.setCanLoseFocus(true);
         this.textField.setMaxStringLength(CHANNEL_MAX_CHARACTERS);
+
+        this.transferButton = this.addButton(new TransferButton(5, this.left + 236, this.top + 47));
+        this.transferButton.update(tile, type);
+        this.redstoneButton = this.addButton(new RedstoneButton(6, this.left + 240, this.top + 198));
+        this.redstoneButton.update(tile);
     }
 
     @Override
     public void updateScreen(){
-        this.getTileOrClose();
+        TesseractTile tile = this.getTileOrClose();
+        if(tile == null)
+            return;
         this.textField.updateCursorCounter();
         if(!this.lastText.equals(this.textField.getText())){
             this.lastText = this.textField.getText();
@@ -113,6 +130,8 @@ public class TesseractScreen extends GuiScreen {
                 this.addButton.enabled = enabled;
             }
         }
+        this.transferButton.update(tile, type);
+        this.redstoneButton.update(tile);
     }
 
     @Override
@@ -133,6 +152,11 @@ public class TesseractScreen extends GuiScreen {
         for(GuiButton button : this.buttonList)
             button.drawButton(Minecraft.getMinecraft(), mouseX, mouseY, partialTicks);
         this.textField.drawTextBox();
+
+        if(this.transferButton.isMouseOver())
+            this.drawHoveringText(Collections.singletonList(this.transferButton.state.translate().getFormattedText()), mouseX, mouseY);
+        if(this.redstoneButton.isMouseOver())
+            this.drawHoveringText(Collections.singletonList(this.redstoneButton.state.translate().getFormattedText()), mouseX, mouseY);
     }
 
     private void drawBackground(){
@@ -152,6 +176,12 @@ public class TesseractScreen extends GuiScreen {
 
         // fluid
         this.drawTab(EnumChannelType.FLUID, 64, FLUID_ICON);
+
+        // transfer
+        this.drawTexture(SIDE_TAB, 232, 41, 30, 32);
+
+        // redstone
+        this.drawTexture(REDSTONE_TAB, 235, 192, 30, 32);
     }
 
     private void drawTab(EnumChannelType type, int x, ResourceLocation icon){
@@ -300,7 +330,8 @@ public class TesseractScreen extends GuiScreen {
             this.selectedChannel = -1;
             this.setButton.enabled = false;
             this.removeButton.enabled = false;
-        }
+        }else if(button instanceof CycleButton)
+            ((CycleButton)button).onPress();
     }
 
     @Override

@@ -58,4 +58,21 @@ public class BlockTesseract extends Block implements ITileEntityProvider {
     public boolean canEntitySpawn(IBlockState state, Entity entityIn){
         return false;
     }
+
+    @Override
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos){
+        TileEntity tile = worldIn.getTileEntity(pos);
+        if(tile instanceof TesseractTile)
+            ((TesseractTile)tile).setPowered(worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(pos.up()));
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState state){
+        return false;
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state){
+        return false;
+    }
 }

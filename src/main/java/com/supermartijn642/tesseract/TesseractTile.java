@@ -51,6 +51,7 @@ public class TesseractTile extends TileEntity {
             return 0;
         }
     };
+
     private static final IFluidHandler EMPTY_FLUID_HANDLER = new IFluidHandler() {
         public IFluidTankProperties[] getTankProperties(){
             return new IFluidTankProperties[0];
@@ -96,10 +97,15 @@ public class TesseractTile extends TileEntity {
 
     private final HashMap<EnumChannelType,Integer> channels = new HashMap<>();
     private boolean hasChanged = false;
+    private final HashMap<EnumChannelType,TransferState> transferState = new HashMap<>();
+    private RedstoneState redstoneState = RedstoneState.DISABLED;
+    private boolean redstone;
 
     public TesseractTile(){
-        for(EnumChannelType type : EnumChannelType.values())
+        for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, -1);
+            this.transferState.put(type, TransferState.BOTH);
+        }
     }
 
     public void setChannel(EnumChannelType type, int channel){
@@ -119,7 +125,7 @@ public class TesseractTile extends TileEntity {
     }
 
     public boolean renderOn(){
-        return true;
+        return this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW);
     }
 
     @Override
@@ -163,15 +169,52 @@ public class TesseractTile extends TileEntity {
     }
 
     public boolean canSend(EnumChannelType type){
-        return true;
+        return this.transferState.get(type).canSend() &&
+            this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW);
     }
 
     public boolean canReceive(EnumChannelType type){
-        return true;
+        return this.transferState.get(type).canReceive() &&
+            this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW);
     }
 
     public int getChannelId(EnumChannelType type){
         return this.channels.get(type);
+    }
+
+    public TransferState getTransferState(EnumChannelType type){
+        return this.transferState.get(type);
+    }
+
+    public void cycleTransferState(EnumChannelType type){
+        TransferState transferState = this.transferState.get(type);
+        this.transferState.put(type, transferState == TransferState.BOTH ? TransferState.SEND : transferState == TransferState.SEND ? TransferState.RECEIVE : TransferState.BOTH);
+        this.hasChanged = true;
+        IBlockState state = this.world.getBlockState(this.pos);
+        this.world.notifyBlockUpdate(this.pos, state, state, 2);
+        this.markDirty();
+    }
+
+    public RedstoneState getRedstoneState(){
+        return this.redstoneState;
+    }
+
+    public void cycleRedstoneState(){
+        this.redstoneState = this.redstoneState == RedstoneState.DISABLED ? RedstoneState.HIGH : this.redstoneState == RedstoneState.HIGH ? RedstoneState.LOW : RedstoneState.DISABLED;
+        this.hasChanged = true;
+        IBlockState state = this.world.getBlockState(this.pos);
+        this.world.notifyBlockUpdate(this.pos, state, state, 2);
+        this.markDirty();
+    }
+
+    public void setPowered(boolean powered){
+        if(this.redstone != powered){
+            this.redstone = powered;
+
+            this.hasChanged = true;
+            IBlockState state = this.world.getBlockState(this.pos);
+            this.world.notifyBlockUpdate(this.pos, state, state, 2);
+        }
     }
 
     @Override
@@ -219,18 +262,29 @@ public class TesseractTile extends TileEntity {
 
     public NBTTagCompound getData(){
         NBTTagCompound compound = new NBTTagCompound();
-        for(EnumChannelType type : EnumChannelType.values())
+        for(EnumChannelType type : EnumChannelType.values()){
             compound.setInteger(type.name(), this.channels.get(type));
+            compound.setString("transferState" + type.name(), this.transferState.get(type).name());
+        }
+        compound.setString("redstoneState", this.redstoneState.name());
+        compound.setBoolean("powered", this.redstone);
         return compound;
     }
 
     public void handleData(NBTTagCompound compound){
-        for(EnumChannelType type : EnumChannelType.values())
+        for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, compound.getInteger(type.name()));
+            if(compound.hasKey("transferState" + type.name()))
+                this.transferState.put(type, TransferState.valueOf(compound.getString("transferState" + type.name())));
+        }
+        if(compound.hasKey("redstoneState"))
+            this.redstoneState = RedstoneState.valueOf(compound.getString("redstoneState"));
+        if(compound.hasKey("powered"))
+            this.redstone = compound.getBoolean("powered");
     }
 
     private Channel getChannel(EnumChannelType type){
-        if(this.channels.get(type) < 0)
+        if(this.channels.get(type) < 0 || this.world == null)
             return null;
         Channel channel = (this.world.isRemote ? TesseractChannelManager.CLIENT : TesseractChannelManager.SERVER).getChannelById(type, this.channels.get(type));
         if(channel == null && !this.world.isRemote){
