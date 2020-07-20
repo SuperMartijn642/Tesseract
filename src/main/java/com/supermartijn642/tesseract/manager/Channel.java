@@ -63,8 +63,10 @@ public class Channel {
         compound.setBoolean("private", this.isPrivate);
         compound.setString("name", this.name);
         NBTTagCompound tesseractCompound = new NBTTagCompound();
-        for(int a = 0; a < this.tesseracts.size(); a++)
-            tesseractCompound.setTag(Integer.toString(a), this.tesseracts.get(a).write());
+        for(int a = 0; a < this.tesseracts.size(); a++){
+            if(this.tesseracts.get(a).isValid())
+                tesseractCompound.setTag(Integer.toString(a), this.tesseracts.get(a).write());
+        }
         compound.setTag("tesseracts", tesseractCompound);
         return compound;
     }
@@ -77,8 +79,7 @@ public class Channel {
         NBTTagCompound tesseractCompound = compound.getCompoundTag("tesseracts");
         for(String key : tesseractCompound.getKeySet()){
             TesseractLocation location = new TesseractLocation(tesseractCompound.getCompoundTag(key));
-            if(DimensionManager.getWorld(location.getDimension()) == null || location.isValid())
-                this.tesseracts.add(location);
+            this.tesseracts.add(location);
         }
     }
 
