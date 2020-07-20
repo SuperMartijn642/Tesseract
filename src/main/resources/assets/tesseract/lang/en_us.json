@@ -12,5 +12,7 @@
   "gui.tesseract.transfer.both": "SEND AND RECEIVE",
   "gui.tesseract.redstone.disabled": "DISABLED",
   "gui.tesseract.redstone.high": "HIGH",
-  "gui.tesseract.redstone.low": "LOW"
+  "gui.tesseract.redstone.low": "LOW",
+  "gui.tesseract.channel.private": "Private",
+  "gui.tesseract.channel.public": "Public"
 }

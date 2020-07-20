@@ -12,5 +12,7 @@
   "gui.tesseract.transfer.both": "STUREN EN ONTVANGEN",
   "gui.tesseract.redstone.disabled": "UIT",
   "gui.tesseract.redstone.high": "STERK",
-  "gui.tesseract.redstone.low": "ZWAK"
+  "gui.tesseract.redstone.low": "ZWAK",
+  "gui.tesseract.channel.private": "Privé",
+  "gui.tesseract.channel.public": "Openbaar"
 }
