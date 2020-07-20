@@ -18,6 +18,7 @@ import net.minecraft.client.gui.widget.button.LockIconButton;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -175,10 +176,12 @@ public class TesseractScreen extends Screen {
         super.render(mouseX, mouseY, partialTicks);
         this.textField.render(mouseX, mouseY, partialTicks);
 
+        if(this.privateButton.isHovered())
+            this.renderTooltip(I18n.format("gui.tesseract.channel." + (this.privateButton.isLocked() ? "private" : "public")), mouseX, mouseY);
         if(this.transferButton.isHovered())
-            this.renderTooltip(Collections.singletonList(this.transferButton.state.translate().getFormattedText()), mouseX, mouseY);
+            this.renderTooltip(this.transferButton.state.translate().getFormattedText(), mouseX, mouseY);
         if(this.redstoneButton.isHovered())
-            this.renderTooltip(Collections.singletonList(this.redstoneButton.state.translate().getFormattedText()), mouseX, mouseY);
+            this.renderTooltip(this.redstoneButton.state.translate().getFormattedText(), mouseX, mouseY);
     }
 
     private void drawBackground(){
