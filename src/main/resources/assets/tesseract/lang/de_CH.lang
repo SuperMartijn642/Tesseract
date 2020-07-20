@@ -11,3 +11,5 @@ gui.tesseract.transfer.both=SENDEN UND ERHALTEN
 gui.tesseract.redstone.disabled=AUSGESCHALTET
 gui.tesseract.redstone.high=HIGH
 gui.tesseract.redstone.low=LOW
+gui.tesseract.channel.private=privat
+gui.tesseract.channel.public=öffentlich

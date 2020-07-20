@@ -26,7 +26,6 @@ import net.minecraft.world.World;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -153,10 +152,12 @@ public class TesseractScreen extends GuiScreen {
             button.drawButton(Minecraft.getMinecraft(), mouseX, mouseY, partialTicks);
         this.textField.drawTextBox();
 
+        if(this.privateButton.isMouseOver())
+            this.drawHoveringText(I18n.format("gui.tesseract.channel." + (this.privateButton.isLocked() ? "private" : "public")), mouseX, mouseY);
         if(this.transferButton.isMouseOver())
-            this.drawHoveringText(Collections.singletonList(this.transferButton.state.translate().getFormattedText()), mouseX, mouseY);
+            this.drawHoveringText(this.transferButton.state.translate().getFormattedText(), mouseX, mouseY);
         if(this.redstoneButton.isMouseOver())
-            this.drawHoveringText(Collections.singletonList(this.redstoneButton.state.translate().getFormattedText()), mouseX, mouseY);
+            this.drawHoveringText(this.redstoneButton.state.translate().getFormattedText(), mouseX, mouseY);
     }
 
     private void drawBackground(){
