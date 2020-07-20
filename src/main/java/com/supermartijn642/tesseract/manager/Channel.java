@@ -6,6 +6,7 @@ import com.supermartijn642.tesseract.capabilities.CombinedEnergyStorage;
 import com.supermartijn642.tesseract.capabilities.CombinedFluidHandler;
 import com.supermartijn642.tesseract.capabilities.CombinedItemHandler;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.DimensionManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -76,7 +77,7 @@ public class Channel {
         NBTTagCompound tesseractCompound = compound.getCompoundTag("tesseracts");
         for(String key : tesseractCompound.getKeySet()){
             TesseractLocation location = new TesseractLocation(tesseractCompound.getCompoundTag(key));
-            if(location.isValid())
+            if(DimensionManager.getWorld(location.getDimension()) == null || location.isValid())
                 this.tesseracts.add(location);
         }
     }
