@@ -178,7 +178,6 @@ public class TesseractScreen extends Screen {
         super.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
         this.textField.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
 
-
         if(this.privateButton.func_230449_g_())
             this.func_238654_b_(matrixStack, Collections.singletonList(new TranslationTextComponent("gui.tesseract.channel." + (this.privateButton.isLocked() ? "private" : "public"))), mouseX, mouseY);
         if(this.transferButton.func_230449_g_())
