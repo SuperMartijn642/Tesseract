@@ -2,7 +2,7 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "wormhole:tesseract"
+      "tesseract:tesseract"
     ]
   },
   "criteria": {
