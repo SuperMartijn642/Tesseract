@@ -29,6 +29,9 @@ public class BlockTesseract extends Block implements ITileEntityProvider {
         this.setCreativeTab(CreativeTabs.SEARCH);
         this.translucent = true;
         this.setSoundType(SoundType.METAL);
+        this.setHardness(1.5f);
+        this.setResistance(6);
+        this.setHarvestLevel("pickaxe", 1);
     }
 
     @Override
