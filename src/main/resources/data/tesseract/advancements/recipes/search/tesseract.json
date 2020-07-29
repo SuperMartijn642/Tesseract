@@ -1,0 +1,25 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "tesseract:tesseract"
+    ]
+  },
+  "criteria": {
+    "ender_pearl": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:ender_pearl"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ender_pearl"
+    ]
+  ]
+}
