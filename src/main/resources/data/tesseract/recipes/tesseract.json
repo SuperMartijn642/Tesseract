@@ -5,7 +5,8 @@
     "OCO",
     "#O#"
   ],
-  "key": [
+  "key": {
+    "O": [
       {
         "item": "minecraft:ender_pearl"
       },
