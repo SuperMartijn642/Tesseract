@@ -1,6 +1,6 @@
 tile.tesseract:tesseract.name=Tesseract
 gui.tesseract.items=TESSERACT - ITENS
-gui.tesseract.fluid=TESSERACT - FLUIDO
+gui.tesseract.fluid=TESSERACT - FLUIDOS
 gui.tesseract.energy=TESSERACT - ENERGIA
 gui.tesseract.set=SET
 gui.tesseract.remove=REMOVER
