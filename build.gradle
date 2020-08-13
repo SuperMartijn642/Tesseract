@@ -15,7 +15,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'com.wynprice.cursemaven'
 
-version = '1.0.11-mc1.16'
+version = '1.0.11a-mc1.16'
 group = 'com.supermartijn642.tesseract' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'tesseract'
 
@@ -84,9 +84,10 @@ repositories {
 
 dependencies {
 
-    minecraft 'net.minecraftforge:forge:1.16.1-32.0.27'
+    minecraft 'net.minecraftforge:forge:1.16.1-32.0.108'
 
-//    runtimeOnly fg.deobf("curse.maven:mekanism:2952808")
+    runtimeOnly fg.deobf("curse.maven:largefluidtank:3008682")
+    runtimeOnly fg.deobf("curse.maven:scalable-cats-force:2954109")
 
     // compile against the JEI API but do not include it at runtime
 //    compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2:api")
