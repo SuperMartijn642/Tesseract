@@ -91,7 +91,7 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onSave(WorldEvent.Save e){
-        if(e.getWorld().isRemote() || e.getWorld().getWorld().func_234923_W_() != World.field_234918_g_)
+        if(e.getWorld().isRemote() || !(e.getWorld() instanceof World) || ((World)e.getWorld()).func_234923_W_() != World.field_234918_g_)
             return;
         for(ChannelList list : SERVER.types.values()){
             File folder = new File(directory, list.type.name().toLowerCase(Locale.ENGLISH));
@@ -103,7 +103,7 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onLoad(WorldEvent.Load e){
-        if(e.getWorld().isRemote() || e.getWorld().getWorld().func_234923_W_() != World.field_234918_g_)
+        if(e.getWorld().isRemote() || !(e.getWorld() instanceof World) || ((World)e.getWorld()).func_234923_W_() != World.field_234918_g_)
             return;
         minecraftServer = ((ServerWorld)e.getWorld()).getServer();
         directory = new File(((ServerWorld)e.getWorld()).getServer().func_240776_a_(FolderName.field_237253_i_).toFile(), "tesseract");

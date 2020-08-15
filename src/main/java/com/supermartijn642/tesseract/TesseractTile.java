@@ -252,8 +252,8 @@ public class TesseractTile extends TileEntity {
     }
 
     @Override
-    public void func_230337_a_(BlockState state, CompoundNBT compound){
-        super.func_230337_a_(state, compound);
+    public void read(BlockState state, CompoundNBT compound){
+        super.read(state, compound);
         if(compound.contains("data"))
             this.handleData(compound.getCompound("data"));
     }

@@ -32,7 +32,7 @@ public class TransferButton extends CycleButton {
     }
 
     @Override
-    public void func_230930_b_(){
+    public void onPress(){
         if(this.pos != null)
             Tesseract.CHANNEL.sendToServer(new PacketCycleTransferState(this.pos, this.type));
     }

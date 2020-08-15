@@ -29,7 +29,7 @@ public class RedstoneButton extends CycleButton {
     }
 
     @Override
-    public void func_230930_b_(){
+    public void onPress(){
         if(this.pos != null)
             Tesseract.CHANNEL.sendToServer(new PacketCycleRedstoneState(this.pos));
     }

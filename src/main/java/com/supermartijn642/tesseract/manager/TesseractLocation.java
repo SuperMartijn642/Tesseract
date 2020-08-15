@@ -40,7 +40,7 @@ public class TesseractLocation {
     public World getWorld(){
         if(TesseractChannelManager.minecraftServer == null)
             return null;
-        RegistryKey<World> key = RegistryKey.func_240903_a_(Registry.field_239699_ae_, new ResourceLocation(this.dimension));
+        RegistryKey<World> key = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(this.dimension));
         return TesseractChannelManager.minecraftServer.getWorld(key);
     }
 

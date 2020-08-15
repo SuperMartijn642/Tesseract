@@ -28,15 +28,15 @@ public abstract class CycleButton extends AbstractButton {
     protected abstract int getCycleIndex();
 
     @Override
-    public void func_230431_b_(MatrixStack matrixStack, int p_renderButton_1_, int p_renderButton_2_, float p_renderButton_3_){
+    public void renderButton(MatrixStack matrixStack, int p_renderButton_1_, int p_renderButton_2_, float p_renderButton_3_){
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.getTextureManager().bindTexture(TEXTURE);
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.field_230695_q_);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        this.drawTexture(this.field_230690_l_, this.field_230691_m_, this.textureX + this.getCycleIndex() * 20, (this.field_230693_o_ ? this.field_230692_n_ ? 1 : 0 : 2) * 20, this.field_230688_j_, this.field_230689_k_);
-        this.func_230441_a_(matrixStack, minecraft, p_renderButton_1_, p_renderButton_2_);
+        this.drawTexture(this.x, this.y, this.textureX + this.getCycleIndex() * 20, (this.active ? this.isHovered ? 1 : 0 : 2) * 20, this.width, this.height);
+        this.renderBg(matrixStack, minecraft, p_renderButton_1_, p_renderButton_2_);
     }
 
     private void drawTexture(int x, int y, int textureX, int textureY, int width, int height){
