@@ -15,7 +15,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'com.wynprice.cursemaven'
 
-version = '1.0.11b-mc1.16'
+version = '1.0.11b-mc1.16.1'
 group = 'com.supermartijn642.tesseract' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'tesseract'
 
@@ -84,7 +84,7 @@ repositories {
 
 dependencies {
 
-    minecraft 'net.minecraftforge:forge:1.16.2-33.0.5'
+    minecraft 'net.minecraftforge:forge:1.16.1-32.0.108'
 
     runtimeOnly fg.deobf("curse.maven:largefluidtank:3008682")
     runtimeOnly fg.deobf("curse.maven:scalable-cats-force:2954109")

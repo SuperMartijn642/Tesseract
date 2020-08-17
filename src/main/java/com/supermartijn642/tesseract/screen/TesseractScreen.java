@@ -191,7 +191,7 @@ public class TesseractScreen extends Screen {
         this.drawTexturedModalRect(0, 0, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
         TextComponent s = new TranslationTextComponent("gui.tesseract." + type.name().toLowerCase(Locale.ENGLISH));
-        this.font.func_243246_a(matrixStack, s, (BACKGROUND_WIDTH - this.font.func_238414_a_(s)) / 2f, 28 + 10, 0xffffffff);
+        this.font.func_238407_a_(matrixStack, s, (BACKGROUND_WIDTH - this.font.func_238414_a_(s)) / 2f, 28 + 10, 0xffffffff);
     }
 
     private void drawTabs(){
@@ -241,7 +241,7 @@ public class TesseractScreen extends Screen {
                 this.drawColoredRect(15, 28 + 25 + i * channelHeight, 1, channelHeight, 0xffffffff);
                 this.drawColoredRect(134, 28 + 25 + i * channelHeight, 1, channelHeight, 0xffffffff);
             }
-            this.font.func_243248_b(matrixStack, new StringTextComponent(channel.name), 15 + 3, 28 + 25 + 3 + i * channelHeight, 0xffffffff);
+            this.font.func_238407_a_(matrixStack, new StringTextComponent(channel.name), 15 + 3, 28 + 25 + 3 + i * channelHeight, 0xffffffff);
             if(channel.creator.equals(Minecraft.getInstance().player.getUniqueID())){
                 int width = this.font.getStringWidth(channel.name);
                 this.drawTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF, 15 + 6 + width, 28 + 25 + 2 + i * channelHeight, 9, 9);
