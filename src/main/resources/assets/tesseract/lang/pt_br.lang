@@ -1,0 +1,15 @@
+tile.tesseract:tesseract.name=Tesseract
+gui.tesseract.items=TESSERACT - ITENS
+gui.tesseract.fluid=TESSERACT - FLUIDOS
+gui.tesseract.energy=TESSERACT - ENERGIA
+gui.tesseract.set=SET
+gui.tesseract.remove=REMOVER
+gui.tesseract.add=ADICIONAR
+gui.tesseract.transfer.send=ENVIAR APENAS
+gui.tesseract.transfer.receive=RECEBER APENAS
+gui.tesseract.transfer.both=ENVIAR E RECEBER
+gui.tesseract.redstone.disabled=DESATIVADO
+gui.tesseract.redstone.high=ALTO
+gui.tesseract.redstone.low=BAIXO
+gui.tesseract.channel.private=Privado
+gui.tesseract.channel.public=Público
