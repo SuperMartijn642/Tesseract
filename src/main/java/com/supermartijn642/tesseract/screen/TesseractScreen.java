@@ -354,9 +354,8 @@ public class TesseractScreen extends Screen {
                     this.removeButton.active = false;
                 }
             }
-        }else if(mouseButton == 1){ // text field
-            if(mouseX >= this.textField.x && mouseX < this.textField.x + this.textField.getWidth()
-                && mouseY >= this.textField.y && mouseY < this.textField.y + this.textField.getHeight())
+        }else if(mouseButton == 1){ // clear text field
+            if(this.textField.isHovered())
                 this.textField.setText("");
         }
         super.mouseClicked(mouseX, mouseY, mouseButton);
