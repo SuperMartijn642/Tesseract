@@ -345,9 +345,9 @@ public class TesseractScreen extends Screen {
                 if(index < channels.size()){
                     TesseractTile tile = this.getTileOrClose();
                     if(tile != null){
-                        this.selectedChannel = channels.get(index + this.scrollOffset).id;
+                        this.selectedChannel = channels.get(index).id;
                         this.setButton.active = tile.getChannelId(type) != this.selectedChannel;
-                        this.removeButton.active = channels.get(index + this.scrollOffset).creator.equals(Minecraft.getInstance().player.getUniqueID());
+                        this.removeButton.active = channels.get(index).creator.equals(Minecraft.getInstance().player.getUniqueID());
                     }
                 }else{
                     this.selectedChannel = -1;
