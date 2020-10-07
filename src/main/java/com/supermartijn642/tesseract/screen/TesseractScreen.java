@@ -15,10 +15,12 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -191,7 +193,10 @@ public class TesseractScreen extends GuiScreen {
         double width = 16, height = 16;
         double iconX = x + (28 - width) / 2, iconY = (TesseractScreen.type == type ? 0 : 2) + (29 - height) / 2;
 
-        this.drawTexture(icon, iconX, iconY, width, height);
+//        this.drawTexture(icon, iconX, iconY, width, height);
+        RenderHelper.enableGUIStandardItemLighting();
+        this.itemRender.renderItemIntoGUI(new ItemStack(type.item.get()), (int)iconX, (int)iconY);
+        RenderHelper.disableStandardItemLighting();
     }
 
     private void drawChannels(){
