@@ -285,9 +285,9 @@ public class TesseractScreen extends GuiScreen {
                 if(index < channels.size()){
                     TesseractTile tile = this.getTileOrClose();
                     if(tile != null){
-                        this.selectedChannel = channels.get(index + this.scrollOffset).id;
+                        this.selectedChannel = channels.get(index).id;
                         this.setButton.enabled = tile.getChannelId(type) != this.selectedChannel;
-                        this.removeButton.enabled = channels.get(index + this.scrollOffset).creator.equals(Minecraft.getMinecraft().player.getUniqueID());
+                        this.removeButton.enabled = channels.get(index).creator.equals(Minecraft.getMinecraft().player.getUniqueID());
                     }
                 }else{
                     this.selectedChannel = -1;
