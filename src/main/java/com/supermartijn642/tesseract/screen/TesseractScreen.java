@@ -21,13 +21,13 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -215,7 +215,8 @@ public class TesseractScreen extends Screen {
         double width = 16, height = 16;
         double iconX = x + (28 - width) / 2, iconY = (TesseractScreen.type == type ? 0 : 2) + (29 - height) / 2;
 
-        this.drawTexture(icon, iconX, iconY, width, height);
+//        this.drawTexture(icon, iconX, iconY, width, height);
+        this.itemRenderer.renderItemIntoGUI(new ItemStack(type.item.get()), (int)iconX, (int)iconY);
     }
 
     private void drawChannels(){
