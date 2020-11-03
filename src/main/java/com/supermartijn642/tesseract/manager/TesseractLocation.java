@@ -26,7 +26,7 @@ public class TesseractLocation {
     }
 
     public TesseractLocation(World world, BlockPos pos){
-        this(world.func_234923_W_().func_240901_a_().toString(), pos);
+        this(world.getDimensionKey().getRegistryName().toString(), pos);
     }
 
     public TesseractLocation(CompoundNBT compound){
@@ -40,7 +40,7 @@ public class TesseractLocation {
     public World getWorld(){
         if(TesseractChannelManager.minecraftServer == null)
             return null;
-        RegistryKey<World> key = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(this.dimension));
+        RegistryKey<World> key = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(this.dimension));
         return TesseractChannelManager.minecraftServer.getWorld(key);
     }
 

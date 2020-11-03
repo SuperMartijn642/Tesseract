@@ -191,7 +191,7 @@ public class TesseractScreen extends Screen {
         this.drawTexturedModalRect(0, 0, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 
         TextComponent s = new TranslationTextComponent("gui.tesseract." + type.name().toLowerCase(Locale.ENGLISH));
-        this.font.func_243246_a(matrixStack, s, (BACKGROUND_WIDTH - this.font.func_238414_a_(s)) / 2f, 28 + 10, 0xffffffff);
+        this.font.func_243246_a(matrixStack, s, (BACKGROUND_WIDTH - this.font.getStringPropertyWidth(s)) / 2f, 28 + 10, 0xffffffff);
     }
 
     private void drawTabs(){
