@@ -26,7 +26,7 @@ public class TesseractLocation {
     }
 
     public TesseractLocation(World world, BlockPos pos){
-        this(world.getDimensionKey().getRegistryName().toString(), pos);
+        this(world.getDimensionKey().getLocation().toString(), pos);
     }
 
     public TesseractLocation(CompoundNBT compound){
