@@ -101,7 +101,7 @@ public class ChannelList {
     }
 
     public void read(File folder){
-        channelId = 0;
+        this.channelId = 0;
 
         if(!folder.exists())
             return;
@@ -118,7 +118,7 @@ public class ChannelList {
                     NBTTagCompound compound = CompressedStreamTools.read(file);
                     if(compound != null){
                         Channel channel = new Channel(id, this.type, compound);
-                        if(channel.id > this.channelId)
+                        if(channel.id >= this.channelId)
                             this.channelId = channel.id + 1;
                         this.add(channel);
                     }
