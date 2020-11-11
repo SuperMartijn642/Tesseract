@@ -36,7 +36,6 @@ public class PacketRemoveChannel {
         if(this.type != null && this.id >= 0)
             ctx.get().enqueueWork(() -> {
                 TesseractChannelManager.SERVER.removeChannel(this.type, this.id);
-                Tesseract.CHANNEL.send(PacketDistributor.ALL.noArg(), new PacketSendChannels(this.type));
             });
     }
 }
