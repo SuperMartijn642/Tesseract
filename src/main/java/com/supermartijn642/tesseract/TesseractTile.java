@@ -303,6 +303,7 @@ public class TesseractTile extends TileEntity {
             return null;
         Channel channel = TesseractChannelManager.getInstance(this.world).getChannelById(type, this.channels.get(type));
         if(channel == null && !this.world.isRemote){
+            this.channels.put(type, -1);
             this.dataChanged();
         }
         return channel;
