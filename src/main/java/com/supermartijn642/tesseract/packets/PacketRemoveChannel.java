@@ -23,19 +23,20 @@ public class PacketRemoveChannel {
     }
 
     public void encode(PacketBuffer buffer){
-        buffer.writeString(this.type.name());
+        buffer.writeInt(this.type.getIndex());
         buffer.writeInt(this.id);
     }
 
     public static PacketRemoveChannel decode(PacketBuffer buffer){
-        return new PacketRemoveChannel(EnumChannelType.valueOf(buffer.readString(32767)), buffer.readInt());
+        return new PacketRemoveChannel(EnumChannelType.byIndex(buffer.readInt()), buffer.readInt());
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         ctx.get().setPacketHandled(true);
-        ctx.get().enqueueWork(() -> {
-            TesseractChannelManager.SERVER.removeChannel(this.type, this.id);
-            Tesseract.CHANNEL.send(PacketDistributor.ALL.noArg(), new PacketSendChannels(this.type));
-        });
+        if(this.type != null && this.id >= 0)
+            ctx.get().enqueueWork(() -> {
+                TesseractChannelManager.SERVER.removeChannel(this.type, this.id);
+                Tesseract.CHANNEL.send(PacketDistributor.ALL.noArg(), new PacketSendChannels(this.type));
+            });
     }
 }

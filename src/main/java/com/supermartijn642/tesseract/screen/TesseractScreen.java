@@ -52,7 +52,7 @@ public class TesseractScreen extends Screen {
     private static final ResourceLocation SIDE_TAB = new ResourceLocation("tesseract", "textures/gui/side_tab.png");
 
     private static EnumChannelType type = EnumChannelType.ITEMS;
-    private BlockPos pos;
+    private final BlockPos pos;
     private int left, top;
 
     private Button setButton;
@@ -377,7 +377,8 @@ public class TesseractScreen extends Screen {
         if(TesseractChannelManager.CLIENT.getChannels(type).size() > 11){
             this.scrollOffset = Math.max(this.scrollOffset + amount, 0);
             this.scrollOffset = Math.min(this.scrollOffset, TesseractChannelManager.CLIENT.getChannels(type).size() - 11);
-        }
+        }else
+            this.scrollOffset = 0;
     }
 
     @Override
