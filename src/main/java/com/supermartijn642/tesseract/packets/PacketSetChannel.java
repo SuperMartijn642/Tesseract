@@ -27,17 +27,19 @@ public class PacketSetChannel {
     }
 
     public void encode(PacketBuffer buffer){
-        buffer.writeString(this.type.name());
+        buffer.writeInt(this.type.getIndex());
         buffer.writeInt(this.id);
         buffer.writeBlockPos(this.pos);
     }
 
     public static PacketSetChannel decode(PacketBuffer buffer){
-        return new PacketSetChannel(EnumChannelType.valueOf(buffer.readString(32767)), buffer.readInt(), buffer.readBlockPos());
+        return new PacketSetChannel(EnumChannelType.byIndex(buffer.readInt()), buffer.readInt(), buffer.readBlockPos());
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         ctx.get().setPacketHandled(true);
+        if(this.type == null || this.id < 0)
+            return;
         PlayerEntity player = ctx.get().getSender();
         if(player == null)
             return;
