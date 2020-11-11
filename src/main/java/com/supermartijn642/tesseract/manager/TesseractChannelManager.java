@@ -32,6 +32,10 @@ public class TesseractChannelManager {
     public static final TesseractChannelManager SERVER = new TesseractChannelManager();
     public static final TesseractChannelManager CLIENT = new TesseractChannelManager();
 
+    public static TesseractChannelManager getInstance(World world){
+        return world.isRemote ? CLIENT : SERVER;
+    }
+
     private final HashMap<EnumChannelType,ChannelList> types = new HashMap<>();
 
     public Channel addChannel(EnumChannelType type, UUID creator, boolean isPrivate, String name){
@@ -40,7 +44,7 @@ public class TesseractChannelManager {
         synchronized(types.get(type)){
             channel = types.get(type).add(creator, isPrivate, name);
         }
-        Tesseract.CHANNEL.send(PacketDistributor.ALL.noArg(), new PacketSendChannels(type));
+        this.update(type);
         return channel;
     }
 
@@ -49,6 +53,7 @@ public class TesseractChannelManager {
         synchronized(types.get(channel.type)){
             types.get(channel.type).add(channel);
         }
+        this.update(channel.type);
         return channel;
     }
 
@@ -57,7 +62,7 @@ public class TesseractChannelManager {
         synchronized(types.get(type)){
             types.get(type).remove(id);
         }
-        Tesseract.CHANNEL.send(PacketDistributor.ALL.noArg(), new PacketSendChannels(type));
+        this.update(type);
     }
 
     public void sortChannels(PlayerEntity player, EnumChannelType type){
@@ -87,6 +92,11 @@ public class TesseractChannelManager {
     public void clear(EnumChannelType type){
         types.putIfAbsent(type, new ChannelList(type));
         types.get(type).clear();
+    }
+
+    public void update(EnumChannelType type){
+        if(this == SERVER)
+            Tesseract.CHANNEL.send(PacketDistributor.ALL.noArg(), new PacketSendChannels(type));
     }
 
     @SubscribeEvent
