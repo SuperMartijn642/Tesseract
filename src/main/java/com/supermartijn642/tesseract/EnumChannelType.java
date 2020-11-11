@@ -15,18 +15,33 @@ import java.util.function.Supplier;
  */
 public enum EnumChannelType {
 
-    ITEMS(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, () -> Item.getItemFromBlock(Blocks.CHEST)), FLUID(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, () -> Items.BUCKET), ENERGY(CapabilityEnergy.ENERGY, () -> Items.REDSTONE);
+    ITEMS(0, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, () -> Item.getItemFromBlock(Blocks.CHEST)),
+    FLUID(1, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, () -> Items.BUCKET),
+    ENERGY(2, CapabilityEnergy.ENERGY, () -> Items.REDSTONE);
 
-    private Capability<?> capability;
-    public Supplier<Item> item;
+    private final int index;
+    private final Capability<?> capability;
+    public final Supplier<Item> item;
 
-    EnumChannelType(Capability<?> capability, Supplier<Item> item){
+    EnumChannelType(int index, Capability<?> capability, Supplier<Item> item){
+        this.index = index;
         this.capability = capability;
         this.item = item;
     }
 
     public Capability<?> getCapability(){
         return this.capability;
+    }
+
+    public int getIndex(){
+        return this.index;
+    }
+
+    public static EnumChannelType byIndex(int index){
+        for(EnumChannelType type : values())
+            if(type.index == index)
+                return type;
+        return null;
     }
 
 }

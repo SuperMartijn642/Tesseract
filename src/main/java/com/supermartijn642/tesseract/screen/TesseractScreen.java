@@ -53,7 +53,7 @@ public class TesseractScreen extends GuiScreen {
     private static final ResourceLocation SIDE_TAB = new ResourceLocation(Tesseract.MODID, "textures/gui/side_tab.png");
 
     private static EnumChannelType type = EnumChannelType.ITEMS;
-    private BlockPos pos;
+    private final BlockPos pos;
     private int left, top;
 
     private GuiButton setButton;
@@ -207,7 +207,7 @@ public class TesseractScreen extends GuiScreen {
         Minecraft.getMinecraft().getTextureManager().bindTexture(CHANNEL_BACKGROUND);
         this.drawTexturedModalRect(15, 28 + 25, 0, 0, 120, 143);
 
-        List<Channel> channels = TesseractChannelManager.CLIENT.getChannels(TesseractScreen.type);
+        List<Channel> channels = TesseractChannelManager.CLIENT.getChannels(type);
         int channelHeight = 143 / 11;
 
         for(int i = 0; i < 11 && i + this.scrollOffset < channels.size(); i++){
@@ -316,14 +316,17 @@ public class TesseractScreen extends GuiScreen {
         if(TesseractChannelManager.CLIENT.getChannels(type).size() > 11){
             this.scrollOffset = Math.max(this.scrollOffset + amount, 0);
             this.scrollOffset = Math.min(this.scrollOffset, TesseractChannelManager.CLIENT.getChannels(type).size() - 11);
-        }
+        }else
+            this.scrollOffset = 0;
     }
 
     @Override
     protected void actionPerformed(GuiButton button){
         if(button == this.addButton){
-            Tesseract.channel.sendToServer(new PacketAddChannel(type, this.lastText.trim(), this.privateButton.isLocked()));
-            this.textField.setText("");
+            if(!this.lastText.trim().isEmpty()){
+                Tesseract.channel.sendToServer(new PacketAddChannel(type, this.lastText.trim(), this.privateButton.isLocked()));
+                this.textField.setText("");
+            }
         }else if(button == this.privateButton)
             this.privateButton.setLocked(!this.privateButton.isLocked());
         else if(button == this.setButton){

@@ -6,7 +6,6 @@ import com.supermartijn642.tesseract.capabilities.CombinedEnergyStorage;
 import com.supermartijn642.tesseract.capabilities.CombinedFluidHandler;
 import com.supermartijn642.tesseract.capabilities.CombinedItemHandler;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.DimensionManager;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -55,6 +54,7 @@ public class Channel {
     public void removeTesseract(TesseractTile tesseract){
         TesseractLocation location = new TesseractLocation(tesseract.getWorld(), tesseract.getPos());
         this.tesseracts.remove(location);
+        tesseract.setChannel(this.type, -1);
     }
 
     public NBTTagCompound write(){

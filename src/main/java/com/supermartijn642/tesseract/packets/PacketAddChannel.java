@@ -29,10 +29,8 @@ public class PacketAddChannel implements IMessage, IMessageHandler<PacketAddChan
 
     @Override
     public void fromBytes(ByteBuf buf){
+        this.type = EnumChannelType.byIndex(buf.readInt());
         byte[] bytes = new byte[buf.readInt()];
-        buf.readBytes(bytes);
-        this.type = EnumChannelType.valueOf(new String(bytes, StandardCharsets.UTF_16));
-        bytes = new byte[buf.readInt()];
         buf.readBytes(bytes);
         this.name = new String(bytes, StandardCharsets.UTF_16);
         this.isPrivate = buf.readBoolean();
@@ -40,10 +38,8 @@ public class PacketAddChannel implements IMessage, IMessageHandler<PacketAddChan
 
     @Override
     public void toBytes(ByteBuf buf){
-        byte[] bytes = this.type.name().getBytes(StandardCharsets.UTF_16);
-        buf.writeInt(bytes.length);
-        buf.writeBytes(bytes);
-        bytes = this.name.getBytes(StandardCharsets.UTF_16);
+        buf.writeInt(this.type.getIndex());
+        byte[] bytes = this.name.getBytes(StandardCharsets.UTF_16);
         buf.writeInt(bytes.length);
         buf.writeBytes(bytes);
         buf.writeBoolean(this.isPrivate);
@@ -51,9 +47,10 @@ public class PacketAddChannel implements IMessage, IMessageHandler<PacketAddChan
 
     @Override
     public IMessage onMessage(PacketAddChannel message, MessageContext ctx){
-        ctx.getServerHandler().player.getServerWorld().addScheduledTask(() ->
-            TesseractChannelManager.SERVER.addChannel(message.type, ctx.getServerHandler().player.getUniqueID(), message.isPrivate, message.name)
-        );
+        if(message.type != null && !message.name.trim().isEmpty())
+            ctx.getServerHandler().player.getServerWorld().addScheduledTask(() ->
+                TesseractChannelManager.SERVER.addChannel(message.type, ctx.getServerHandler().player.getUniqueID(), message.isPrivate, message.name)
+            );
         return null;
     }
 }

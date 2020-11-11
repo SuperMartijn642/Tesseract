@@ -96,10 +96,11 @@ public class TesseractTile extends TileEntity {
     };
 
     private final HashMap<EnumChannelType,Integer> channels = new HashMap<>();
-    private boolean hasChanged = false;
     private final HashMap<EnumChannelType,TransferState> transferState = new HashMap<>();
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
+
+    private boolean dataChanged = false;
 
     public TesseractTile(){
         for(EnumChannelType type : EnumChannelType.values()){
@@ -118,10 +119,7 @@ public class TesseractTile extends TileEntity {
         Channel newChannel = this.getChannel(type);
         if(newChannel != null)
             newChannel.addTesseract(this);
-        this.hasChanged = true;
-        IBlockState state = this.world.getBlockState(this.pos);
-        this.world.notifyBlockUpdate(this.pos, state, state, 2);
-        this.markDirty();
+        this.dataChanged();
     }
 
     public boolean renderOn(){
@@ -189,10 +187,7 @@ public class TesseractTile extends TileEntity {
     public void cycleTransferState(EnumChannelType type){
         TransferState transferState = this.transferState.get(type);
         this.transferState.put(type, transferState == TransferState.BOTH ? TransferState.SEND : transferState == TransferState.SEND ? TransferState.RECEIVE : TransferState.BOTH);
-        this.hasChanged = true;
-        IBlockState state = this.world.getBlockState(this.pos);
-        this.world.notifyBlockUpdate(this.pos, state, state, 2);
-        this.markDirty();
+        this.dataChanged();
     }
 
     public RedstoneState getRedstoneState(){
@@ -201,19 +196,13 @@ public class TesseractTile extends TileEntity {
 
     public void cycleRedstoneState(){
         this.redstoneState = this.redstoneState == RedstoneState.DISABLED ? RedstoneState.HIGH : this.redstoneState == RedstoneState.HIGH ? RedstoneState.LOW : RedstoneState.DISABLED;
-        this.hasChanged = true;
-        IBlockState state = this.world.getBlockState(this.pos);
-        this.world.notifyBlockUpdate(this.pos, state, state, 2);
-        this.markDirty();
+        this.dataChanged();
     }
 
     public void setPowered(boolean powered){
         if(this.redstone != powered){
             this.redstone = powered;
-
-            this.hasChanged = true;
-            IBlockState state = this.world.getBlockState(this.pos);
-            this.world.notifyBlockUpdate(this.pos, state, state, 2);
+            this.dataChanged();
         }
     }
 
@@ -248,8 +237,8 @@ public class TesseractTile extends TileEntity {
     @Nullable
     @Override
     public SPacketUpdateTileEntity getUpdatePacket(){
-        if(this.hasChanged){
-            this.hasChanged = false;
+        if(this.dataChanged){
+            this.dataChanged = false;
             return new SPacketUpdateTileEntity(this.pos, 0, this.getData());
         }
         return null;
@@ -286,14 +275,19 @@ public class TesseractTile extends TileEntity {
     private Channel getChannel(EnumChannelType type){
         if(this.channels.get(type) < 0 || this.world == null)
             return null;
-        Channel channel = (this.world.isRemote ? TesseractChannelManager.CLIENT : TesseractChannelManager.SERVER).getChannelById(type, this.channels.get(type));
+        Channel channel = TesseractChannelManager.getInstance(this.world).getChannelById(type, this.channels.get(type));
         if(channel == null && !this.world.isRemote){
             this.channels.put(type, -1);
-            this.hasChanged = true;
-            IBlockState state = this.world.getBlockState(this.pos);
-            this.world.notifyBlockUpdate(this.pos, state, state, 2);
-            this.markDirty();
+            this.dataChanged();
         }
         return channel;
+    }
+
+    private void dataChanged(){
+        this.dataChanged = true;
+        IBlockState state = this.world.getBlockState(this.pos);
+        this.world.notifyBlockUpdate(this.pos, state, state, 2);
+        this.world.notifyNeighborsOfStateChange(this.pos, this.blockType, false);
+        this.markDirty();
     }
 }

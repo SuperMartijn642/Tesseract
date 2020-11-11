@@ -52,6 +52,8 @@ public class PacketSetChannel implements IMessage, IMessageHandler<PacketSetChan
 
     @Override
     public IMessage onMessage(PacketSetChannel message, MessageContext ctx){
+        if(message.type == null || message.id < 0)
+            return null;
         World world = ctx.getServerHandler().player.world;
         if(world == null)
             return null;
