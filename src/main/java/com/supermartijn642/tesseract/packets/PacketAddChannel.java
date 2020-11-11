@@ -23,19 +23,20 @@ public class PacketAddChannel {
     }
 
     public void encode(PacketBuffer buffer){
-        buffer.writeString(this.type.name());
+        buffer.writeInt(this.type.getIndex());
         buffer.writeString(this.name);
         buffer.writeBoolean(this.isPrivate);
     }
 
     public static PacketAddChannel decode(PacketBuffer buffer){
-        return new PacketAddChannel(EnumChannelType.valueOf(buffer.readString(32767)), buffer.readString(32767), buffer.readBoolean());
+        return new PacketAddChannel(EnumChannelType.byIndex(buffer.readInt()), buffer.readString(32767), buffer.readBoolean());
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         ctx.get().setPacketHandled(true);
-        ctx.get().enqueueWork(() ->
-            TesseractChannelManager.SERVER.addChannel(this.type, ctx.get().getSender().getUniqueID(), this.isPrivate, this.name)
-        );
+        if(this.type != null && !this.name.trim().isEmpty())
+            ctx.get().enqueueWork(() ->
+                TesseractChannelManager.SERVER.addChannel(this.type, ctx.get().getSender().getUniqueID(), this.isPrivate, this.name)
+            );
     }
 }
