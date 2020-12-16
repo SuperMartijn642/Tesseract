@@ -8,7 +8,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import java.util.function.Supplier;
 
 /**
- * Created 4/23/2020 by SuperMartijn642
+ * Created 12/16/2020 by SuperMartijn642
  */
 public class PacketAddChannel {
 
@@ -28,8 +28,8 @@ public class PacketAddChannel {
         buffer.writeBoolean(this.isPrivate);
     }
 
-    public static PacketAddChannel decode(PacketBuffer buffer){
-        return new PacketAddChannel(EnumChannelType.byIndex(buffer.readInt()), buffer.readString(32767), buffer.readBoolean());
+    public static PacketScreenAddChannel decode(PacketBuffer buffer){
+        return new PacketScreenAddChannel(EnumChannelType.byIndex(buffer.readInt()), buffer.readString(32767), buffer.readBoolean());
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){

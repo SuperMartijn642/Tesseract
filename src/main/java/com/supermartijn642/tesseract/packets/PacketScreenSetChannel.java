@@ -14,13 +14,13 @@ import java.util.function.Supplier;
 /**
  * Created 4/23/2020 by SuperMartijn642
  */
-public class PacketSetChannel {
+public class PacketScreenSetChannel {
 
     private EnumChannelType type;
     private int id;
     private BlockPos pos;
 
-    public PacketSetChannel(EnumChannelType type, int id, BlockPos pos){
+    public PacketScreenSetChannel(EnumChannelType type, int id, BlockPos pos){
         this.type = type;
         this.id = id;
         this.pos = pos;
@@ -32,8 +32,8 @@ public class PacketSetChannel {
         buffer.writeBlockPos(this.pos);
     }
 
-    public static PacketSetChannel decode(PacketBuffer buffer){
-        return new PacketSetChannel(EnumChannelType.byIndex(buffer.readInt()), buffer.readInt(), buffer.readBlockPos());
+    public static PacketScreenSetChannel decode(PacketBuffer buffer){
+        return new PacketScreenSetChannel(EnumChannelType.byIndex(buffer.readInt()), buffer.readInt(), buffer.readBlockPos());
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){

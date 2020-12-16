@@ -32,11 +32,11 @@ public class Tesseract {
     public Tesseract(){
         MinecraftForge.EVENT_BUS.register(TesseractChannelManager.class);
         CHANNEL.registerMessage(0, PacketSendChannels.class, PacketSendChannels::encode, PacketSendChannels::decode, PacketSendChannels::handle);
-        CHANNEL.registerMessage(1, PacketAddChannel.class, PacketAddChannel::encode, PacketAddChannel::decode, PacketAddChannel::handle);
-        CHANNEL.registerMessage(2, PacketRemoveChannel.class, PacketRemoveChannel::encode, PacketRemoveChannel::decode, PacketRemoveChannel::handle);
-        CHANNEL.registerMessage(3, PacketSetChannel.class, PacketSetChannel::encode, PacketSetChannel::decode, PacketSetChannel::handle);
-        CHANNEL.registerMessage(4, PacketCycleRedstoneState.class, PacketCycleRedstoneState::encode, PacketCycleRedstoneState::decode, PacketCycleRedstoneState::handle);
-        CHANNEL.registerMessage(5, PacketCycleTransferState.class, PacketCycleTransferState::encode, PacketCycleTransferState::decode, PacketCycleTransferState::handle);
+        CHANNEL.registerMessage(1, PacketScreenAddChannel.class, PacketScreenAddChannel::encode, PacketScreenAddChannel::decode, PacketScreenAddChannel::handle);
+        CHANNEL.registerMessage(2, PacketScreenRemoveChannel.class, PacketScreenRemoveChannel::encode, PacketScreenRemoveChannel::decode, PacketScreenRemoveChannel::handle);
+        CHANNEL.registerMessage(3, PacketScreenSetChannel.class, PacketScreenSetChannel::encode, PacketScreenSetChannel::decode, PacketScreenSetChannel::handle);
+        CHANNEL.registerMessage(4, PacketScreenCycleRedstoneState.class, PacketScreenCycleRedstoneState::encode, PacketScreenCycleRedstoneState::decode, PacketScreenCycleRedstoneState::handle);
+        CHANNEL.registerMessage(5, PacketScreenCycleTransferState.class, PacketScreenCycleTransferState::encode, PacketScreenCycleTransferState::decode, PacketScreenCycleTransferState::handle);
     }
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
