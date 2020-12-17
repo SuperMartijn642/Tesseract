@@ -61,7 +61,17 @@ public class BlockTesseract extends Block {
     @Override
     public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving){
         TileEntity tile = worldIn.getTileEntity(pos);
-        if(tile instanceof TesseractTile)
+        if(tile instanceof TesseractTile){
             ((TesseractTile)tile).setPowered(worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(pos.up()));
+            ((TesseractTile)tile).onNeighborChanged(fromPos);
+        }
+    }
+
+    @Override
+    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving){
+        TileEntity tile = worldIn.getTileEntity(pos);
+        if(tile instanceof TesseractTile)
+            ((TesseractTile)tile).onReplaced();
+        super.onReplaced(state, worldIn, pos, newState, isMoving);
     }
 }

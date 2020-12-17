@@ -8,14 +8,14 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import java.util.function.Supplier;
 
 /**
- * Created 12/16/2020 by SuperMartijn642
+ * Created 4/23/2020 by SuperMartijn642
  */
-public class PacketRemoveChannel {
+public class PacketScreenRemoveChannel {
 
     private EnumChannelType type;
     private int id;
 
-    public PacketRemoveChannel(EnumChannelType type, int id){
+    public PacketScreenRemoveChannel(EnumChannelType type, int id){
         this.type = type;
         this.id = id;
     }
@@ -25,12 +25,15 @@ public class PacketRemoveChannel {
         buffer.writeInt(this.id);
     }
 
-    public static PacketRemoveChannel decode(PacketBuffer buffer){
-        return new PacketRemoveChannel(EnumChannelType.byIndex(buffer.readInt()), buffer.readInt());
+    public static PacketScreenRemoveChannel decode(PacketBuffer buffer){
+        return new PacketScreenRemoveChannel(EnumChannelType.byIndex(buffer.readInt()), buffer.readInt());
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         ctx.get().setPacketHandled(true);
-        ctx.get().enqueueWork(() -> TesseractChannelManager.CLIENT.removeChannel(this.type, this.id));
+        if(this.type != null && this.id >= 0)
+            ctx.get().enqueueWork(() -> {
+                TesseractChannelManager.SERVER.removeChannel(this.type, this.id);
+            });
     }
 }

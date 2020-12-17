@@ -7,9 +7,9 @@ import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractTile;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import com.supermartijn642.tesseract.packets.PacketAddChannel;
 import com.supermartijn642.tesseract.packets.PacketRemoveChannel;
-import com.supermartijn642.tesseract.packets.PacketSetChannel;
+import com.supermartijn642.tesseract.packets.PacketScreenAddChannel;
+import com.supermartijn642.tesseract.packets.PacketScreenSetChannel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -86,7 +86,7 @@ public class TesseractScreen extends Screen {
         // set button
         boolean enabled = this.setButton != null && this.setButton.active;
         this.setButton = this.addButton(new Button(this.left + 140, this.top + 28 + 25, 80, 20, new TranslationTextComponent("gui.tesseract.set").getFormattedText(), button -> {
-            Tesseract.CHANNEL.sendToServer(new PacketSetChannel(type, this.selectedChannel, this.pos));
+            Tesseract.CHANNEL.sendToServer(new PacketScreenSetChannel(type, this.selectedChannel, this.pos));
             this.selectedChannel = -1;
             this.setButton.active = false;
             this.removeButton.active = false;
@@ -106,7 +106,7 @@ public class TesseractScreen extends Screen {
         // add button
         enabled = this.addButton != null && this.addButton.active;
         this.addButton = this.addButton(new Button(this.left + 165, this.top + 28 + 173, 55, 20, new TranslationTextComponent("gui.tesseract.add").getFormattedText(), button -> {
-            Tesseract.CHANNEL.sendToServer(new PacketAddChannel(type, this.lastText.trim(), this.privateButton.isLocked()));
+            Tesseract.CHANNEL.sendToServer(new PacketScreenAddChannel(type, this.lastText.trim(), this.privateButton.isLocked()));
             this.textField.setText("");
         }));
         this.addButton.active = enabled;
