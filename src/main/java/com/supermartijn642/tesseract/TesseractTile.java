@@ -243,4 +243,15 @@ public class TesseractTile extends TileEntity {
     private void updateReference(){
         this.reference.update(this);
     }
+
+    public void onReplaced(){
+        if(this.world.isRemote){
+            for(EnumChannelType type : EnumChannelType.values()){
+                Channel channel = this.getChannel(type);
+                if(channel != null)
+                    channel.removeTesseract(this.reference);
+            }
+            TesseractTracker.SERVER.remove(this.world, this.pos);
+        }
+    }
 }
