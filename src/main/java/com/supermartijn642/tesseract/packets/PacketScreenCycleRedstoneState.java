@@ -12,15 +12,15 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /**
  * Created 7/5/2020 by SuperMartijn642
  */
-public class PacketCycleRedstoneState implements IMessage, IMessageHandler<PacketCycleRedstoneState,IMessage> {
+public class PacketScreenCycleRedstoneState implements IMessage, IMessageHandler<PacketScreenCycleRedstoneState,IMessage> {
 
     private BlockPos pos;
 
-    public PacketCycleRedstoneState(BlockPos pos){
+    public PacketScreenCycleRedstoneState(BlockPos pos){
         this.pos = pos;
     }
 
-    public PacketCycleRedstoneState(){
+    public PacketScreenCycleRedstoneState(){
     }
 
     @Override
@@ -36,7 +36,7 @@ public class PacketCycleRedstoneState implements IMessage, IMessageHandler<Packe
     }
 
     @Override
-    public IMessage onMessage(PacketCycleRedstoneState message, MessageContext ctx){
+    public IMessage onMessage(PacketScreenCycleRedstoneState message, MessageContext ctx){
         World world = ctx.getServerHandler().player.world;
         if(world == null)
             return null;

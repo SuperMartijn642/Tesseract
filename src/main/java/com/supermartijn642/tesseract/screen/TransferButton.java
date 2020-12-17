@@ -4,7 +4,7 @@ import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractTile;
 import com.supermartijn642.tesseract.TransferState;
-import com.supermartijn642.tesseract.packets.PacketCycleTransferState;
+import com.supermartijn642.tesseract.packets.PacketScreenCycleTransferState;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -34,7 +34,7 @@ public class TransferButton extends CycleButton {
     @Override
     public void onPress(){
         if(this.pos != null)
-            Tesseract.channel.sendToServer(new PacketCycleTransferState(this.pos, this.type));
+            Tesseract.channel.sendToServer(new PacketScreenCycleTransferState(this.pos, this.type));
     }
 
 }

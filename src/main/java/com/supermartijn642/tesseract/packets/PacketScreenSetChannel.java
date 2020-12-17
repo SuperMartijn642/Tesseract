@@ -15,19 +15,19 @@ import java.nio.charset.StandardCharsets;
 /**
  * Created 4/23/2020 by SuperMartijn642
  */
-public class PacketSetChannel implements IMessage, IMessageHandler<PacketSetChannel,IMessage> {
+public class PacketScreenSetChannel implements IMessage, IMessageHandler<PacketScreenSetChannel,IMessage> {
 
     private EnumChannelType type;
     private int id;
     private BlockPos pos;
 
-    public PacketSetChannel(EnumChannelType type, int id, BlockPos pos){
+    public PacketScreenSetChannel(EnumChannelType type, int id, BlockPos pos){
         this.type = type;
         this.id = id;
         this.pos = pos;
     }
 
-    public PacketSetChannel(){
+    public PacketScreenSetChannel(){
     }
 
     @Override
@@ -51,7 +51,7 @@ public class PacketSetChannel implements IMessage, IMessageHandler<PacketSetChan
     }
 
     @Override
-    public IMessage onMessage(PacketSetChannel message, MessageContext ctx){
+    public IMessage onMessage(PacketScreenSetChannel message, MessageContext ctx){
         if(message.type == null || message.id < 0)
             return null;
         World world = ctx.getServerHandler().player.world;

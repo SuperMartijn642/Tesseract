@@ -66,8 +66,10 @@ public class BlockTesseract extends Block implements ITileEntityProvider {
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos){
         TileEntity tile = worldIn.getTileEntity(pos);
-        if(tile instanceof TesseractTile)
+        if(tile instanceof TesseractTile){
             ((TesseractTile)tile).setPowered(worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(pos.up()));
+            ((TesseractTile)tile).onNeighborChanged(fromPos);
+        }
     }
 
     @Override
@@ -78,5 +80,13 @@ public class BlockTesseract extends Block implements ITileEntityProvider {
     @Override
     public boolean isFullCube(IBlockState state){
         return false;
+    }
+
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state){
+        TileEntity tile = worldIn.getTileEntity(pos);
+        if(tile instanceof TesseractTile)
+            ((TesseractTile)tile).onReplaced();
+        super.breakBlock(worldIn, pos, state);
     }
 }

@@ -5,9 +5,9 @@ import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractTile;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import com.supermartijn642.tesseract.packets.PacketAddChannel;
-import com.supermartijn642.tesseract.packets.PacketRemoveChannel;
-import com.supermartijn642.tesseract.packets.PacketSetChannel;
+import com.supermartijn642.tesseract.packets.PacketScreenAddChannel;
+import com.supermartijn642.tesseract.packets.PacketScreenRemoveChannel;
+import com.supermartijn642.tesseract.packets.PacketScreenSetChannel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLockIconButton;
@@ -324,18 +324,18 @@ public class TesseractScreen extends GuiScreen {
     protected void actionPerformed(GuiButton button){
         if(button == this.addButton){
             if(!this.lastText.trim().isEmpty()){
-                Tesseract.channel.sendToServer(new PacketAddChannel(type, this.lastText.trim(), this.privateButton.isLocked()));
+                Tesseract.channel.sendToServer(new PacketScreenAddChannel(type, this.lastText.trim(), this.privateButton.isLocked()));
                 this.textField.setText("");
             }
         }else if(button == this.privateButton)
             this.privateButton.setLocked(!this.privateButton.isLocked());
         else if(button == this.setButton){
-            Tesseract.channel.sendToServer(new PacketSetChannel(type, this.selectedChannel, this.pos));
+            Tesseract.channel.sendToServer(new PacketScreenSetChannel(type, this.selectedChannel, this.pos));
             this.selectedChannel = -1;
             this.setButton.enabled = false;
             this.removeButton.enabled = false;
         }else if(button == this.removeButton){
-            Tesseract.channel.sendToServer(new PacketRemoveChannel(type, this.selectedChannel));
+            Tesseract.channel.sendToServer(new PacketScreenRemoveChannel(type, this.selectedChannel));
             this.selectedChannel = -1;
             this.setButton.enabled = false;
             this.removeButton.enabled = false;

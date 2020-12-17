@@ -2,111 +2,46 @@ package com.supermartijn642.tesseract;
 
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
+import com.supermartijn642.tesseract.manager.TesseractReference;
+import com.supermartijn642.tesseract.manager.TesseractTracker;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
  */
 public class TesseractTile extends TileEntity {
 
-    private static final IItemHandler EMPTY_ITEM_HANDLER = new IItemHandler() {
-        public int getSlots(){
-            return 0;
-        }
-
-        public ItemStack getStackInSlot(int slot){
-            return ItemStack.EMPTY;
-        }
-
-        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate){
-            return stack;
-        }
-
-        public ItemStack extractItem(int slot, int amount, boolean simulate){
-            return ItemStack.EMPTY;
-        }
-
-        public int getSlotLimit(int slot){
-            return 0;
-        }
-    };
-
-    private static final IFluidHandler EMPTY_FLUID_HANDLER = new IFluidHandler() {
-        public IFluidTankProperties[] getTankProperties(){
-            return new IFluidTankProperties[0];
-        }
-
-        public int fill(FluidStack resource, boolean doFill){
-            return 0;
-        }
-
-        public FluidStack drain(FluidStack resource, boolean doDrain){
-            return null;
-        }
-
-        public FluidStack drain(int maxDrain, boolean doDrain){
-            return null;
-        }
-    };
-    private static final IEnergyStorage EMPTY_ENERGY_STORAGE = new IEnergyStorage() {
-        public int receiveEnergy(int maxReceive, boolean simulate){
-            return 0;
-        }
-
-        public int extractEnergy(int maxExtract, boolean simulate){
-            return 0;
-        }
-
-        public int getEnergyStored(){
-            return 0;
-        }
-
-        public int getMaxEnergyStored(){
-            return 0;
-        }
-
-        public boolean canExtract(){
-            return true;
-        }
-
-        public boolean canReceive(){
-            return true;
-        }
-    };
-
-    private final HashMap<EnumChannelType,Integer> channels = new HashMap<>();
-    private final HashMap<EnumChannelType,TransferState> transferState = new HashMap<>();
+    private TesseractReference reference;
+    private final EnumMap<EnumChannelType,Integer> channels = new EnumMap<>(EnumChannelType.class);
+    private final EnumMap<EnumChannelType,TransferState> transferState = new EnumMap<>(EnumChannelType.class);
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
 
     private boolean dataChanged = false;
 
+    private final Map<EnumFacing,Map<Capability<?>,Object>> capabilities = new HashMap<>();
+
     public TesseractTile(){
+        super();
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, -1);
             this.transferState.put(type, TransferState.BOTH);
         }
+        for(EnumFacing facing : EnumFacing.values())
+            this.capabilities.put(facing, new HashMap<>());
     }
 
     public void setChannel(EnumChannelType type, int channel){
@@ -115,10 +50,11 @@ public class TesseractTile extends TileEntity {
         Channel oldChannel = this.getChannel(type);
         this.channels.put(type, channel);
         if(oldChannel != null)
-            oldChannel.removeTesseract(this);
+            oldChannel.removeTesseract(this.reference);
         Channel newChannel = this.getChannel(type);
         if(newChannel != null)
-            newChannel.addTesseract(this);
+            newChannel.addTesseract(this.reference);
+        this.updateReference();
         this.dataChanged();
     }
 
@@ -128,8 +64,10 @@ public class TesseractTile extends TileEntity {
 
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing){
-        return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY ||
-            capability == CapabilityEnergy.ENERGY || super.hasCapability(capability, facing);
+        return (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && this.getChannel(EnumChannelType.ITEMS) != null) ||
+            (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && this.getChannel(EnumChannelType.FLUID) != null) ||
+            (capability == CapabilityEnergy.ENERGY && this.getChannel(EnumChannelType.ENERGY) != null) ||
+            super.hasCapability(capability, facing);
     }
 
     @Nullable
@@ -137,31 +75,39 @@ public class TesseractTile extends TileEntity {
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing){
         if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
             if(this.getChannel(EnumChannelType.ITEMS) == null)
-                return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(EMPTY_ITEM_HANDLER);
+                return null;
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.getChannel(EnumChannelType.ITEMS).getItemHandler(this));
         }
         if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY){
             if(this.getChannel(EnumChannelType.FLUID) == null)
-                return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(EMPTY_FLUID_HANDLER);
+                return null;
             return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this.getChannel(EnumChannelType.FLUID).getFluidHandler(this));
         }
         if(capability == CapabilityEnergy.ENERGY){
             if(this.getChannel(EnumChannelType.ENERGY) == null)
-                return CapabilityEnergy.ENERGY.cast(EMPTY_ENERGY_STORAGE);
+                return null;
             return CapabilityEnergy.ENERGY.cast(this.getChannel(EnumChannelType.ENERGY).getEnergyStorage(this));
         }
         return super.getCapability(capability, facing);
     }
 
     public <T> List<T> getSurroundingCapabilities(Capability<T> capability){
+        if(this.world == null)
+            return Collections.emptyList();
+
         ArrayList<T> list = new ArrayList<>();
         for(EnumFacing facing : EnumFacing.values()){
-            TileEntity tile = this.getWorld().getTileEntity(this.pos.offset(facing));
-            if(tile != null && !(tile instanceof TesseractTile) && tile.hasCapability(capability, facing.getOpposite())){
-                T handler = tile.getCapability(capability, facing.getOpposite());
-                if(handler != null)
-                    list.add(handler);
-            }
+            if(!this.capabilities.get(facing).containsKey(capability)){
+                TileEntity tile = this.world.getTileEntity(this.pos.offset(facing));
+                if(tile != null && !(tile instanceof TesseractTile)){
+                    T object = tile.getCapability(capability, facing.getOpposite());
+                    if(object != null){
+                        this.capabilities.get(facing).put(capability, object);
+                        list.add(object);
+                    }
+                }
+            }else
+                list.add((T)this.capabilities.get(facing).get(capability));
         }
         return list;
     }
@@ -187,6 +133,7 @@ public class TesseractTile extends TileEntity {
     public void cycleTransferState(EnumChannelType type){
         TransferState transferState = this.transferState.get(type);
         this.transferState.put(type, transferState == TransferState.BOTH ? TransferState.SEND : transferState == TransferState.SEND ? TransferState.RECEIVE : TransferState.BOTH);
+        this.updateReference();
         this.dataChanged();
     }
 
@@ -196,14 +143,22 @@ public class TesseractTile extends TileEntity {
 
     public void cycleRedstoneState(){
         this.redstoneState = this.redstoneState == RedstoneState.DISABLED ? RedstoneState.HIGH : this.redstoneState == RedstoneState.HIGH ? RedstoneState.LOW : RedstoneState.DISABLED;
+        this.updateReference();
         this.dataChanged();
     }
 
     public void setPowered(boolean powered){
         if(this.redstone != powered){
             this.redstone = powered;
+            this.updateReference();
             this.dataChanged();
         }
+    }
+
+    @Override
+    public void onLoad(){
+        if(!this.world.isRemote)
+            this.reference = TesseractTracker.SERVER.add(this);
     }
 
     @Override
@@ -278,9 +233,15 @@ public class TesseractTile extends TileEntity {
         Channel channel = TesseractChannelManager.getInstance(this.world).getChannelById(type, this.channels.get(type));
         if(channel == null && !this.world.isRemote){
             this.channels.put(type, -1);
+            this.updateReference();
             this.dataChanged();
         }
         return channel;
+    }
+
+    public void onNeighborChanged(BlockPos neighbor){
+        EnumFacing facing = EnumFacing.getFacingFromVector(neighbor.getX() - this.pos.getX(), neighbor.getY() - this.pos.getY(), neighbor.getZ() - this.pos.getZ());
+        this.capabilities.get(facing).clear();
     }
 
     private void dataChanged(){
@@ -289,5 +250,20 @@ public class TesseractTile extends TileEntity {
         this.world.notifyBlockUpdate(this.pos, state, state, 2);
         this.world.notifyNeighborsOfStateChange(this.pos, this.blockType, false);
         this.markDirty();
+    }
+
+    private void updateReference(){
+        this.reference.update(this);
+    }
+
+    public void onReplaced(){
+        if(this.world.isRemote){
+            for(EnumChannelType type : EnumChannelType.values()){
+                Channel channel = this.getChannel(type);
+                if(channel != null)
+                    channel.removeTesseract(this.reference);
+            }
+            TesseractTracker.SERVER.remove(this.world, this.pos);
+        }
     }
 }

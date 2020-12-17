@@ -3,7 +3,7 @@ package com.supermartijn642.tesseract.screen;
 import com.supermartijn642.tesseract.RedstoneState;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractTile;
-import com.supermartijn642.tesseract.packets.PacketCycleRedstoneState;
+import com.supermartijn642.tesseract.packets.PacketScreenCycleRedstoneState;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -31,6 +31,6 @@ public class RedstoneButton extends CycleButton {
     @Override
     public void onPress(){
         if(this.pos != null)
-            Tesseract.channel.sendToServer(new PacketCycleRedstoneState(this.pos));
+            Tesseract.channel.sendToServer(new PacketScreenCycleRedstoneState(this.pos));
     }
 }

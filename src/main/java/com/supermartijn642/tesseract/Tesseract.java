@@ -1,6 +1,7 @@
 package com.supermartijn642.tesseract;
 
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
+import com.supermartijn642.tesseract.manager.TesseractTracker;
 import com.supermartijn642.tesseract.packets.*;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -36,16 +37,20 @@ public class Tesseract {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e){
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
-        channel.registerMessage(PacketSendChannels.class, PacketSendChannels.class, 0, Side.CLIENT);
-        channel.registerMessage(PacketAddChannel.class, PacketAddChannel.class, 1, Side.SERVER);
-        channel.registerMessage(PacketRemoveChannel.class, PacketRemoveChannel.class, 2, Side.SERVER);
-        channel.registerMessage(PacketSetChannel.class, PacketSetChannel.class, 3, Side.SERVER);
-        channel.registerMessage(PacketCycleRedstoneState.class, PacketCycleRedstoneState.class, 4, Side.SERVER);
-        channel.registerMessage(PacketCycleTransferState.class, PacketCycleTransferState.class, 5, Side.SERVER);
+
+        channel.registerMessage(PacketCompleteChannelsUpdate.class, PacketCompleteChannelsUpdate.class, 0, Side.CLIENT);
+        channel.registerMessage(PacketScreenAddChannel.class, PacketScreenAddChannel.class, 1, Side.SERVER);
+        channel.registerMessage(PacketScreenRemoveChannel.class, PacketScreenRemoveChannel.class, 2, Side.SERVER);
+        channel.registerMessage(PacketScreenSetChannel.class, PacketScreenSetChannel.class, 3, Side.SERVER);
+        channel.registerMessage(PacketScreenCycleRedstoneState.class, PacketScreenCycleRedstoneState.class, 4, Side.SERVER);
+        channel.registerMessage(PacketScreenCycleTransferState.class, PacketScreenCycleTransferState.class, 5, Side.SERVER);
+        channel.registerMessage(PacketAddChannel.class, PacketAddChannel.class, 6, Side.CLIENT);
+        channel.registerMessage(PacketRemoveChannel.class, PacketRemoveChannel.class, 7, Side.CLIENT);
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent e){
+        MinecraftForge.EVENT_BUS.register(TesseractTracker.class);
         MinecraftForge.EVENT_BUS.register(TesseractChannelManager.class);
     }
 

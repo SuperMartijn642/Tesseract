@@ -37,4 +37,8 @@ public class ClientProxy {
     public static ListenableFuture<Object> scheduleTask(Runnable task){
         return Minecraft.getMinecraft().addScheduledTask(task);
     }
+
+    public static void queTask(Runnable task){
+        Minecraft.getMinecraft().addScheduledTask(task);
+    }
 }

@@ -6,10 +6,9 @@ import com.supermartijn642.tesseract.capabilities.CombinedEnergyStorage;
 import com.supermartijn642.tesseract.capabilities.CombinedFluidHandler;
 import com.supermartijn642.tesseract.capabilities.CombinedItemHandler;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created 3/20/2020 by SuperMartijn642
@@ -23,7 +22,9 @@ public class Channel {
 
     public String name;
 
-    private final List<TesseractLocation> tesseracts = new LinkedList<>();
+    public final Set<TesseractReference> tesseracts = new LinkedHashSet<>();
+    public final Set<TesseractReference> sendingTesseracts = new LinkedHashSet<>();
+    public final Set<TesseractReference> receivingTesseracts = new LinkedHashSet<>();
 
     public Channel(int id, EnumChannelType type, UUID creator, boolean isPrivate, String name){
         this.id = id;
@@ -43,18 +44,34 @@ public class Channel {
         return this.name;
     }
 
-    public void addTesseract(TesseractTile tesseract){
-        TesseractLocation location = new TesseractLocation(tesseract.getWorld(), tesseract.getPos());
-        if(!this.tesseracts.contains(location)){
-            this.tesseracts.add(location);
-            tesseract.setChannel(this.type, this.id);
+    public void addTesseract(TesseractReference tesseract){
+        if(!this.tesseracts.contains(tesseract)){
+            this.tesseracts.add(tesseract);
+            if(tesseract.canSend(this.type))
+                this.sendingTesseracts.add(tesseract);
+            if(tesseract.canReceive(this.type))
+                this.receivingTesseracts.add(tesseract);
+            if(tesseract.getChannelId(this.type) != this.id)
+                tesseract.getTesseract().setChannel(this.type, this.id);
         }
     }
 
-    public void removeTesseract(TesseractTile tesseract){
-        TesseractLocation location = new TesseractLocation(tesseract.getWorld(), tesseract.getPos());
-        this.tesseracts.remove(location);
-        tesseract.setChannel(this.type, -1);
+    public void removeTesseract(TesseractReference tesseract){
+        this.tesseracts.remove(tesseract);
+        this.sendingTesseracts.remove(tesseract);
+        this.receivingTesseracts.remove(tesseract);
+    }
+
+    public void updateTesseract(TesseractReference tesseract){
+        if(tesseract.canSend(this.type))
+            this.sendingTesseracts.add(tesseract);
+        else
+            this.sendingTesseracts.remove(tesseract);
+
+        if(tesseract.canReceive(this.type))
+            this.receivingTesseracts.add(tesseract);
+        else
+            this.receivingTesseracts.remove(tesseract);
     }
 
     public NBTTagCompound write(){
@@ -63,11 +80,10 @@ public class Channel {
         compound.setBoolean("private", this.isPrivate);
         compound.setString("name", this.name);
         NBTTagCompound tesseractCompound = new NBTTagCompound();
-        for(int a = 0; a < this.tesseracts.size(); a++){
-            if(this.tesseracts.get(a).isValid())
-                tesseractCompound.setTag(Integer.toString(a), this.tesseracts.get(a).write());
-        }
-        compound.setTag("tesseracts", tesseractCompound);
+        Iterator<TesseractReference> iterator = this.tesseracts.iterator();
+        for(int i = 0; iterator.hasNext(); i++)
+            tesseractCompound.setTag("tesseract" + i, TesseractTracker.SERVER.writeKey(iterator.next()));
+        compound.setTag("references", tesseractCompound);
         return compound;
     }
 
@@ -76,23 +92,57 @@ public class Channel {
         this.isPrivate = compound.getBoolean("private");
         this.name = compound.getString("name");
         this.tesseracts.clear();
-        NBTTagCompound tesseractCompound = compound.getCompoundTag("tesseracts");
+        this.sendingTesseracts.clear();
+        this.receivingTesseracts.clear();
+        NBTTagCompound tesseractCompound = compound.getCompoundTag("references");
         for(String key : tesseractCompound.getKeySet()){
-            TesseractLocation location = new TesseractLocation(tesseractCompound.getCompoundTag(key));
-            this.tesseracts.add(location);
+            TesseractReference reference = TesseractTracker.SERVER.fromKey(tesseractCompound.getCompoundTag(key));
+            if(reference != null)
+                this.addTesseract(reference);
+        }
+
+        if(compound.hasKey("tesseracts")){ // for older versions
+            tesseractCompound = compound.getCompoundTag("tesseracts");
+            for(String key : tesseractCompound.getKeySet()){
+                NBTTagCompound compound2 = tesseractCompound.getCompoundTag(key);
+                int dimension = compound2.getInteger("dim");
+                BlockPos pos = new BlockPos(compound2.getInteger("posx"), compound2.getInteger("posy"), compound2.getInteger("posz"));
+                TesseractReference reference = TesseractTracker.SERVER.tryAdd(dimension, pos);
+                if(reference != null)
+                    this.addTesseract(reference);
+            }
         }
     }
 
+    public NBTTagCompound writeClientChannel(){
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setInteger("id", this.id);
+        tag.setInteger("type", this.type.getIndex());
+        tag.setUniqueId("creator", this.creator);
+        tag.setBoolean("private", this.isPrivate);
+        tag.setString("name", this.name);
+        return tag;
+    }
+
+    public static Channel readClientChannel(NBTTagCompound tag){
+        int id = tag.getInteger("id");
+        EnumChannelType type = EnumChannelType.byIndex(tag.getInteger("type"));
+        UUID creator = tag.getUniqueId("creator");
+        boolean isPrivate = tag.getBoolean("private");
+        String name = tag.getString("name");
+        return new Channel(id, type, creator, isPrivate, name);
+    }
+
     public CombinedItemHandler getItemHandler(TesseractTile self){
-        return new CombinedItemHandler(this.tesseracts, self);
+        return new CombinedItemHandler(this, self);
     }
 
     public CombinedFluidHandler getFluidHandler(TesseractTile self){
-        return new CombinedFluidHandler(this.tesseracts, self);
+        return new CombinedFluidHandler(this, self);
     }
 
     public CombinedEnergyStorage getEnergyStorage(TesseractTile self){
-        return new CombinedEnergyStorage(this.tesseracts, self);
+        return new CombinedEnergyStorage(this, self);
     }
 
     @Override
@@ -101,7 +151,7 @@ public class Channel {
     }
 
     public void delete(){
-        for(TesseractLocation location : this.tesseracts)
+        for(TesseractReference location : this.tesseracts)
             if(location.isValid())
                 location.getTesseract().setChannel(this.type, -1);
     }

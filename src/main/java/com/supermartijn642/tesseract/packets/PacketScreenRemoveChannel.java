@@ -1,6 +1,5 @@
 package com.supermartijn642.tesseract.packets;
 
-import com.supermartijn642.tesseract.ClientProxy;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import io.netty.buffer.ByteBuf;
@@ -11,17 +10,17 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /**
  * Created 4/23/2020 by SuperMartijn642
  */
-public class PacketRemoveChannel implements IMessage, IMessageHandler<PacketRemoveChannel,IMessage> {
+public class PacketScreenRemoveChannel implements IMessage, IMessageHandler<PacketScreenRemoveChannel,IMessage> {
 
     private EnumChannelType type;
     private int id;
 
-    public PacketRemoveChannel(EnumChannelType type, int id){
+    public PacketScreenRemoveChannel(EnumChannelType type, int id){
         this.type = type;
         this.id = id;
     }
 
-    public PacketRemoveChannel(){
+    public PacketScreenRemoveChannel(){
     }
 
     @Override
@@ -37,10 +36,11 @@ public class PacketRemoveChannel implements IMessage, IMessageHandler<PacketRemo
     }
 
     @Override
-    public IMessage onMessage(PacketRemoveChannel message, MessageContext ctx){
-        ClientProxy.queTask(() ->
-            TesseractChannelManager.CLIENT.removeChannel(message.type, message.id)
-        );
+    public IMessage onMessage(PacketScreenRemoveChannel message, MessageContext ctx){
+        if(message.type != null && message.id >= 0)
+            ctx.getServerHandler().player.getServerWorld().addScheduledTask(() ->
+                TesseractChannelManager.SERVER.removeChannel(message.type, message.id)
+            );
         return null;
     }
 }

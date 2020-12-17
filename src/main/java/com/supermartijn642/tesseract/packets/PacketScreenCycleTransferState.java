@@ -13,17 +13,17 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /**
  * Created 7/5/2020 by SuperMartijn642
  */
-public class PacketCycleTransferState implements IMessage, IMessageHandler<PacketCycleTransferState,IMessage> {
+public class PacketScreenCycleTransferState implements IMessage, IMessageHandler<PacketScreenCycleTransferState,IMessage> {
 
     private BlockPos pos;
     private EnumChannelType type;
 
-    public PacketCycleTransferState(BlockPos pos, EnumChannelType type){
+    public PacketScreenCycleTransferState(BlockPos pos, EnumChannelType type){
         this.pos = pos;
         this.type = type;
     }
 
-    public PacketCycleTransferState(){
+    public PacketScreenCycleTransferState(){
     }
 
     @Override
@@ -45,7 +45,7 @@ public class PacketCycleTransferState implements IMessage, IMessageHandler<Packe
     }
 
     @Override
-    public IMessage onMessage(PacketCycleTransferState message, MessageContext ctx){
+    public IMessage onMessage(PacketScreenCycleTransferState message, MessageContext ctx){
         World world = ctx.getServerHandler().player.world;
         if(world == null)
             return null;
