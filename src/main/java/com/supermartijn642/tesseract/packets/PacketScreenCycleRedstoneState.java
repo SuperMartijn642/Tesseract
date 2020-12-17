@@ -1,6 +1,5 @@
 package com.supermartijn642.tesseract.packets;
 
-import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractTile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
@@ -14,23 +13,20 @@ import java.util.function.Supplier;
 /**
  * Created 7/5/2020 by SuperMartijn642
  */
-public class PacketCycleTransferState {
+public class PacketScreenCycleRedstoneState {
 
     private BlockPos pos;
-    private EnumChannelType type;
 
-    public PacketCycleTransferState(BlockPos pos, EnumChannelType type){
+    public PacketScreenCycleRedstoneState(BlockPos pos){
         this.pos = pos;
-        this.type = type;
     }
 
     public void encode(PacketBuffer buffer){
         buffer.writeBlockPos(this.pos);
-        buffer.writeString(this.type.name());
     }
 
-    public static PacketCycleTransferState decode(PacketBuffer buffer){
-        return new PacketCycleTransferState(buffer.readBlockPos(), EnumChannelType.valueOf(buffer.readString(32767)));
+    public static PacketScreenCycleRedstoneState decode(PacketBuffer buffer){
+        return new PacketScreenCycleRedstoneState(buffer.readBlockPos());
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
@@ -44,7 +40,7 @@ public class PacketCycleTransferState {
         ctx.get().enqueueWork(() -> {
             TileEntity tile = world.getTileEntity(this.pos);
             if(tile instanceof TesseractTile)
-                ((TesseractTile)tile).cycleTransferState(this.type);
+                ((TesseractTile)tile).cycleRedstoneState();
         });
     }
 }
