@@ -89,7 +89,7 @@ public class TesseractTracker {
         int index = 0;
         for(Map.Entry<String,HashMap<BlockPos,TesseractReference>> dimensionEntry : SERVER.tesseracts.entrySet()){
             for(Map.Entry<BlockPos,TesseractReference> entry : dimensionEntry.getValue().entrySet()){
-                File file = new File(directory, "tesseract" + index + ".nbt");
+                File file = new File(directory, "tesseract" + index++ + ".nbt");
                 try{
                     file.getParentFile().mkdirs();
                     file.createNewFile();
