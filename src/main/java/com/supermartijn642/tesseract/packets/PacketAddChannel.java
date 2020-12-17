@@ -1,6 +1,7 @@
 package com.supermartijn642.tesseract.packets;
 
-import com.supermartijn642.tesseract.EnumChannelType;
+import com.supermartijn642.tesseract.ClientProxy;
+import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -12,31 +13,25 @@ import java.util.function.Supplier;
  */
 public class PacketAddChannel {
 
-    private EnumChannelType type;
-    private String name;
-    private boolean isPrivate;
+    private Channel channel;
 
-    public PacketAddChannel(EnumChannelType type, String name, boolean isPrivate){
-        this.type = type;
-        this.name = name;
-        this.isPrivate = isPrivate;
+    public PacketAddChannel(Channel channel){
+        this.channel = channel;
     }
 
     public void encode(PacketBuffer buffer){
-        buffer.writeInt(this.type.getIndex());
-        buffer.writeString(this.name);
-        buffer.writeBoolean(this.isPrivate);
+        buffer.writeCompoundTag(this.channel.writeClientChannel());
     }
 
-    public static PacketScreenAddChannel decode(PacketBuffer buffer){
-        return new PacketScreenAddChannel(EnumChannelType.byIndex(buffer.readInt()), buffer.readString(32767), buffer.readBoolean());
+    public static PacketAddChannel decode(PacketBuffer buffer){
+        return new PacketAddChannel(Channel.readClientChannel(buffer.readCompoundTag()));
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         ctx.get().setPacketHandled(true);
-        if(this.type != null && !this.name.trim().isEmpty())
-            ctx.get().enqueueWork(() ->
-                TesseractChannelManager.SERVER.addChannel(this.type, ctx.get().getSender().getUniqueID(), this.isPrivate, this.name)
-            );
+        ctx.get().enqueueWork(() -> {
+            TesseractChannelManager.CLIENT.addChannel(this.channel);
+            TesseractChannelManager.CLIENT.sortChannels(ClientProxy.getPlayer(), this.channel.type);
+        });
     }
 }

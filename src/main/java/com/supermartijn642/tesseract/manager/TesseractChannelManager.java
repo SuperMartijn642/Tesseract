@@ -2,7 +2,9 @@ package com.supermartijn642.tesseract.manager;
 
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
-import com.supermartijn642.tesseract.packets.PacketSendChannels;
+import com.supermartijn642.tesseract.packets.PacketAddChannel;
+import com.supermartijn642.tesseract.packets.PacketCompleteChannelsUpdate;
+import com.supermartijn642.tesseract.packets.PacketRemoveChannel;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
@@ -40,38 +42,29 @@ public class TesseractChannelManager {
 
     public Channel addChannel(EnumChannelType type, UUID creator, boolean isPrivate, String name){
         types.putIfAbsent(type, new ChannelList(type));
-        Channel channel;
-        synchronized(types.get(type)){
-            channel = types.get(type).add(creator, isPrivate, name);
-        }
-        this.update(type);
+        Channel channel = types.get(type).add(creator, isPrivate, name);
+        this.sendAddChannelPacket(channel);
         return channel;
     }
 
     public Channel addChannel(Channel channel){
         types.putIfAbsent(channel.type, new ChannelList(channel.type));
-        synchronized(types.get(channel.type)){
-            types.get(channel.type).add(channel);
-        }
-        this.update(channel.type);
+        types.get(channel.type).add(channel);
+        this.sendAddChannelPacket(channel);
         return channel;
     }
 
     public void removeChannel(EnumChannelType type, int id){
         types.putIfAbsent(type, new ChannelList(type));
-        synchronized(types.get(type)){
-            types.get(type).remove(id);
-        }
-        this.update(type);
+        types.get(type).remove(id);
+        this.sendRemoveChannelPacket(type, id);
     }
 
     public void sortChannels(PlayerEntity player, EnumChannelType type){
         if(player == null || player.world == null || !player.world.isRemote)
             return;
         types.putIfAbsent(type, new ChannelList(type));
-        synchronized(types.get(type)){
-            types.get(type).sortForPlayer(player);
-        }
+        types.get(type).sortForPlayer(player);
     }
 
     public List<Channel> getChannels(EnumChannelType type){
@@ -89,20 +82,33 @@ public class TesseractChannelManager {
         return types.get(type).getById(id);
     }
 
-    public void clear(EnumChannelType type){
-        types.putIfAbsent(type, new ChannelList(type));
-        types.get(type).clear();
+    public void clear(){
+        for(EnumChannelType type : EnumChannelType.values()){
+            types.putIfAbsent(type, new ChannelList(type));
+            types.get(type).clear();
+        }
     }
 
-    public void update(EnumChannelType type){
+    public void sendCompleteUpdatePacket(PlayerEntity player){
         if(this == SERVER)
-            Tesseract.CHANNEL.send(PacketDistributor.ALL.noArg(), new PacketSendChannels(type));
+            Tesseract.CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new PacketCompleteChannelsUpdate());
+    }
+
+    public void sendAddChannelPacket(Channel channel){
+        if(this == SERVER)
+            Tesseract.CHANNEL.send(PacketDistributor.ALL.noArg(), new PacketAddChannel(channel));
+    }
+
+    public void sendRemoveChannelPacket(EnumChannelType type, int id){
+        if(this == SERVER)
+            Tesseract.CHANNEL.send(PacketDistributor.ALL.noArg(), new PacketRemoveChannel(type, id));
     }
 
     @SubscribeEvent
     public static void onSave(WorldEvent.Save e){
         if(e.getWorld().isRemote() || !(e.getWorld() instanceof World) || ((World)e.getWorld()).getDimensionKey() != World.OVERWORLD)
             return;
+
         for(ChannelList list : SERVER.types.values()){
             File folder = new File(directory, list.type.name().toLowerCase(Locale.ENGLISH));
             if(!folder.exists())
@@ -115,6 +121,7 @@ public class TesseractChannelManager {
     public static void onLoad(WorldEvent.Load e){
         if(e.getWorld().isRemote() || !(e.getWorld() instanceof World) || ((World)e.getWorld()).getDimensionKey() != World.OVERWORLD)
             return;
+
         minecraftServer = ((ServerWorld)e.getWorld()).getServer();
         directory = new File(((ServerWorld)e.getWorld()).getServer().func_240776_a_(FolderName.DOT).toFile(), "tesseract");
         for(EnumChannelType type : EnumChannelType.values()){
@@ -127,7 +134,7 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onJoin(PlayerEvent.PlayerLoggedInEvent e){
-        for(EnumChannelType type : EnumChannelType.values())
-            Tesseract.CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)e.getPlayer()), new PacketSendChannels(type));
+        if(!e.getPlayer().getEntityWorld().isRemote)
+            SERVER.sendCompleteUpdatePacket(e.getPlayer());
     }
 }
