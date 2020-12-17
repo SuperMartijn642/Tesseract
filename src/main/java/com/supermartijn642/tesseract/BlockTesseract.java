@@ -26,10 +26,6 @@ import javax.annotation.Nullable;
  */
 public class BlockTesseract extends Block {
 
-    /*
-        TODO remove reference when the block is broken
-     */
-
     public BlockTesseract(){
         super(Block.Properties.create(Material.ANVIL, MaterialColor.GREEN).sound(SoundType.METAL).harvestTool(ToolType.PICKAXE).hardnessAndResistance(1.5F, 6.0F));
         this.setRegistryName("tesseract");
@@ -66,8 +62,10 @@ public class BlockTesseract extends Block {
     @Override
     public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving){
         TileEntity tile = worldIn.getTileEntity(pos);
-        if(tile instanceof TesseractTile)
+        if(tile instanceof TesseractTile){
             ((TesseractTile)tile).setPowered(worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(pos.up()));
+            ((TesseractTile)tile).onNeighborChanged(fromPos);
+        }
     }
 
     @Override

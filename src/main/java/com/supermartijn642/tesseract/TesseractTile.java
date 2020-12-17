@@ -19,10 +19,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
@@ -37,12 +34,16 @@ public class TesseractTile extends TileEntity {
 
     private boolean dataChanged = false;
 
+    private final Map<Direction,Map<Capability<?>,Object>> capabilities = new HashMap<>();
+
     public TesseractTile(){
         super(Tesseract.tesseract_tile);
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, -1);
             this.transferState.put(type, TransferState.BOTH);
         }
+        for(Direction facing : Direction.values())
+            this.capabilities.put(facing, new HashMap<>());
     }
 
     public void setChannel(EnumChannelType type, int channel){
@@ -93,11 +94,20 @@ public class TesseractTile extends TileEntity {
     public <T> List<T> getSurroundingCapabilities(Capability<T> capability){
         if(this.world == null)
             return Collections.emptyList();
+
         ArrayList<T> list = new ArrayList<>();
         for(Direction facing : Direction.values()){
-            TileEntity tile = this.world.getTileEntity(this.pos.offset(facing));
-            if(tile != null && !(tile instanceof TesseractTile))
-                tile.getCapability(capability, facing.getOpposite()).ifPresent(list::add);
+            if(!this.capabilities.get(facing).containsKey(capability)){
+                TileEntity tile = this.world.getTileEntity(this.pos.offset(facing));
+                if(tile != null && !(tile instanceof TesseractTile))
+                    tile.getCapability(capability, facing.getOpposite()).ifPresent(
+                        object -> {
+                            this.capabilities.get(facing).put(capability, object);
+                            list.add(object);
+                        }
+                    );
+            }else
+                list.add((T)this.capabilities.get(facing).get(capability));
         }
         return list;
     }
@@ -229,8 +239,9 @@ public class TesseractTile extends TileEntity {
         return channel;
     }
 
-    private void onNeighborChanged(BlockPos neighbor){
-        // TODO cache neighbors
+    public void onNeighborChanged(BlockPos neighbor){
+        Direction facing = Direction.getFacingFromVector(neighbor.getX() - this.pos.getX(), neighbor.getY() - this.pos.getY(), neighbor.getZ() - this.pos.getZ());
+        this.capabilities.get(facing).clear();
     }
 
     private void dataChanged(){
