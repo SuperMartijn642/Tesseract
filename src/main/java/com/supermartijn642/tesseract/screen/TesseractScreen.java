@@ -7,8 +7,8 @@ import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractTile;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import com.supermartijn642.tesseract.packets.PacketRemoveChannel;
 import com.supermartijn642.tesseract.packets.PacketScreenAddChannel;
+import com.supermartijn642.tesseract.packets.PacketScreenRemoveChannel;
 import com.supermartijn642.tesseract.packets.PacketScreenSetChannel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -96,7 +96,7 @@ public class TesseractScreen extends Screen {
         // remove button
         enabled = this.removeButton != null && this.removeButton.active;
         this.removeButton = this.addButton(new Button(this.left + 140, this.top + 28 + 50, 80, 20, new TranslationTextComponent("gui.tesseract.remove").getFormattedText(), buttons -> {
-            Tesseract.CHANNEL.sendToServer(new PacketRemoveChannel(type, this.selectedChannel));
+            Tesseract.CHANNEL.sendToServer(new PacketScreenRemoveChannel(type, this.selectedChannel));
             this.selectedChannel = -1;
             this.setButton.active = false;
             this.removeButton.active = false;
