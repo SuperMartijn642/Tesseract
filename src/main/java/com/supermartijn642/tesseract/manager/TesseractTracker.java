@@ -12,11 +12,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created 12/16/2020 by SuperMartijn642
@@ -31,6 +34,7 @@ public class TesseractTracker {
     }
 
     private final IntObjectMap<HashMap<BlockPos,TesseractReference>> tesseracts = new IntObjectHashMap<>();
+    private final Set<TesseractReference> toBeRemoved = new HashSet<>();
 
     public TesseractReference add(TesseractTile self){
         int dimension = self.getWorld().provider.getDimension();
@@ -45,10 +49,22 @@ public class TesseractTracker {
         return tile instanceof TesseractTile ? this.add((TesseractTile)tile) : null;
     }
 
-    public TesseractReference remove(World world, BlockPos pos){
+    public void remove(World world, BlockPos pos){
         int dimension = world.provider.getDimension();
+        this.remove(dimension, pos);
+    }
+
+    public void remove(int dimension, BlockPos pos){
         this.tesseracts.putIfAbsent(dimension, new HashMap<>());
-        return this.tesseracts.get(dimension).remove(pos);
+        TesseractReference reference = this.tesseracts.get(dimension).get(pos);
+        if(reference != null)
+            this.toBeRemoved.add(reference);
+    }
+
+    private void removeAndUpdate(TesseractReference reference){
+        reference.delete();
+        this.tesseracts.putIfAbsent(reference.getDimension(), new HashMap<>());
+        this.tesseracts.get(reference.getDimension()).remove(reference.getPos());
     }
 
     public TesseractReference get(World world, BlockPos pos){
@@ -118,5 +134,14 @@ public class TesseractTracker {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onTick(TickEvent.WorldTickEvent e){
+        if(e.world.isRemote || e.phase != TickEvent.Phase.END || e.world.provider.getDimensionType() != DimensionType.OVERWORLD)
+            return;
+
+        SERVER.toBeRemoved.forEach(SERVER::removeAndUpdate);
+        SERVER.toBeRemoved.clear();
     }
 }
