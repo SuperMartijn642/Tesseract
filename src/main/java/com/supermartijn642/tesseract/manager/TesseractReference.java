@@ -10,6 +10,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.DimensionManager;
 
 import java.util.EnumMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -60,7 +61,12 @@ public class TesseractReference {
 
     public boolean isValid(){
         World world = this.getWorld();
-        return world != null && world.getBlockState(this.pos).getBlock() == Tesseract.tesseract && world.getTileEntity(pos) instanceof TesseractTile;
+        boolean isValid = world != null && world.getBlockState(this.pos).getBlock() == Tesseract.tesseract && world.getTileEntity(pos) instanceof TesseractTile;
+
+        if(!isValid)
+            TesseractTracker.SERVER.remove(this.dimension, this.pos);
+
+        return isValid;
     }
 
     public TesseractTile getTesseract(){
@@ -104,6 +110,14 @@ public class TesseractReference {
                 if(channel != null)
                     channel.updateTesseract(this);
             }
+        }
+    }
+
+    public void delete(){
+        for(Map.Entry<EnumChannelType,Integer> entry : this.channels.entrySet()){
+            Channel channel = TesseractChannelManager.SERVER.getChannelById(entry.getKey(), entry.getValue());
+            if(channel != null)
+                channel.removeTesseract(this);
         }
     }
 
