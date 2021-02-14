@@ -251,7 +251,9 @@ public class TesseractTile extends TileEntity {
     }
 
     private void updateReference(){
-        this.reference.update(this);
+        // Mekanism seems to interact with the tile entity before #onLoad is called somehow, thus this check is needed
+        if(this.reference != null)
+            this.reference.update(this);
     }
 
     public void onReplaced(){
