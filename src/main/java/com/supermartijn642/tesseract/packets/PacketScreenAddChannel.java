@@ -3,6 +3,7 @@ package com.supermartijn642.tesseract.packets;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.SharedConstants;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -34,7 +35,7 @@ public class PacketScreenAddChannel {
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         ctx.get().setPacketHandled(true);
-        if(this.type != null && !this.name.trim().isEmpty())
+        if(this.type != null && !this.name.trim().isEmpty() && this.name.trim().equals(SharedConstants.filterAllowedCharacters(this.name.trim())))
             ctx.get().enqueueWork(() ->
                 TesseractChannelManager.SERVER.addChannel(this.type, ctx.get().getSender().getUniqueID(), this.isPrivate, this.name)
             );

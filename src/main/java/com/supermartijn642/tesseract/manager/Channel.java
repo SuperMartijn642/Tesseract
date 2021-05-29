@@ -8,7 +8,10 @@ import com.supermartijn642.tesseract.capabilities.CombinedItemHandler;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created 3/20/2020 by SuperMartijn642
