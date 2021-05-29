@@ -61,7 +61,7 @@ public class TesseractReference {
 
     public boolean isValid(){
         World world = this.getWorld();
-        boolean isValid = world != null && world.getBlockState(this.pos).getBlock() == Tesseract.tesseract && world.getTileEntity(pos) instanceof TesseractTile;
+        boolean isValid = world != null && world.getBlockState(this.pos).getBlock() == Tesseract.tesseract && world.getTileEntity(this.pos) instanceof TesseractTile;
 
         if(!isValid)
             TesseractTracker.SERVER.remove(this.dimension, this.pos);

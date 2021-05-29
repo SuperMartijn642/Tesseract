@@ -1,12 +1,11 @@
 package com.supermartijn642.tesseract;
 
+import com.supermartijn642.core.block.BaseTileEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -23,15 +22,13 @@ import java.util.*;
 /**
  * Created 3/19/2020 by SuperMartijn642
  */
-public class TesseractTile extends TileEntity {
+public class TesseractTile extends BaseTileEntity {
 
     private TesseractReference reference;
     private final EnumMap<EnumChannelType,Integer> channels = new EnumMap<>(EnumChannelType.class);
     private final EnumMap<EnumChannelType,TransferState> transferState = new EnumMap<>(EnumChannelType.class);
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
-
-    private boolean dataChanged = false;
 
     private final Map<Direction,Map<Capability<?>,Object>> capabilities = new HashMap<>();
 
@@ -161,49 +158,7 @@ public class TesseractTile extends TileEntity {
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound){
-        super.write(compound);
-        compound.put("data", this.getData());
-        return compound;
-    }
-
-    @Override
-    public void read(CompoundNBT compound){
-        super.read(compound);
-        if(compound.contains("data"))
-            this.handleData(compound.getCompound("data"));
-    }
-
-    @Override
-    public CompoundNBT getUpdateTag(){
-        CompoundNBT compound = super.getUpdateTag();
-        compound.put("data", this.getData());
-        return compound;
-    }
-
-    @Override
-    public void handleUpdateTag(CompoundNBT compound){
-        super.handleUpdateTag(compound);
-        if(compound.contains("data"))
-            this.handleData(compound.getCompound("data"));
-    }
-
-    @Nullable
-    @Override
-    public SUpdateTileEntityPacket getUpdatePacket(){
-        if(this.dataChanged){
-            this.dataChanged = false;
-            return new SUpdateTileEntityPacket(this.pos, 0, this.getData());
-        }
-        return null;
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt){
-        this.handleData(pkt.getNbtCompound());
-    }
-
-    public CompoundNBT getData(){
+    protected CompoundNBT writeData(){
         CompoundNBT compound = new CompoundNBT();
         for(EnumChannelType type : EnumChannelType.values()){
             compound.putInt(type.name(), this.channels.get(type));
@@ -214,7 +169,8 @@ public class TesseractTile extends TileEntity {
         return compound;
     }
 
-    public void handleData(CompoundNBT compound){
+    @Override
+    protected void readData(CompoundNBT compound){
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, compound.getInt(type.name()));
             if(compound.contains("transferState" + type.name()))
@@ -243,11 +199,10 @@ public class TesseractTile extends TileEntity {
         this.capabilities.get(facing).clear();
     }
 
-    private void dataChanged(){
-        this.dataChanged = true;
-        this.world.notifyBlockUpdate(this.pos, this.getBlockState(), this.getBlockState(), 2);
+    @Override
+    public void dataChanged(){
+        super.dataChanged();
         this.world.notifyNeighbors(this.pos, this.getBlockState().getBlock());
-        this.markDirty();
     }
 
     private void updateReference(){
