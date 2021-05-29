@@ -86,8 +86,8 @@ dependencies {
 
     minecraft 'net.minecraftforge:forge:1.16.1-32.0.108'
 
-    runtimeOnly fg.deobf("curse.maven:largefluidtank:3008682")
-    runtimeOnly fg.deobf("curse.maven:scalable-cats-force:2954109")
+    // Core Lib
+    compile fg.deobf("curse.maven:supermartijn642s-core-lib:3328611")
 
     // compile against the JEI API but do not include it at runtime
 //    compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2:api")
