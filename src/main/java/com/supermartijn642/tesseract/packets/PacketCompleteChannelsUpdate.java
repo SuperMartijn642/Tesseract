@@ -1,6 +1,6 @@
 package com.supermartijn642.tesseract.packets;
 
-import com.supermartijn642.tesseract.ClientProxy;
+import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
@@ -65,7 +65,7 @@ public class PacketCompleteChannelsUpdate {
                 TesseractChannelManager.CLIENT.addChannel(channel);
                 types.add(channel.type);
             });
-            types.forEach(type -> TesseractChannelManager.CLIENT.sortChannels(ClientProxy.getPlayer(), type));
+            types.forEach(type -> TesseractChannelManager.CLIENT.sortChannels(ClientUtils.getPlayer(), type));
         });
     }
 }

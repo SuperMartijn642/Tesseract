@@ -1,10 +1,14 @@
 package com.supermartijn642.tesseract;
 
+import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.tesseract.screen.TesseractScreen;
+import com.supermartijn642.tesseract.screen.info.InfoScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -21,8 +25,21 @@ public class ClientProxy {
         ClientRegistry.bindTileEntityRenderer(Tesseract.tesseract_tile, TesseractTileRenderer::new);
     }
 
+    @SubscribeEvent
+    public static void onModelBake(ModelBakeEvent e){
+        e.getModelLoader().getUnbakedModel(new ResourceLocation("tesseract","block/pipe"));
+        e.getModelLoader().getUnbakedModel(new ResourceLocation("tesseract","block/pipe_extract"));
+        e.getModelLoader().getUnbakedModel(new ResourceLocation("tesseract","block/pipe_extract_and_insert"));
+        e.getModelLoader().getUnbakedModel(new ResourceLocation("tesseract","block/pipe_insert"));
+        e.getModelManager().getModel(new ResourceLocation("tesseract","block/pipe_insert"));
+    }
+
     public static void openScreen(BlockPos pos){
-        Minecraft.getInstance().displayGuiScreen(new TesseractScreen(pos));
+        ClientUtils.getMinecraft().displayGuiScreen(new TesseractScreen(pos));
+    }
+
+    public static void openInfoScreen(BlockPos pos){
+        ClientUtils.getMinecraft().displayGuiScreen(new InfoScreen(pos));
     }
 
     public static PlayerEntity getPlayer(){
