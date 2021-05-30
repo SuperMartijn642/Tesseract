@@ -3,8 +3,6 @@ package com.supermartijn642.tesseract;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.tesseract.screen.TesseractScreen;
 import com.supermartijn642.tesseract.screen.info.InfoScreen;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
@@ -40,9 +38,5 @@ public class ClientProxy {
 
     public static void openInfoScreen(BlockPos pos){
         ClientUtils.getMinecraft().displayGuiScreen(new InfoScreen(pos));
-    }
-
-    public static PlayerEntity getPlayer(){
-        return Minecraft.getInstance().player;
     }
 }

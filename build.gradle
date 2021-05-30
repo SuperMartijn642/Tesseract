@@ -85,7 +85,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.2.3'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.2.23'
 
     // Core Lib
     compile fg.deobf("curse.maven:supermartijn642s-core-lib:3328607")
