@@ -90,7 +90,7 @@ public class TesseractTracker {
     }
 
     public TesseractReference fromKey(CompoundNBT key){
-        String dimension = key.getString("dimension");
+        int dimension = key.getInt("dimension");
         BlockPos pos = new BlockPos(key.getInt("posx"), key.getInt("posy"), key.getInt("posz"));
         return this.tesseracts.containsKey(dimension) ?
             this.tesseracts.get(dimension).get(pos) : null;
