@@ -5,7 +5,6 @@ import com.supermartijn642.tesseract.screen.TesseractScreen;
 import com.supermartijn642.tesseract.screen.info.InfoScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -37,9 +36,5 @@ public class ClientProxy {
 
     public static void openInfoScreen(BlockPos pos){
         ClientUtils.getMinecraft().displayGuiScreen(new InfoScreen(pos));
-    }
-
-    public static EntityPlayer getPlayer(){
-        return Minecraft.getMinecraft().player;
     }
 }
