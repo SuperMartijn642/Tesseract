@@ -52,7 +52,7 @@ public class PacketScreenSetChannel implements IMessage, IMessageHandler<PacketS
 
     @Override
     public IMessage onMessage(PacketScreenSetChannel message, MessageContext ctx){
-        if(message.type == null || message.id < 0)
+        if(message.type == null || message.id < -1)
             return null;
         World world = ctx.getServerHandler().player.world;
         if(world == null)

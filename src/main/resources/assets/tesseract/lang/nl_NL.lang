@@ -1,4 +1,4 @@
-tile.tesseract:tesseract.name=Tesseract
+tile.tesseract.tesseract.name=Tesseract
 gui.tesseract.items=TESSERACT - SPULLEN
 gui.tesseract.fluid=TESSERACT - VLOEISTOFFEN
 gui.tesseract.energy=TESSERACT - ENERGIE

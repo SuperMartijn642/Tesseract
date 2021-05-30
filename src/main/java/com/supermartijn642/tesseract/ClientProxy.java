@@ -1,7 +1,8 @@
 package com.supermartijn642.tesseract;
 
-import com.google.common.util.concurrent.ListenableFuture;
+import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.tesseract.screen.TesseractScreen;
+import com.supermartijn642.tesseract.screen.info.InfoScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,15 +31,15 @@ public class ClientProxy {
         Minecraft.getMinecraft().displayGuiScreen(new TesseractScreen(pos));
     }
 
-    public static EntityPlayer getPlayer(){
-        return Minecraft.getMinecraft().player;
-    }
-
-    public static ListenableFuture<Object> scheduleTask(Runnable task){
-        return Minecraft.getMinecraft().addScheduledTask(task);
-    }
-
     public static void queTask(Runnable task){
         Minecraft.getMinecraft().addScheduledTask(task);
+    }
+
+    public static void openInfoScreen(BlockPos pos){
+        ClientUtils.getMinecraft().displayGuiScreen(new InfoScreen(pos));
+    }
+
+    public static EntityPlayer getPlayer(){
+        return Minecraft.getMinecraft().player;
     }
 }

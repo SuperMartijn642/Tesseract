@@ -1,5 +1,6 @@
 package com.supermartijn642.tesseract.packets;
 
+import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.tesseract.ClientProxy;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.Channel;
@@ -47,15 +48,11 @@ public class PacketCompleteChannelsUpdate implements IMessage, IMessageHandler<P
 
         for(String key : compound.getKeySet())
             this.channels.add(Channel.readClientChannel(compound.getCompoundTag(key)));
-
-        System.out.println("RECEIVING: " + this.channels.size());
     }
 
     @Override
     public void toBytes(ByteBuf buf){
         NBTTagCompound compound = new NBTTagCompound();
-
-        System.out.println("SENDING: " + this.channels.size());
 
         Iterator<Channel> iterator = this.channels.iterator();
         for(int index = 0; iterator.hasNext(); index++)
@@ -73,7 +70,7 @@ public class PacketCompleteChannelsUpdate implements IMessage, IMessageHandler<P
                 TesseractChannelManager.CLIENT.addChannel(channel);
                 types.add(channel.type);
             });
-            types.forEach(type -> TesseractChannelManager.CLIENT.sortChannels(ClientProxy.getPlayer(), type));
+            types.forEach(type -> TesseractChannelManager.CLIENT.sortChannels(ClientUtils.getPlayer(), type));
         });
         return null;
     }

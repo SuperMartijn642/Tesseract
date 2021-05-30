@@ -1,37 +1,39 @@
 package com.supermartijn642.tesseract;
 
+import com.supermartijn642.core.ToolType;
+import com.supermartijn642.core.block.BaseBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
  */
-public class BlockTesseract extends Block implements ITileEntityProvider {
+public class BlockTesseract extends BaseBlock implements ITileEntityProvider {
 
     public BlockTesseract(){
-        super(Material.ANVIL, MapColor.GREEN);
-        this.setUnlocalizedName(Tesseract.MODID + ":tesseract");
-        this.setRegistryName("tesseract");
+        super("tesseract", false, Properties.create(Material.ANVIL, MapColor.GREEN).sound(SoundType.METAL).harvestTool(ToolType.PICKAXE).hardnessAndResistance(1.5F, 6.0F));
         this.setCreativeTab(CreativeTabs.SEARCH);
         this.translucent = true;
-        this.setSoundType(SoundType.METAL);
-        this.setHardness(1.5f);
-        this.setResistance(6);
-        this.setHarvestLevel("pickaxe", 1);
     }
 
     @Override
@@ -39,6 +41,11 @@ public class BlockTesseract extends Block implements ITileEntityProvider {
         if(worldIn.isRemote)
             ClientProxy.openScreen(pos);
 
+        return true;
+    }
+
+    @Override
+    public boolean hasTileEntity(IBlockState state){
         return true;
     }
 
@@ -88,5 +95,10 @@ public class BlockTesseract extends Block implements ITileEntityProvider {
         if(tile instanceof TesseractTile)
             ((TesseractTile)tile).onReplaced();
         super.breakBlock(worldIn, pos, state);
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag advanced){
+        tooltip.add(new TextComponentTranslation("tesseract.tesseract.info").setStyle(new Style().setColor(TextFormatting.AQUA)).getFormattedText());
     }
 }

@@ -15,7 +15,7 @@ import net.minecraftforge.fml.relauncher.Side;
 /**
  * Created 3/19/2020 by SuperMartijn642
  */
-@Mod(modid = Tesseract.MODID, name = Tesseract.NAME, version = Tesseract.VERSION, acceptedMinecraftVersions = Tesseract.MC_VERSIONS)
+@Mod(modid = Tesseract.MODID, name = Tesseract.NAME, version = Tesseract.VERSION, acceptedMinecraftVersions = Tesseract.MC_VERSIONS, dependencies = Tesseract.DEPENDENCIES)
 public class Tesseract {
 
     public static Tesseract instance;
@@ -24,6 +24,7 @@ public class Tesseract {
     public static final String NAME = "Tesseract";
     public static final String MC_VERSIONS = "[1.12.2]";
     public static final String VERSION = "1.0.18";
+    public static final String DEPENDENCIES = "required-after:forge@[14.23.5.2779,)";
 
     public static SimpleNetworkWrapper channel;
 

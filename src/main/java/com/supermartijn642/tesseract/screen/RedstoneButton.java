@@ -1,21 +1,24 @@
 package com.supermartijn642.tesseract.screen;
 
+import com.supermartijn642.core.gui.widget.IHoverTextWidget;
 import com.supermartijn642.tesseract.RedstoneState;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractTile;
 import com.supermartijn642.tesseract.packets.PacketScreenCycleRedstoneState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 
 /**
  * Created 7/5/2020 by SuperMartijn642
  */
-public class RedstoneButton extends CycleButton {
+public class RedstoneButton extends CycleButton implements IHoverTextWidget {
 
     public RedstoneState state;
     private BlockPos pos;
 
-    public RedstoneButton(int buttonId, int x, int y){
-        super(buttonId, x, y, 60);
+    public RedstoneButton(int x, int y){
+        super(x, y, 60);
     }
 
     public void update(TesseractTile tile){
@@ -30,7 +33,18 @@ public class RedstoneButton extends CycleButton {
 
     @Override
     public void onPress(){
+        super.onPress();
         if(this.pos != null)
             Tesseract.channel.sendToServer(new PacketScreenCycleRedstoneState(this.pos));
+    }
+
+    @Override
+    protected ITextComponent getNarrationMessage(){
+        return this.getHoverText();
+    }
+
+    @Override
+    public ITextComponent getHoverText(){
+        return new TextComponentTranslation("gui.tesseract.redstone.speech", this.state.translate());
     }
 }

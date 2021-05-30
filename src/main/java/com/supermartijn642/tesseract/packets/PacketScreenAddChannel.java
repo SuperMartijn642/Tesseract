@@ -3,6 +3,7 @@ package com.supermartijn642.tesseract.packets;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -47,7 +48,7 @@ public class PacketScreenAddChannel implements IMessage, IMessageHandler<PacketS
 
     @Override
     public IMessage onMessage(PacketScreenAddChannel message, MessageContext ctx){
-        if(message.type != null && !message.name.trim().isEmpty())
+        if(message.type != null && !message.name.trim().isEmpty() && message.name.trim().equals(ChatAllowedCharacters.filterAllowedCharacters(message.name.trim())))
             ctx.getServerHandler().player.getServerWorld().addScheduledTask(() ->
                 TesseractChannelManager.SERVER.addChannel(message.type, ctx.getServerHandler().player.getUniqueID(), message.isPrivate, message.name)
             );

@@ -120,7 +120,6 @@ public class TesseractChannelManager {
         if(world != null && !world.isRemote && world.provider.getDimensionType() == DimensionType.OVERWORLD){
             File dir = new File(DimensionManager.getCurrentSaveRootDirectory(), "tesseract");
             for(EnumChannelType type : EnumChannelType.values()){
-                System.out.println("READING for type " + type);
                 ChannelList list = new ChannelList(type);
                 SERVER.types.put(type, list);
                 File folder = new File(dir, type.name().toLowerCase(Locale.ENGLISH));

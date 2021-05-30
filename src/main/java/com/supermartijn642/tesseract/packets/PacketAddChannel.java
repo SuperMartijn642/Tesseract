@@ -1,5 +1,6 @@
 package com.supermartijn642.tesseract.packets;
 
+import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.tesseract.ClientProxy;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
@@ -37,7 +38,7 @@ public class PacketAddChannel implements IMessage, IMessageHandler<PacketAddChan
     public IMessage onMessage(PacketAddChannel message, MessageContext ctx){
         ClientProxy.queTask(() -> {
             TesseractChannelManager.CLIENT.addChannel(message.channel);
-            TesseractChannelManager.CLIENT.sortChannels(ClientProxy.getPlayer(), message.channel.type);
+            TesseractChannelManager.CLIENT.sortChannels(ClientUtils.getPlayer(), message.channel.type);
         });
         return null;
     }
