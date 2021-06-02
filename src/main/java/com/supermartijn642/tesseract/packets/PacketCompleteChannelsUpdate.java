@@ -1,24 +1,27 @@
 package com.supermartijn642.tesseract.packets;
 
 import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.network.BasePacket;
+import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.*;
-import java.util.function.Supplier;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
  */
-public class PacketCompleteChannelsUpdate {
+public class PacketCompleteChannelsUpdate implements BasePacket {
 
     private List<Channel> channels;
 
-    public PacketCompleteChannelsUpdate(){
+    public PacketCompleteChannelsUpdate(boolean server){
+        if(!server)
+            throw new IllegalStateException();
+
         List<Channel>[] lists = new List[EnumChannelType.values().length];
         int index = 0;
         int size = 0;
@@ -32,11 +35,11 @@ public class PacketCompleteChannelsUpdate {
             this.channels.addAll(list);
     }
 
-    private PacketCompleteChannelsUpdate(List<Channel> channels){
-        this.channels = channels;
+    public PacketCompleteChannelsUpdate(){
     }
 
-    public void encode(PacketBuffer buffer){
+    @Override
+    public void write(PacketBuffer buffer){
         CompoundNBT compound = new CompoundNBT();
 
         Iterator<Channel> iterator = this.channels.iterator();
@@ -46,26 +49,23 @@ public class PacketCompleteChannelsUpdate {
         buffer.writeCompoundTag(compound);
     }
 
-    public static PacketCompleteChannelsUpdate decode(PacketBuffer buffer){
+    @Override
+    public void read(PacketBuffer buffer){
         CompoundNBT compound = buffer.readCompoundTag();
 
-        ArrayList<Channel> channels = new ArrayList<>();
+        this.channels = new ArrayList<>();
         for(String key : compound.keySet())
-            channels.add(Channel.readClientChannel(compound.getCompound(key)));
-
-        return new PacketCompleteChannelsUpdate(channels);
+            this.channels.add(Channel.readClientChannel(compound.getCompound(key)));
     }
 
-    public void handle(Supplier<NetworkEvent.Context> ctx){
-        ctx.get().setPacketHandled(true);
-        ctx.get().enqueueWork(() -> {
-            TesseractChannelManager.CLIENT.clear();
-            Set<EnumChannelType> types = new HashSet<>(3);
-            this.channels.forEach(channel -> {
-                TesseractChannelManager.CLIENT.addChannel(channel);
-                types.add(channel.type);
-            });
-            types.forEach(type -> TesseractChannelManager.CLIENT.sortChannels(ClientUtils.getPlayer(), type));
+    @Override
+    public void handle(PacketContext buffer){
+        TesseractChannelManager.CLIENT.clear();
+        Set<EnumChannelType> types = new HashSet<>(3);
+        this.channels.forEach(channel -> {
+            TesseractChannelManager.CLIENT.addChannel(channel);
+            types.add(channel.type);
         });
+        types.forEach(type -> TesseractChannelManager.CLIENT.sortChannels(ClientUtils.getPlayer(), type));
     }
 }
