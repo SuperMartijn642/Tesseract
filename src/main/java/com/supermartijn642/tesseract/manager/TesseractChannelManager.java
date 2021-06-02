@@ -6,7 +6,6 @@ import com.supermartijn642.tesseract.packets.PacketAddChannel;
 import com.supermartijn642.tesseract.packets.PacketCompleteChannelsUpdate;
 import com.supermartijn642.tesseract.packets.PacketRemoveChannel;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -14,7 +13,6 @@ import net.minecraft.world.storage.FolderName;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.network.PacketDistributor;
 
 import java.io.File;
 import java.util.HashMap;
@@ -91,17 +89,17 @@ public class TesseractChannelManager {
 
     public void sendCompleteUpdatePacket(PlayerEntity player){
         if(this == SERVER)
-            Tesseract.CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new PacketCompleteChannelsUpdate());
+            Tesseract.CHANNEL.sendToPlayer(player, new PacketCompleteChannelsUpdate(true));
     }
 
     public void sendAddChannelPacket(Channel channel){
         if(this == SERVER)
-            Tesseract.CHANNEL.send(PacketDistributor.ALL.noArg(), new PacketAddChannel(channel));
+            Tesseract.CHANNEL.sendToAllPlayers(new PacketAddChannel(channel));
     }
 
     public void sendRemoveChannelPacket(EnumChannelType type, int id){
         if(this == SERVER)
-            Tesseract.CHANNEL.send(PacketDistributor.ALL.noArg(), new PacketRemoveChannel(type, id));
+            Tesseract.CHANNEL.sendToAllPlayers(new PacketRemoveChannel(type, id));
     }
 
     @SubscribeEvent
