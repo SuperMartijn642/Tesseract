@@ -72,15 +72,8 @@ minecraft {
 }
 
 repositories {
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.k-4u.nl"
+    flatDir {
+        dirs 'libs'
     }
 }
 
@@ -88,10 +81,5 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.14.4-28.2.23'
 
     // Core Lib
-    compile fg.deobf("curse.maven:supermartijn642s-core-lib:3328607")
-
-    // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.27:api")
-    // at runtime, use the full JEI jar
-    runtimeOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.27")
+    compile fg.deobf('com.supermartijn642.core:supermartijn642corelib:1.0.4-dev-mc1.14')//fg.deobf("curse.maven:supermartijn642s-core-lib:3328607")
 }

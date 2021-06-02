@@ -1,16 +1,15 @@
 package com.supermartijn642.tesseract.packets;
 
+import com.supermartijn642.core.network.BasePacket;
+import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 /**
  * Created 12/16/2020 by SuperMartijn642
  */
-public class PacketRemoveChannel {
+public class PacketRemoveChannel implements BasePacket {
 
     private EnumChannelType type;
     private int id;
@@ -20,17 +19,23 @@ public class PacketRemoveChannel {
         this.id = id;
     }
 
-    public void encode(PacketBuffer buffer){
+    public PacketRemoveChannel(){
+    }
+
+    @Override
+    public void write(PacketBuffer buffer){
         buffer.writeInt(this.type.getIndex());
         buffer.writeInt(this.id);
     }
 
-    public static PacketRemoveChannel decode(PacketBuffer buffer){
-        return new PacketRemoveChannel(EnumChannelType.byIndex(buffer.readInt()), buffer.readInt());
+    @Override
+    public void read(PacketBuffer buffer){
+        this.type = EnumChannelType.byIndex(buffer.readInt());
+        this.id = buffer.readInt();
     }
 
-    public void handle(Supplier<NetworkEvent.Context> ctx){
-        ctx.get().setPacketHandled(true);
-        ctx.get().enqueueWork(() -> TesseractChannelManager.CLIENT.removeChannel(this.type, this.id));
+    @Override
+    public void handle(PacketContext context){
+        TesseractChannelManager.CLIENT.removeChannel(this.type, this.id);
     }
 }
