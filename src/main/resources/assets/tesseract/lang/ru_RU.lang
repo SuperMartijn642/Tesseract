@@ -1,0 +1,16 @@
+tile.tesseract.tesseract.name=Тессеракт
+gui.tesseract.title=Тессеракт
+gui.tesseract.items=ТЕССЕРАКТ - ПРЕДМЕТЫ
+gui.tesseract.fluid=ТЕССЕРАКТ - ЖИДКОСТЬ
+gui.tesseract.energy=ТЕССЕРАКТ - ЭНЕРГИЯ
+gui.tesseract.set=ВЫБРАТЬ
+gui.tesseract.remove=УДАЛИТЬ
+gui.tesseract.add=ДОБАВИТЬ
+gui.tesseract.transfer.send=ТОЛЬКО ОТПРАВКА
+gui.tesseract.transfer.receive=ТОЛЬКО ПОЛУЧЕНИЕ
+gui.tesseract.transfer.both=ОТПРАВКА И ПОЛУЧЕНИЕ
+gui.tesseract.redstone.disabled=ОТКЛЮЧЕН
+gui.tesseract.redstone.high=ВЫСОКИЙ
+gui.tesseract.redstone.low=НИЗКИЙ
+gui.tesseract.channel.private=Приватный
+gui.tesseract.channel.public=Публичный
