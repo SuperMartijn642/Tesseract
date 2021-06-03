@@ -1,19 +1,18 @@
 package com.supermartijn642.tesseract.packets;
 
 import com.supermartijn642.core.ClientUtils;
-import com.supermartijn642.tesseract.ClientProxy;
+import com.supermartijn642.core.network.BasePacket;
+import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+
+import java.io.IOException;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
  */
-public class PacketAddChannel implements IMessage, IMessageHandler<PacketAddChannel,IMessage> {
+public class PacketAddChannel implements BasePacket {
 
     private Channel channel;
 
@@ -25,21 +24,25 @@ public class PacketAddChannel implements IMessage, IMessageHandler<PacketAddChan
     }
 
     @Override
-    public void fromBytes(ByteBuf buf){
-        this.channel = Channel.readClientChannel(ByteBufUtils.readTag(buf));
+    public void write(PacketBuffer buffer){
+        buffer.writeCompoundTag(this.channel.writeClientChannel());
     }
 
     @Override
-    public void toBytes(ByteBuf buf){
-        ByteBufUtils.writeTag(buf, this.channel.writeClientChannel());
+    public void read(PacketBuffer buffer){
+        try{
+            this.channel = Channel.readClientChannel(buffer.readCompoundTag());
+        }catch(IOException ignore){}
     }
 
     @Override
-    public IMessage onMessage(PacketAddChannel message, MessageContext ctx){
-        ClientProxy.queTask(() -> {
-            TesseractChannelManager.CLIENT.addChannel(message.channel);
-            TesseractChannelManager.CLIENT.sortChannels(ClientUtils.getPlayer(), message.channel.type);
-        });
-        return null;
+    public boolean verify(PacketContext context){
+        return this.channel != null;
+    }
+
+    @Override
+    public void handle(PacketContext buffer){
+        TesseractChannelManager.CLIENT.addChannel(this.channel);
+        TesseractChannelManager.CLIENT.sortChannels(ClientUtils.getPlayer(), this.channel.type);
     }
 }

@@ -1,19 +1,16 @@
 package com.supermartijn642.tesseract.packets;
 
+import com.supermartijn642.core.network.BasePacket;
+import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import io.netty.buffer.ByteBuf;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ChatAllowedCharacters;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
  */
-public class PacketScreenAddChannel implements IMessage, IMessageHandler<PacketScreenAddChannel,IMessage> {
+public class PacketScreenAddChannel implements BasePacket {
 
     private EnumChannelType type;
     private String name;
@@ -29,29 +26,26 @@ public class PacketScreenAddChannel implements IMessage, IMessageHandler<PacketS
     }
 
     @Override
-    public void fromBytes(ByteBuf buf){
-        this.type = EnumChannelType.byIndex(buf.readInt());
-        byte[] bytes = new byte[buf.readInt()];
-        buf.readBytes(bytes);
-        this.name = new String(bytes, StandardCharsets.UTF_16);
-        this.isPrivate = buf.readBoolean();
+    public void write(PacketBuffer buffer){
+        buffer.writeInt(this.type.getIndex());
+        buffer.writeString(this.name);
+        buffer.writeBoolean(this.isPrivate);
     }
 
     @Override
-    public void toBytes(ByteBuf buf){
-        buf.writeInt(this.type.getIndex());
-        byte[] bytes = this.name.getBytes(StandardCharsets.UTF_16);
-        buf.writeInt(bytes.length);
-        buf.writeBytes(bytes);
-        buf.writeBoolean(this.isPrivate);
+    public void read(PacketBuffer buffer){
+        this.type = EnumChannelType.byIndex(buffer.readInt());
+        this.name = buffer.readString(32767);
+        this.isPrivate = buffer.readBoolean();
     }
 
     @Override
-    public IMessage onMessage(PacketScreenAddChannel message, MessageContext ctx){
-        if(message.type != null && !message.name.trim().isEmpty() && message.name.trim().equals(ChatAllowedCharacters.filterAllowedCharacters(message.name.trim())))
-            ctx.getServerHandler().player.getServerWorld().addScheduledTask(() ->
-                TesseractChannelManager.SERVER.addChannel(message.type, ctx.getServerHandler().player.getUniqueID(), message.isPrivate, message.name)
-            );
-        return null;
+    public boolean verify(PacketContext context){
+        return this.type != null && !this.name.trim().isEmpty() && this.name.trim().equals(ChatAllowedCharacters.filterAllowedCharacters(this.name.trim()));
+    }
+
+    @Override
+    public void handle(PacketContext context){
+        TesseractChannelManager.SERVER.addChannel(this.type, context.getSendingPlayer().getUniqueID(), this.isPrivate, this.name);
     }
 }

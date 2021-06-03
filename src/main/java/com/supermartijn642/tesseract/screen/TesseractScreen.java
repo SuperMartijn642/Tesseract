@@ -79,10 +79,10 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
             TesseractTile tile2 = this.getObjectOrClose();
             if(tile2 != null){
                 if(tile2.getChannelId(type) == this.selectedChannel){
-                    Tesseract.channel.sendToServer(new PacketScreenSetChannel(type, -1, this.tilePos));
+                    Tesseract.CHANNEL.sendToServer(new PacketScreenSetChannel(type, -1, this.tilePos));
                     this.setButton.setText(new TextComponentTranslation("gui.tesseract.set"));
                 }else{
-                    Tesseract.channel.sendToServer(new PacketScreenSetChannel(type, this.selectedChannel, this.tilePos));
+                    Tesseract.CHANNEL.sendToServer(new PacketScreenSetChannel(type, this.selectedChannel, this.tilePos));
                     this.setButton.setText(new TextComponentTranslation("gui.tesseract.unset"));
                 }
             }
@@ -91,7 +91,7 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
 
         // remove button
         this.removeButton = this.addWidget(new TesseractButton(180, 185, 61, 18, new TextComponentTranslation("gui.tesseract.remove"), () -> {
-            Tesseract.channel.sendToServer(new PacketScreenRemoveChannel(type, this.selectedChannel));
+            Tesseract.CHANNEL.sendToServer(new PacketScreenRemoveChannel(type, this.selectedChannel));
             this.selectedChannel = -1;
             this.setButton.active = false;
             this.setButton.setText(new TextComponentTranslation("gui.tesseract.set"));

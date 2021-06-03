@@ -38,7 +38,7 @@ public class TransferButton extends CycleButton implements IHoverTextWidget {
     public void onPress(){
         super.onPress();
         if(this.pos != null)
-            Tesseract.channel.sendToServer(new PacketScreenCycleTransferState(this.pos, this.type));
+            Tesseract.CHANNEL.sendToServer(new PacketScreenCycleTransferState(this.pos, this.type));
     }
 
     @Override

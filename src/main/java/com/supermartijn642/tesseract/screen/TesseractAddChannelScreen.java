@@ -100,7 +100,7 @@ public class TesseractAddChannelScreen extends TileEntityBaseScreen<TesseractTil
         if(!this.checkChannelName(name))
             return;
 
-        Tesseract.channel.sendToServer(new PacketScreenAddChannel(this.type, name, this.lockButton.isLocked()));
+        Tesseract.CHANNEL.sendToServer(new PacketScreenAddChannel(this.type, name, this.lockButton.isLocked()));
         ClientUtils.displayScreen(new TesseractScreen(this.tilePos));
     }
 }

@@ -1,16 +1,15 @@
 package com.supermartijn642.tesseract.packets;
 
+import com.supermartijn642.core.network.BasePacket;
+import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
  */
-public class PacketScreenRemoveChannel implements IMessage, IMessageHandler<PacketScreenRemoveChannel,IMessage> {
+public class PacketScreenRemoveChannel implements BasePacket {
 
     private EnumChannelType type;
     private int id;
@@ -24,23 +23,24 @@ public class PacketScreenRemoveChannel implements IMessage, IMessageHandler<Pack
     }
 
     @Override
-    public void fromBytes(ByteBuf buf){
-        this.type = EnumChannelType.byIndex(buf.readInt());
-        this.id = buf.readInt();
+    public void write(PacketBuffer buffer){
+        buffer.writeInt(this.type.getIndex());
+        buffer.writeInt(this.id);
     }
 
     @Override
-    public void toBytes(ByteBuf buf){
-        buf.writeInt(this.type.getIndex());
-        buf.writeInt(this.id);
+    public void read(PacketBuffer buffer){
+        this.type = EnumChannelType.byIndex(buffer.readInt());
+        this.id = buffer.readInt();
     }
 
     @Override
-    public IMessage onMessage(PacketScreenRemoveChannel message, MessageContext ctx){
-        if(message.type != null && message.id >= 0)
-            ctx.getServerHandler().player.getServerWorld().addScheduledTask(() ->
-                TesseractChannelManager.SERVER.removeChannel(message.type, message.id)
-            );
-        return null;
+    public boolean verify(PacketContext context){
+        return this.type != null && this.id >= 0;
+    }
+
+    @Override
+    public void handle(PacketContext context){
+        TesseractChannelManager.SERVER.removeChannel(this.type, this.id);
     }
 }

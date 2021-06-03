@@ -6,7 +6,6 @@ import com.supermartijn642.tesseract.packets.PacketAddChannel;
 import com.supermartijn642.tesseract.packets.PacketCompleteChannelsUpdate;
 import com.supermartijn642.tesseract.packets.PacketRemoveChannel;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -85,17 +84,17 @@ public class TesseractChannelManager {
 
     public void sendCompleteUpdatePacket(EntityPlayer player){
         if(this == SERVER)
-            Tesseract.channel.sendTo(new PacketCompleteChannelsUpdate(true), (EntityPlayerMP)player);
+            Tesseract.CHANNEL.sendToPlayer(player, new PacketCompleteChannelsUpdate(true));
     }
 
     public void sendAddChannelPacket(Channel channel){
         if(this == SERVER)
-            Tesseract.channel.sendToAll(new PacketAddChannel(channel));
+            Tesseract.CHANNEL.sendToAllPlayers(new PacketAddChannel(channel));
     }
 
     public void sendRemoveChannelPacket(EnumChannelType type, int id){
         if(this == SERVER)
-            Tesseract.channel.sendToAll(new PacketRemoveChannel(type, id));
+            Tesseract.CHANNEL.sendToAllPlayers(new PacketRemoveChannel(type, id));
     }
 
     @SubscribeEvent

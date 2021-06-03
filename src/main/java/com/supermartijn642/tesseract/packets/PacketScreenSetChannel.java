@@ -1,67 +1,45 @@
 package com.supermartijn642.tesseract.packets;
 
+import com.supermartijn642.core.network.PacketContext;
+import com.supermartijn642.core.network.TileEntityBasePacket;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractTile;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-
-import java.nio.charset.StandardCharsets;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
  */
-public class PacketScreenSetChannel implements IMessage, IMessageHandler<PacketScreenSetChannel,IMessage> {
+public class PacketScreenSetChannel extends TileEntityBasePacket<TesseractTile> {
 
     private EnumChannelType type;
     private int id;
-    private BlockPos pos;
 
     public PacketScreenSetChannel(EnumChannelType type, int id, BlockPos pos){
+        super(pos);
         this.type = type;
         this.id = id;
-        this.pos = pos;
     }
 
     public PacketScreenSetChannel(){
     }
 
     @Override
-    public void fromBytes(ByteBuf buf){
-        byte[] bytes = new byte[buf.readInt()];
-        buf.readBytes(bytes);
-        this.type = EnumChannelType.valueOf(new String(bytes, StandardCharsets.UTF_16));
-        this.id = buf.readInt();
-        this.pos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
+    public void write(PacketBuffer buffer){
+        super.write(buffer);
+        buffer.writeInt(this.type.getIndex());
+        buffer.writeInt(this.id);
     }
 
     @Override
-    public void toBytes(ByteBuf buf){
-        byte[] bytes = this.type.name().getBytes(StandardCharsets.UTF_16);
-        buf.writeInt(bytes.length);
-        buf.writeBytes(bytes);
-        buf.writeInt(this.id);
-        buf.writeInt(this.pos.getX());
-        buf.writeInt(this.pos.getY());
-        buf.writeInt(this.pos.getZ());
+    public void read(PacketBuffer buffer){
+        super.read(buffer);
+        this.type = EnumChannelType.byIndex(buffer.readInt());
+        this.id = buffer.readInt();
     }
 
     @Override
-    public IMessage onMessage(PacketScreenSetChannel message, MessageContext ctx){
-        if(message.type == null || message.id < -1)
-            return null;
-        World world = ctx.getServerHandler().player.world;
-        if(world == null)
-            return null;
-        ctx.getServerHandler().player.getServerWorld().addScheduledTask(() -> {
-            TileEntity tile = world.getTileEntity(message.pos);
-            if(tile instanceof TesseractTile)
-                ((TesseractTile)tile).setChannel(message.type, message.id);
-        });
-        return null;
+    protected void handle(TesseractTile tile, PacketContext context){
+        tile.setChannel(this.type, this.id);
     }
 }

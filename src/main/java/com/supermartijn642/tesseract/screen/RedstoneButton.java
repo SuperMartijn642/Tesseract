@@ -35,7 +35,7 @@ public class RedstoneButton extends CycleButton implements IHoverTextWidget {
     public void onPress(){
         super.onPress();
         if(this.pos != null)
-            Tesseract.channel.sendToServer(new PacketScreenCycleRedstoneState(this.pos));
+            Tesseract.CHANNEL.sendToServer(new PacketScreenCycleRedstoneState(this.pos));
     }
 
     @Override

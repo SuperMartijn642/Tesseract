@@ -1,17 +1,15 @@
 package com.supermartijn642.tesseract.packets;
 
-import com.supermartijn642.tesseract.ClientProxy;
+import com.supermartijn642.core.network.BasePacket;
+import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
  */
-public class PacketRemoveChannel implements IMessage, IMessageHandler<PacketRemoveChannel,IMessage> {
+public class PacketRemoveChannel implements BasePacket {
 
     private EnumChannelType type;
     private int id;
@@ -25,22 +23,19 @@ public class PacketRemoveChannel implements IMessage, IMessageHandler<PacketRemo
     }
 
     @Override
-    public void fromBytes(ByteBuf buf){
-        this.type = EnumChannelType.byIndex(buf.readInt());
-        this.id = buf.readInt();
+    public void write(PacketBuffer buffer){
+        buffer.writeInt(this.type.getIndex());
+        buffer.writeInt(this.id);
     }
 
     @Override
-    public void toBytes(ByteBuf buf){
-        buf.writeInt(this.type.getIndex());
-        buf.writeInt(this.id);
+    public void read(PacketBuffer buffer){
+        this.type = EnumChannelType.byIndex(buffer.readInt());
+        this.id = buffer.readInt();
     }
 
     @Override
-    public IMessage onMessage(PacketRemoveChannel message, MessageContext ctx){
-        ClientProxy.queTask(() ->
-            TesseractChannelManager.CLIENT.removeChannel(message.type, message.id)
-        );
-        return null;
+    public void handle(PacketContext context){
+        TesseractChannelManager.CLIENT.removeChannel(this.type, this.id);
     }
 }
