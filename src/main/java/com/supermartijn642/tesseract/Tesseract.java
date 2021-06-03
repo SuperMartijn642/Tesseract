@@ -21,7 +21,7 @@ public class Tesseract {
     public static final String MODID = "tesseract";
     public static final String NAME = "Tesseract";
     public static final String MC_VERSIONS = "[1.12.2]";
-    public static final String VERSION = "1.0.19";
+    public static final String VERSION = "1.0.20";
     public static final String DEPENDENCIES = "required-after:forge@[14.23.5.2779,);required-after:supermartijn642corelib@[1.0.5,1.1.0)";
 
     public static final PacketChannel CHANNEL = PacketChannel.create();
