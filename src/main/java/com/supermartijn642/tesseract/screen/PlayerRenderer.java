@@ -11,16 +11,13 @@ import com.supermartijn642.core.gui.ScreenUtils;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.client.resources.SkinManager;
 import net.minecraft.server.management.PlayerProfileCache;
-import net.minecraft.tileentity.SkullTileEntity;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,9 +28,6 @@ import java.util.UUID;
  * Created 5/20/2021 by SuperMartijn642
  */
 public class PlayerRenderer {
-
-    private static final Field profileCache = ObfuscationReflectionHelper.findField(SkullTileEntity.class, "field_152366_X");
-    private static final Field sessionService = ObfuscationReflectionHelper.findField(SkullTileEntity.class, "field_184299_k");
 
     // TODO: this should probably be cleared after a certain time
     private static final Map<UUID,GameProfile> PLAYER_PROFILE_MAP = new HashMap<>();
@@ -122,20 +116,10 @@ public class PlayerRenderer {
     }
 
     private static PlayerProfileCache getProfileCache(){
-        try{
-            return (PlayerProfileCache)profileCache.get(null);
-        }catch(IllegalAccessException e){
-            e.printStackTrace();
-        }
-        return null;
+        return ClientUtils.getMinecraft().getIntegratedServer().getPlayerProfileCache();
     }
 
     private static MinecraftSessionService getSessionService(){
-        try{
-            return (MinecraftSessionService)sessionService.get(null);
-        }catch(IllegalAccessException e){
-            e.printStackTrace();
-        }
-        return null;
+        return ClientUtils.getMinecraft().getSessionService();
     }
 }
