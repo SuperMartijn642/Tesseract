@@ -52,6 +52,6 @@ description='''Tesseract allows you to transport Items, Fluid and Energy. Tesser
 [[dependencies.tesseract]]
     modId="supermartijn642corelib"
     mandatory=true
-    versionRange="[1.0.5,1.1.0)"
+    versionRange="[1.0.7,1.1.0)"
     ordering="NONE"
     side="BOTH"
