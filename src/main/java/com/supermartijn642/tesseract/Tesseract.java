@@ -21,7 +21,7 @@ import net.minecraftforge.registries.ObjectHolder;
 @Mod("tesseract")
 public class Tesseract {
 
-    public static final PacketChannel CHANNEL = PacketChannel.create();
+    public static final PacketChannel CHANNEL = PacketChannel.create("tesseract");
 
     @ObjectHolder("tesseract:tesseract")
     public static BlockTesseract tesseract;
