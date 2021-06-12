@@ -87,7 +87,7 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.1.2'
 
     // Core Lib
-    compile files('libs/supermartijn642corelib-1.0.4-dev-mc1.16.5-sources.jar')//fg.deobf("curse.maven:supermartijn642s-core-lib:3328612")
+    compile fg.deobf("curse.maven:supermartijn642s-core-lib:3349593")
 
     // compile against the JEI API but do not include it at runtime
 //    compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2:api")
