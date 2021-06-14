@@ -29,9 +29,6 @@ public class TesseractTileRenderer extends TileEntitySpecialRenderer<TesseractTi
             return;
 
         GlStateManager.pushMatrix();
-        GlStateManager.pushAttrib();
-
-        GlStateManager.disableLighting();
 
         GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
         GlStateManager.scale(0.65, 0.65, 0.65);
@@ -39,7 +36,6 @@ public class TesseractTileRenderer extends TileEntitySpecialRenderer<TesseractTi
         this.renderEnderFaces();
 
         GlStateManager.popMatrix();
-        GlStateManager.popAttrib();
     }
 
     private void renderEnderFaces(){ // Adapted from TileEntityEndPortalRenderer
