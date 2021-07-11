@@ -32,6 +32,8 @@ public class Tesseract {
         MinecraftForge.EVENT_BUS.register(TesseractTracker.class);
         MinecraftForge.EVENT_BUS.register(TesseractChannelManager.class);
 
+        TesseractConfig.init();
+
         CHANNEL.registerMessage(PacketCompleteChannelsUpdate.class, PacketCompleteChannelsUpdate::new, true);
         CHANNEL.registerMessage(PacketScreenAddChannel.class, PacketScreenAddChannel::new, true);
         CHANNEL.registerMessage(PacketScreenRemoveChannel.class, PacketScreenRemoveChannel::new, true);
