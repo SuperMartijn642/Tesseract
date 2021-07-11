@@ -1,31 +1,30 @@
 {
   "type": "minecraft:crafting_shaped",
+  "conditions": [
+    {
+      "type": "forge:not",
+      "value": {
+        "type": "tesseract:thermal_recipe"
+      }
+    }
+  ],
   "pattern": [
-    "#O#",
-    "OCO",
-    "#O#"
+    "ABA",
+    "BCB",
+    "ABA"
   ],
   "key": {
-    "O": [
-      {
-        "item": "minecraft:ender_pearl"
-      },
-      {
-        "tag": "forge:ender_pearls"
-      }
-    ],
-    "#": [
-      {
-        "item": "minecraft:obsidian"
-      },
+    "A": [
       {
         "tag": "forge:obsidian"
       }
     ],
-    "C": [
+    "B": [
       {
-        "item": "minecraft:diamond_block"
-      },
+        "tag": "forge:ender_pearls"
+      }
+    ],
+    "C": [
       {
         "tag": "forge:storage_blocks/diamond"
       }
