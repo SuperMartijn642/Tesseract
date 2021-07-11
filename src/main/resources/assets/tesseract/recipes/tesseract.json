@@ -1,16 +1,20 @@
 {
   "type": "forge:ore_shaped",
+  "conditions": [
+    {
+      "type": "forge:not",
+      "value": {
+        "type": "enableThermalRecipe"
+      }
+    }
+  ],
   "pattern": [
-    "#O#",
-    "OCO",
-    "#O#"
+    "ABA",
+    "BCB",
+    "ABA"
   ],
   "key": {
-    "O": {
-      "type": "forge:ore_dict",
-      "ore": "enderpearl"
-    },
-    "#": [
+    "A": [
       {
         "item": "minecraft:obsidian"
       },
@@ -19,6 +23,10 @@
         "ore": "obsidian"
       }
     ],
+    "B": {
+      "type": "forge:ore_dict",
+      "ore": "enderpearl"
+    },
     "C": [
       {
         "item": "minecraft:diamond_block"
@@ -30,7 +38,6 @@
     ]
   },
   "result": {
-    "item": "tesseract:tesseract",
-    "count": 1
+    "item": "tesseract:tesseract"
   }
 }

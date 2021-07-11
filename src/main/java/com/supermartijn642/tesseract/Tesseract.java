@@ -35,6 +35,7 @@ public class Tesseract {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e){
+        TesseractConfig.init();
         CHANNEL.registerMessage(PacketCompleteChannelsUpdate.class, PacketCompleteChannelsUpdate::new, true);
         CHANNEL.registerMessage(PacketScreenAddChannel.class, PacketScreenAddChannel::new, true);
         CHANNEL.registerMessage(PacketScreenRemoveChannel.class, PacketScreenRemoveChannel::new, true);

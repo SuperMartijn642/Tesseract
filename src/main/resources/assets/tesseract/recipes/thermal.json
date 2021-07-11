@@ -1,0 +1,29 @@
+{
+  "type": "forge:ore_shaped",
+  "conditions": [
+    {
+      "type": "enableThermalRecipe"
+    }
+  ],
+  "pattern": [
+    "ABA",
+    "BCB",
+    "ABA"
+  ],
+  "key": {
+    "A": {
+      "item": "thermalfoundation:material",
+      "data": 167
+    },
+    "B": {
+      "item": "thermalfoundation:glass",
+      "data": 3
+    },
+    "C": {
+      "item": "minecraft:diamond_block"
+    }
+  },
+  "result": {
+    "item": "tesseract:tesseract"
+  }
+}

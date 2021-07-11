@@ -3,17 +3,14 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
-        maven { url = 'https://plugins.gradle.org/m2'}
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-        classpath group: 'com.wynprice.cursemaven', name: 'CurseMaven', version: '2.1.4'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
-apply plugin: 'com.wynprice.cursemaven'
 
 version = '1.0.21a-mc1.12'
 group = 'com.supermartijn642.tesseract' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -60,13 +57,18 @@ repositories {
     flatDir {
         dirs 'libs'
     }
+    maven {
+        url "https://www.cursemaven.com"
+    }
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2855'
 
     // Core Lib
-    compile fg.deobf("curse.maven:supermartijn642s-core-lib:3349593")//fg.deobf('com.supermartijn642.core:supermartijn642corelib:1.0.4-dev-mc1.12')
+    compile fg.deobf('curse.maven:supermartijn642s-core-lib-454372:3357859')//fg.deobf('com.supermartijn642.core:supermartijn642corelib:1.0.4-dev-mc1.12')
+    // Config Lib
+    compile fg.deobf('curse.maven:supermartijn642s-config-lib-438332:3357662')
 }
 
 //sourceSets {
