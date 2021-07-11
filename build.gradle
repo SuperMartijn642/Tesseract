@@ -3,17 +3,14 @@ buildscript {
         maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
-        maven { url = 'https://plugins.gradle.org/m2'}
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-        classpath group: 'com.wynprice.cursemaven', name: 'CurseMaven', version: '2.1.4'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
-apply plugin: 'com.wynprice.cursemaven'
 
 version = '1.0.21-mc1.16.5'
 group = 'com.supermartijn642.tesseract' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -22,7 +19,6 @@ archivesBaseName = 'tesseract'
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-
     mappings channel: 'snapshot', version: '20201028-1.16.3'
 
     runs {
@@ -70,27 +66,19 @@ minecraft {
 }
 
 repositories {
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "https://dvs1.progwml6.com/files/maven/"
+    flatDir {
+        dirs 'libs'
     }
     maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "https://modmaven.k-4u.nl"
+        url "https://www.cursemaven.com"
     }
 }
 
 dependencies {
-
     minecraft 'net.minecraftforge:forge:1.16.5-36.1.2'
 
     // Core Lib
-    compile fg.deobf("curse.maven:supermartijn642s-core-lib:3349598")//files('libs/supermartijn642corelib-1.0.4-dev-mc1.16.5-sources.jar')
-
-    // compile against the JEI API but do not include it at runtime
-//    compileOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2:api")
-    // at runtime, use the full JEI jar
-//    runtimeOnly fg.deobf("mezz.jei:jei-1.15.2:6.0.0.2")
+    compile fg.deobf('curse.maven:supermartijn642s-core-lib-454372:3357863')
+    // Config Lib
+    compile fg.deobf('curse.maven:supermartijn642s-config-lib-438332:3357667')
 }
