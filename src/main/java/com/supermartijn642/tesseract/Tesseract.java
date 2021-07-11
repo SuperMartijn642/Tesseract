@@ -4,12 +4,15 @@ import com.supermartijn642.core.network.PacketChannel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import com.supermartijn642.tesseract.packets.*;
+import com.supermartijn642.tesseract.recipe_conditions.TesseractRecipeCondition;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -32,6 +35,8 @@ public class Tesseract {
         MinecraftForge.EVENT_BUS.register(TesseractTracker.class);
         MinecraftForge.EVENT_BUS.register(TesseractChannelManager.class);
 
+        TesseractConfig.init();
+
         CHANNEL.registerMessage(PacketCompleteChannelsUpdate.class, PacketCompleteChannelsUpdate::new, true);
         CHANNEL.registerMessage(PacketScreenAddChannel.class, PacketScreenAddChannel::new, true);
         CHANNEL.registerMessage(PacketScreenRemoveChannel.class, PacketScreenRemoveChannel::new, true);
@@ -44,6 +49,7 @@ public class Tesseract {
 
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
+
         @SubscribeEvent
         public static void onBlockRegistry(final RegistryEvent.Register<Block> e){
             e.getRegistry().register(new BlockTesseract());
@@ -57,6 +63,11 @@ public class Tesseract {
         @SubscribeEvent
         public static void onItemRegistry(final RegistryEvent.Register<Item> e){
             e.getRegistry().register(new BlockItem(tesseract, new Item.Properties().group(ItemGroup.SEARCH)).setRegistryName("tesseract"));
+        }
+
+        @SubscribeEvent
+        public static void onRecipeRegistry(final RegistryEvent.Register<IRecipeSerializer<?>> e){
+            CraftingHelper.register(TesseractRecipeCondition.SERIALIZER);
         }
     }
 }
