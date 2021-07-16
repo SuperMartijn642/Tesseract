@@ -2,6 +2,7 @@ package com.supermartijn642.tesseract.screen;
 
 import com.google.common.collect.Iterables;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonReader;
@@ -42,60 +43,58 @@ public class PlayerRenderer {
     }
 
     public static String getPlayerUsername(UUID player){
-        return PLAYER_PROFILE_MAP.containsKey(player) ? PLAYER_PROFILE_MAP.get(player).getName() : null;
+        GameProfile profile = fetchPlayerProfile(player);
+        return profile == null ? null : profile.getName();
     }
 
     public static ResourceLocation getPlayerSkin(UUID player){
-        if(PLAYER_PROFILE_MAP.containsKey(player)){
-            GameProfile profile = PLAYER_PROFILE_MAP.get(player);
+        GameProfile profile = fetchPlayerProfile(player);
+        if(profile != null){
             SkinManager skinManager = ClientUtils.getMinecraft().getSkinManager();
             Map<MinecraftProfileTexture.Type,MinecraftProfileTexture> map = skinManager.loadSkinFromCache(profile);
             if(map.containsKey(MinecraftProfileTexture.Type.SKIN))
                 return skinManager.loadSkin(map.get(MinecraftProfileTexture.Type.SKIN), MinecraftProfileTexture.Type.SKIN);
-        }else if(!updateFetchQueue(player, null, null))
-            fetchPlayerProfile(player);
+        }
         return DefaultPlayerSkin.getDefaultSkin(player);
     }
 
-    private static void fetchPlayerProfile(final UUID player){
-        updateFetchQueue(null, player, null);
-        new Thread(() -> {
-            boolean success = false;
-            try{
-                InputStream inputStream = new URL("https://api.mojang.com/user/profiles/" + player + "/names").openStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                // No tools to just read an array I guess
-                StringBuilder builder = new StringBuilder();
-                String s;
-                while((s = reader.readLine()) != null)
-                    builder.append(s);
-                if(builder.length() > 0){
-                    JsonArray array = ((JsonObject)Streams.parse(new JsonReader(new StringReader("{\"array\":" + builder + "}")))).getAsJsonArray("array");
-                    String name = array.get(0).getAsJsonObject().get("name").getAsString();
-                    GameProfile profile = updateGameProfile(new GameProfile(player, name));
-                    if(profile != null){
-                        PLAYER_PROFILE_MAP.put(player, profile);
-                        success = true;
-                    }
-                }
-            }catch(Exception ignore){}
-            if(!success){
-                try{
-                    Thread.sleep(120000);
-                }catch(Exception e2){
-                    e2.printStackTrace();
-                }
-            }
-            updateFetchQueue(null, null, player);
-        }, "Tesseract - UUID to username").start();
-    }
+    private static GameProfile fetchPlayerProfile(final UUID player){
+        synchronized(PLAYER_PROFILE_MAP){
+            GameProfile profile = PLAYER_PROFILE_MAP.get(player);
+            if(profile != null)
+                return profile;
+        }
 
-    private static synchronized boolean updateFetchQueue(UUID contains, UUID add, UUID remove){
-        if(add != null)
-            FETCH_QUEUE.add(add);
-        if(remove != null)
-            FETCH_QUEUE.remove(remove);
-        return contains != null && FETCH_QUEUE.contains(contains);
+        synchronized(FETCH_QUEUE){
+            if(!FETCH_QUEUE.contains(player)){
+                FETCH_QUEUE.add(player);
+                new Thread(() -> {
+                    boolean success = false;
+                    String name = fetchPlayerName(player);
+                    if(name != null){
+                        GameProfile profile = updateGameProfile(new GameProfile(player, name));
+                        if(profile != null){
+                            synchronized(PLAYER_PROFILE_MAP){
+                                PLAYER_PROFILE_MAP.put(player, profile);
+                            }
+                            success = true;
+                        }
+                    }
+                    if(!success){
+                        try{
+                            Thread.sleep(120000);
+                        }catch(Exception e2){
+                            e2.printStackTrace();
+                        }
+                    }
+                    synchronized(FETCH_QUEUE){
+                        FETCH_QUEUE.remove(player);
+                    }
+                }, "Tesseract - UUID to username").start();
+            }
+        }
+
+        return null;
     }
 
     @Nullable
@@ -115,6 +114,33 @@ public class PlayerRenderer {
                 }
             }
         }
+        return null;
+    }
+
+    private static String fetchPlayerName(UUID player){
+        try{
+            InputStream inputStream = new URL("https://api.mojang.com/user/profiles/" + player + "/names").openStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            StringBuilder builder = new StringBuilder();
+            String s;
+            while((s = reader.readLine()) != null)
+                builder.append(s);
+            if(builder.length() > 0){
+                // No tools to just read an array I guess
+                JsonArray array = ((JsonObject)Streams.parse(new JsonReader(new StringReader("{\"array\":" + builder + "}")))).getAsJsonArray("array");
+                String latestName = null;
+                long changeDate = -1;
+                for(JsonElement element : array){
+                    long date = element.getAsJsonObject().has("changedToAt") ? element.getAsJsonObject().get("changedToAt").getAsLong() : 0;
+                    if(date > changeDate){
+                        latestName = element.getAsJsonObject().get("name").getAsString();
+                        changeDate = date;
+                    }
+                }
+                if(latestName != null)
+                    return latestName;
+            }
+        }catch(Exception ignore){}
         return null;
     }
 
