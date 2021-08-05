@@ -1,9 +1,9 @@
 package com.supermartijn642.tesseract.manager;
 
 import com.supermartijn642.tesseract.EnumChannelType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.world.entity.player.Player;
 
 import java.io.File;
 import java.util.*;
@@ -57,7 +57,7 @@ public class ChannelList {
         this.removedIds.add(channel.id);
     }
 
-    public List<Channel> sortForPlayer(PlayerEntity player){
+    public List<Channel> sortForPlayer(Player player){
         final UUID uuid = player.getUUID();
 
         this.channels.removeIf(channel -> channel.isPrivate && !channel.creator.equals(uuid));
@@ -88,7 +88,7 @@ public class ChannelList {
         for(Channel channel : this.channels){
             File file = new File(folder, "channel" + channel.id + ".nbt");
             try{
-                CompressedStreamTools.write(channel.write(), file);
+                NbtIo.write(channel.write(), file);
             }catch(Exception exception){exception.printStackTrace();}
         }
         for(int id : this.removedIds){
@@ -115,7 +115,7 @@ public class ChannelList {
             if(name.startsWith("channel") && name.endsWith(".nbt")){
                 try{
                     int id = Integer.parseInt(name.substring("channel".length(), name.length() - ".nbt".length()));
-                    CompoundNBT compound = CompressedStreamTools.read(file);
+                    CompoundTag compound = NbtIo.read(file);
                     if(compound != null){
                         Channel channel = new Channel(id, this.type, compound);
                         if(channel.id >= this.channelId)

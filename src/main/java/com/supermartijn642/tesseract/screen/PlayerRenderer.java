@@ -7,24 +7,21 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.gui.ScreenUtils;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.client.resources.SkinManager;
-import net.minecraft.server.management.PlayerProfileCache;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.players.GameProfileCache;
+import net.minecraft.util.GsonHelper;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created 5/20/2021 by SuperMartijn642
@@ -35,7 +32,7 @@ public class PlayerRenderer {
     private static final Map<UUID,GameProfile> PLAYER_PROFILE_MAP = new HashMap<>();
     private static final HashSet<UUID> FETCH_QUEUE = new HashSet<>();
 
-    public static void renderPlayerHead(UUID player, MatrixStack matrixStack, int x, int y, int width, int height){
+    public static void renderPlayerHead(UUID player, PoseStack matrixStack, int x, int y, int width, int height){
         ScreenUtils.bindTexture(getPlayerSkin(player));
         ScreenUtils.drawTexture(matrixStack, x, y, width, height, 1 / 8f, 1 / 8f, 1 / 8f, 1 / 8f);
     }
@@ -99,15 +96,16 @@ public class PlayerRenderer {
     private static GameProfile updateGameProfile(@Nullable GameProfile input){
         if(input != null && input.getName() != null && !input.getName().isEmpty()){
             if(!input.isComplete() || !input.getProperties().containsKey("textures")){
-                PlayerProfileCache profileCache = getProfileCache();
+                GameProfileCache profileCache = getProfileCache();
                 MinecraftSessionService sessionService = getSessionService();
                 if(profileCache != null && sessionService != null){
-                    GameProfile gameprofile = profileCache.get(input.getName());
-                    if(gameprofile != null){
-                        Property property = Iterables.getFirst(gameprofile.getProperties().get("textures"), null);
+                    Optional<GameProfile> optionalGameProfile = profileCache.get(input.getName());
+                    if(optionalGameProfile.isPresent()){
+                        GameProfile gameProfile = optionalGameProfile.get();
+                        Property property = Iterables.getFirst(gameProfile.getProperties().get("textures"), null);
                         if(property == null)
-                            gameprofile = sessionService.fillProfileProperties(gameprofile, true);
-                        return gameprofile;
+                            gameProfile = sessionService.fillProfileProperties(gameProfile, true);
+                        return gameProfile;
                     }
                 }
             }
@@ -125,7 +123,7 @@ public class PlayerRenderer {
                 builder.append(s);
             if(builder.length() > 0){
                 // No tools to just read an array I guess
-                JsonArray array = JSONUtils.parse("{\"array\":" + builder + "}").getAsJsonArray("array");
+                JsonArray array = GsonHelper.parse("{\"array\":" + builder + "}").getAsJsonArray("array");
                 String latestName = null;
                 long changeDate = -1;
                 for(JsonElement element : array){
@@ -142,7 +140,7 @@ public class PlayerRenderer {
         return null;
     }
 
-    private static PlayerProfileCache getProfileCache(){
+    private static GameProfileCache getProfileCache(){
         return ClientUtils.getMinecraft().getSingleplayerServer().getProfileCache();
     }
 

@@ -1,17 +1,17 @@
 package com.supermartijn642.tesseract.manager;
 
 import com.supermartijn642.tesseract.TesseractTile;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.FolderName;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -33,7 +33,7 @@ public class TesseractTracker {
     public static final TesseractTracker SERVER = new TesseractTracker();
 //    public static final TesseractTracker CLIENT = new TesseractTracker();
 
-    public static TesseractTracker getInstance(World world){
+    public static TesseractTracker getInstance(Level world){
         return world.isClientSide ? null /*CLIENT*/ : SERVER;
     }
 
@@ -51,13 +51,13 @@ public class TesseractTracker {
         if(minecraftServer == null)
             return null;
 
-        RegistryKey<World> key = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dimension));
-        World world = TesseractChannelManager.minecraftServer.getLevel(key);
-        TileEntity tile = world.getBlockEntity(pos);
+        ResourceKey<Level> key = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dimension));
+        Level world = TesseractChannelManager.minecraftServer.getLevel(key);
+        BlockEntity tile = world.getBlockEntity(pos);
         return tile instanceof TesseractTile ? this.add((TesseractTile)tile) : null;
     }
 
-    public void remove(World world, BlockPos pos){
+    public void remove(Level world, BlockPos pos){
         String dimension = world.dimension().location().toString();
         this.remove(dimension, pos);
     }
@@ -75,13 +75,13 @@ public class TesseractTracker {
         this.tesseracts.get(reference.getDimension()).remove(reference.getPos());
     }
 
-    public TesseractReference get(World world, BlockPos pos){
+    public TesseractReference get(Level world, BlockPos pos){
         String dimension = world.dimension().location().toString();
         return this.tesseracts.putIfAbsent(dimension, new HashMap<>()).get(pos);
     }
 
-    public CompoundNBT writeKey(TesseractReference reference){
-        CompoundNBT tag = new CompoundNBT();
+    public CompoundTag writeKey(TesseractReference reference){
+        CompoundTag tag = new CompoundTag();
         tag.putString("dimension", reference.getDimension());
         tag.putInt("posx", reference.getPos().getX());
         tag.putInt("posy", reference.getPos().getY());
@@ -89,7 +89,7 @@ public class TesseractTracker {
         return tag;
     }
 
-    public TesseractReference fromKey(CompoundNBT key){
+    public TesseractReference fromKey(CompoundTag key){
         String dimension = key.getString("dimension");
         BlockPos pos = new BlockPos(key.getInt("posx"), key.getInt("posy"), key.getInt("posz"));
         return this.tesseracts.containsKey(dimension) ?
@@ -98,10 +98,10 @@ public class TesseractTracker {
 
     @SubscribeEvent
     public static void onSave(WorldEvent.Save e){
-        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof World) || ((World)e.getWorld()).dimension() != World.OVERWORLD)
+        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof Level) || ((Level)e.getWorld()).dimension() != Level.OVERWORLD)
             return;
 
-        File directory = new File(((ServerWorld)e.getWorld()).getServer().getWorldPath(FolderName.ROOT).toFile(), "tesseract/tracking");
+        File directory = new File(((ServerLevel)e.getWorld()).getServer().getWorldPath(LevelResource.ROOT).toFile(), "tesseract/tracking");
         int index = 0;
         for(Map.Entry<String,HashMap<BlockPos,TesseractReference>> dimensionEntry : SERVER.tesseracts.entrySet()){
             for(Map.Entry<BlockPos,TesseractReference> entry : dimensionEntry.getValue().entrySet()){
@@ -109,7 +109,7 @@ public class TesseractTracker {
                 try{
                     file.getParentFile().mkdirs();
                     file.createNewFile();
-                    CompressedStreamTools.write(entry.getValue().write(), file);
+                    NbtIo.write(entry.getValue().write(), file);
                 }catch(IOException ioException){
                     ioException.printStackTrace();
                 }
@@ -119,20 +119,20 @@ public class TesseractTracker {
 
     @SubscribeEvent
     public static void onLoad(WorldEvent.Load e){
-        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof World) || ((World)e.getWorld()).dimension() != World.OVERWORLD)
+        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof Level) || ((Level)e.getWorld()).dimension() != Level.OVERWORLD)
             return;
 
-        minecraftServer = ((ServerWorld)e.getWorld()).getServer();
+        minecraftServer = ((ServerLevel)e.getWorld()).getServer();
 
         SERVER.tesseracts.clear();
 
-        File directory = new File(((ServerWorld)e.getWorld()).getServer().getWorldPath(FolderName.ROOT).toFile(), "tesseract/tracking");
+        File directory = new File(((ServerLevel)e.getWorld()).getServer().getWorldPath(LevelResource.ROOT).toFile(), "tesseract/tracking");
         File[] files = directory.listFiles();
         if(files != null){
             for(File file : directory.listFiles()){
                 if(file.isFile() && file.getName().endsWith(".nbt")){
                     try{
-                        CompoundNBT tag = CompressedStreamTools.read(file);
+                        CompoundTag tag = NbtIo.read(file);
                         TesseractReference location = new TesseractReference(tag);
                         SERVER.tesseracts.putIfAbsent(location.getDimension(), new HashMap<>());
                         SERVER.tesseracts.get(location.getDimension()).put(location.getPos(), location);
@@ -146,7 +146,7 @@ public class TesseractTracker {
 
     @SubscribeEvent
     public static void onTick(TickEvent.WorldTickEvent e){
-        if(e.world.isClientSide || e.phase != TickEvent.Phase.END || e.world.dimension() != World.OVERWORLD)
+        if(e.world.isClientSide || e.phase != TickEvent.Phase.END || e.world.dimension() != Level.OVERWORLD)
             return;
 
         SERVER.toBeRemoved.forEach(SERVER::removeAndUpdate);

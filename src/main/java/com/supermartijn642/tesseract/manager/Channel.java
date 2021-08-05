@@ -5,8 +5,8 @@ import com.supermartijn642.tesseract.TesseractTile;
 import com.supermartijn642.tesseract.capabilities.CombinedEnergyStorage;
 import com.supermartijn642.tesseract.capabilities.CombinedFluidHandler;
 import com.supermartijn642.tesseract.capabilities.CombinedItemHandler;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -37,7 +37,7 @@ public class Channel {
         this.name = name;
     }
 
-    public Channel(int id, EnumChannelType type, CompoundNBT compound){
+    public Channel(int id, EnumChannelType type, CompoundTag compound){
         this.id = id;
         this.type = type;
         this.read(compound);
@@ -77,12 +77,12 @@ public class Channel {
             this.receivingTesseracts.remove(tesseract);
     }
 
-    public CompoundNBT write(){
-        CompoundNBT compound = new CompoundNBT();
+    public CompoundTag write(){
+        CompoundTag compound = new CompoundTag();
         compound.putUUID("creator", this.creator);
         compound.putBoolean("private", this.isPrivate);
         compound.putString("name", this.name);
-        CompoundNBT tesseractCompound = new CompoundNBT();
+        CompoundTag tesseractCompound = new CompoundTag();
         Iterator<TesseractReference> iterator = this.tesseracts.iterator();
         for(int i = 0; iterator.hasNext(); i++)
             tesseractCompound.put("tesseract" + i, TesseractTracker.SERVER.writeKey(iterator.next()));
@@ -90,14 +90,14 @@ public class Channel {
         return compound;
     }
 
-    public void read(CompoundNBT compound){
+    public void read(CompoundTag compound){
         this.creator = compound.getUUID("creator");
         this.isPrivate = compound.getBoolean("private");
         this.name = compound.getString("name");
         this.tesseracts.clear();
         this.sendingTesseracts.clear();
         this.receivingTesseracts.clear();
-        CompoundNBT tesseractCompound = compound.getCompound("references");
+        CompoundTag tesseractCompound = compound.getCompound("references");
         for(String key : tesseractCompound.getAllKeys()){
             TesseractReference reference = TesseractTracker.SERVER.fromKey(tesseractCompound.getCompound(key));
             if(reference != null)
@@ -107,7 +107,7 @@ public class Channel {
         if(compound.contains("tesseracts")){ // for older versions
             tesseractCompound = compound.getCompound("tesseracts");
             for(String key : tesseractCompound.getAllKeys()){
-                CompoundNBT compound2 = tesseractCompound.getCompound(key);
+                CompoundTag compound2 = tesseractCompound.getCompound(key);
                 String dimension = compound2.getString("dim");
                 BlockPos pos = new BlockPos(compound2.getInt("posx"), compound2.getInt("posy"), compound2.getInt("posz"));
                 TesseractReference reference = TesseractTracker.SERVER.tryAdd(dimension, pos);
@@ -117,8 +117,8 @@ public class Channel {
         }
     }
 
-    public CompoundNBT writeClientChannel(){
-        CompoundNBT tag = new CompoundNBT();
+    public CompoundTag writeClientChannel(){
+        CompoundTag tag = new CompoundTag();
         tag.putInt("id", this.id);
         tag.putInt("type", this.type.getIndex());
         tag.putUUID("creator", this.creator);
@@ -127,7 +127,7 @@ public class Channel {
         return tag;
     }
 
-    public static Channel readClientChannel(CompoundNBT tag){
+    public static Channel readClientChannel(CompoundTag tag){
         int id = tag.getInt("id");
         EnumChannelType type = EnumChannelType.byIndex(tag.getInt("type"));
         UUID creator = tag.getUUID("creator");

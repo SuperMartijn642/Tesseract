@@ -4,8 +4,8 @@ import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.core.network.TileEntityBasePacket;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractTile;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 
 /**
  * Created 7/5/2020 by SuperMartijn642
@@ -23,13 +23,13 @@ public class PacketScreenCycleTransferState extends TileEntityBasePacket<Tessera
     }
 
     @Override
-    public void write(PacketBuffer buffer){
+    public void write(FriendlyByteBuf buffer){
         super.write(buffer);
         buffer.writeInt(this.type.getIndex());
     }
 
     @Override
-    public void read(PacketBuffer buffer){
+    public void read(FriendlyByteBuf buffer){
         super.read(buffer);
         this.type = EnumChannelType.byIndex(buffer.readInt());
     }

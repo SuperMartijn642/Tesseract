@@ -1,12 +1,12 @@
 package com.supermartijn642.tesseract.screen;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.core.gui.widget.AbstractButtonWidget;
 import com.supermartijn642.core.gui.widget.IHoverTextWidget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -27,12 +27,12 @@ public class LockButton extends AbstractButtonWidget implements IHoverTextWidget
     }
 
     @Override
-    protected ITextComponent getNarrationMessage(){
-        return new TranslationTextComponent("gui.narrate.button", new TranslationTextComponent("narrator.button.difficulty_lock")).append(". ").append(this.isLocked() ? new TranslationTextComponent("narrator.button.difficulty_lock.locked") : new TranslationTextComponent("narrator.button.difficulty_lock.unlocked"));
+    protected Component getNarrationMessage(){
+        return new TranslatableComponent("gui.narrate.button", new TranslatableComponent("narrator.button.difficulty_lock")).append(". ").append(this.isLocked() ? new TranslatableComponent("narrator.button.difficulty_lock.locked") : new TranslatableComponent("narrator.button.difficulty_lock.unlocked"));
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int x, int y, float partialTicks){
+    public void render(PoseStack matrixStack, int x, int y, float partialTicks){
         ScreenUtils.bindTexture(Button.WIDGETS_LOCATION);
 
         Icon icon;
@@ -55,8 +55,8 @@ public class LockButton extends AbstractButtonWidget implements IHoverTextWidget
     }
 
     @Override
-    public ITextComponent getHoverText(){
-        return new TranslationTextComponent("gui.tesseract.channel." + (this.locked ? "private" : "public"));
+    public Component getHoverText(){
+        return new TranslatableComponent("gui.tesseract.channel." + (this.locked ? "private" : "public"));
     }
 
     @OnlyIn(Dist.CLIENT)

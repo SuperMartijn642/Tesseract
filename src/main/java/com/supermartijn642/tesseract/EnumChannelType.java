@@ -1,9 +1,9 @@
 package com.supermartijn642.tesseract;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -40,8 +40,8 @@ public enum EnumChannelType {
         return this.index;
     }
 
-    public ITextComponent getTranslation(){
-        return new TranslationTextComponent(this.translationKey);
+    public Component getTranslation(){
+        return new TranslatableComponent(this.translationKey);
     }
 
     public static EnumChannelType byIndex(int index){

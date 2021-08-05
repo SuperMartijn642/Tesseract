@@ -5,10 +5,11 @@ import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -32,8 +33,8 @@ public class TesseractTile extends BaseTileEntity {
 
     private final Map<Direction,Map<Capability<?>,Object>> capabilities = new HashMap<>();
 
-    public TesseractTile(){
-        super(Tesseract.tesseract_tile);
+    public TesseractTile(BlockPos pos, BlockState state){
+        super(Tesseract.tesseract_tile, pos, state);
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, -1);
             this.transferState.put(type, TransferState.BOTH);
@@ -94,7 +95,7 @@ public class TesseractTile extends BaseTileEntity {
         ArrayList<T> list = new ArrayList<>();
         for(Direction facing : Direction.values()){
             if(!this.capabilities.get(facing).containsKey(capability)){
-                TileEntity tile = this.level.getBlockEntity(this.worldPosition.relative(facing));
+                BlockEntity tile = this.level.getBlockEntity(this.worldPosition.relative(facing));
                 if(tile != null && !(tile instanceof TesseractTile))
                     tile.getCapability(capability, facing.getOpposite()).ifPresent(
                         object -> {
@@ -158,8 +159,8 @@ public class TesseractTile extends BaseTileEntity {
     }
 
     @Override
-    protected CompoundNBT writeData(){
-        CompoundNBT compound = new CompoundNBT();
+    protected CompoundTag writeData(){
+        CompoundTag compound = new CompoundTag();
         for(EnumChannelType type : EnumChannelType.values()){
             compound.putInt(type.name(), this.channels.get(type));
             compound.putString("transferState" + type.name(), this.transferState.get(type).name());
@@ -170,7 +171,7 @@ public class TesseractTile extends BaseTileEntity {
     }
 
     @Override
-    protected void readData(CompoundNBT compound){
+    protected void readData(CompoundTag compound){
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, compound.getInt(type.name()));
             if(compound.contains("transferState" + type.name()))

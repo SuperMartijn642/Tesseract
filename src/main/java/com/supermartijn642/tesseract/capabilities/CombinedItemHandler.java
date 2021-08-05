@@ -4,7 +4,7 @@ import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractTile;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 

@@ -4,7 +4,7 @@ import com.supermartijn642.core.network.BasePacket;
 import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 /**
  * Created 12/16/2020 by SuperMartijn642
@@ -23,13 +23,13 @@ public class PacketRemoveChannel implements BasePacket {
     }
 
     @Override
-    public void write(PacketBuffer buffer){
+    public void write(FriendlyByteBuf buffer){
         buffer.writeInt(this.type.getIndex());
         buffer.writeInt(this.id);
     }
 
     @Override
-    public void read(PacketBuffer buffer){
+    public void read(FriendlyByteBuf buffer){
         this.type = EnumChannelType.byIndex(buffer.readInt());
         this.id = buffer.readInt();
     }

@@ -1,10 +1,10 @@
 package com.supermartijn642.tesseract.screen.info.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.tesseract.screen.info.InfoScreen;
 import com.supermartijn642.tesseract.screen.info.Page;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Created 7/17/2021 by SuperMartijn642
@@ -42,7 +42,7 @@ public class GuiPage extends Page {
     }
 
     @Override
-    public void render(MatrixStack matrixStack){
+    public void render(PoseStack matrixStack){
         int textX = this.textLeft ? 0 : GUI_WIDTH + 10;
         int guiX = this.textLeft ? TEXT_WIDTH + 10 : 0;
         InfoScreen.drawHoveringTab(matrixStack, textX, 0, TEXT_WIDTH, 50);

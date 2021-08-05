@@ -1,15 +1,14 @@
 package com.supermartijn642.tesseract.screen.info;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.gui.BaseScreen;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.tesseract.ClientProxy;
 import com.supermartijn642.tesseract.screen.InfoButton;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +33,7 @@ public class InfoScreen extends BaseScreen {
     private List<InfoPageButton> pageButtons = new LinkedList<>();
 
     public InfoScreen(BlockPos pos){
-        super(new TranslationTextComponent("gui.tesseract.info.title"));
+        super(new TranslatableComponent("gui.tesseract.info.title"));
         this.pos = pos;
     }
 
@@ -50,7 +49,7 @@ public class InfoScreen extends BaseScreen {
 
     @Override
     protected void addWidgets(){
-        this.closeInfoButton = this.addWidget(new InfoButton(0,0, () -> ClientProxy.openScreen(this.pos)));
+        this.closeInfoButton = this.addWidget(new InfoButton(0, 0, () -> ClientProxy.openScreen(this.pos)));
         this.backButton = this.addWidget(new InfoArrowWidget(0, 0, 7, 7, true, () -> tab.currentPageIndex, tab::getNumberOfPages, this::setPage));
         this.nextButton = this.addWidget(new InfoArrowWidget(0, 0, 7, 7, false, () -> tab.currentPageIndex, tab::getNumberOfPages, this::setPage));
         this.updateNavigationWidgets();
@@ -71,16 +70,15 @@ public class InfoScreen extends BaseScreen {
     }
 
     @Override
-    protected void render(MatrixStack matrixStack, int mouseX, int mouseY){
+    protected void render(PoseStack matrixStack, int mouseX, int mouseY){
         // tabs
         int x = ((int)this.sizeX() - WIDTH) / 2;
         drawHoveringTab(matrixStack, x, 0, 30, 30);
-        drawHoveringTab(matrixStack, x+40, 0, 102, 30);
+        drawHoveringTab(matrixStack, x + 40, 0, 102, 30);
         this.renderInfoTab(matrixStack, x + 43, 3, 24, 24, mouseX, mouseY, InfoTab.GUI);
         this.renderInfoTab(matrixStack, x + 67, 3, 24, 24, mouseX, mouseY, InfoTab.ITEMS);
         this.renderInfoTab(matrixStack, x + 91, 3, 24, 24, mouseX, mouseY, InfoTab.FLUID);
         this.renderInfoTab(matrixStack, x + 115, 3, 24, 24, mouseX, mouseY, InfoTab.ENERGY);
-        GlStateManager._enableAlphaTest();
 
         // page
         matrixStack.pushPose();
@@ -92,7 +90,7 @@ public class InfoScreen extends BaseScreen {
         // navigation
     }
 
-    private void renderInfoTab(MatrixStack matrixStack, int x, int y, int width, int height, int mouseX, int mouseY, InfoTab tab){
+    private void renderInfoTab(PoseStack matrixStack, int x, int y, int width, int height, int mouseX, int mouseY, InfoTab tab){
         if(tab == InfoScreen.tab)
             ScreenUtils.fillRect(matrixStack, x, y, width, height, 0x69007050);
         else if(mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height){
@@ -106,11 +104,11 @@ public class InfoScreen extends BaseScreen {
     }
 
     @Override
-    protected void renderTooltips(MatrixStack matrixStack, int mouseX, int mouseY){
+    protected void renderTooltips(PoseStack matrixStack, int mouseX, int mouseY){
 
     }
 
-    public static void drawHoveringTab(MatrixStack matrixStack, int x, int y, int width, int height){
+    public static void drawHoveringTab(PoseStack matrixStack, int x, int y, int width, int height){
         ScreenUtils.bindTexture(TESSERACT_HOVER_TAB);
         ScreenUtils.drawTexture(matrixStack, x, y, width - 3, height - 3, 0, 0, (width - 3) / 200f, (height - 3) / 200f);
         ScreenUtils.drawTexture(matrixStack, x + width - 3, y, 3, height - 3, 197 / 200f, 0, 3 / 200f, (height - 3) / 200f);

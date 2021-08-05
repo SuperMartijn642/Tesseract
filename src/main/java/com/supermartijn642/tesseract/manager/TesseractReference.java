@@ -3,12 +3,12 @@ package com.supermartijn642.tesseract.manager;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractTile;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class TesseractReference {
         }
     }
 
-    public TesseractReference(CompoundNBT tag){
+    public TesseractReference(CompoundTag tag){
         this.dimension = tag.getString("dim");
         this.pos = new BlockPos(tag.getInt("posx"), tag.getInt("posy"), tag.getInt("posz"));
         for(EnumChannelType type : EnumChannelType.values()){
@@ -49,10 +49,10 @@ public class TesseractReference {
         return this.dimension;
     }
 
-    public World getWorld(){
+    public Level getWorld(){
         if(TesseractChannelManager.minecraftServer == null)
             return null;
-        RegistryKey<World> key = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(this.dimension));
+        ResourceKey<Level> key = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(this.dimension));
         return TesseractChannelManager.minecraftServer.getLevel(key);
     }
 
@@ -61,7 +61,7 @@ public class TesseractReference {
     }
 
     public boolean isValid(){
-        World world = this.getWorld();
+        Level world = this.getWorld();
         boolean isValid = world != null && world.getBlockState(this.pos).getBlock() == Tesseract.tesseract && world.getBlockEntity(this.pos) instanceof TesseractTile;
 
         if(!isValid)
@@ -74,8 +74,8 @@ public class TesseractReference {
         return (TesseractTile)this.getWorld().getBlockEntity(this.pos);
     }
 
-    public CompoundNBT write(){
-        CompoundNBT compound = new CompoundNBT();
+    public CompoundTag write(){
+        CompoundTag compound = new CompoundTag();
         compound.putString("dim", this.dimension);
         compound.putInt("posx", this.pos.getX());
         compound.putInt("posy", this.pos.getY());

@@ -3,10 +3,10 @@ package com.supermartijn642.tesseract.screen.info;
 import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.screen.info.gui.GuiPage;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ public enum InfoTab {
         this.pages.addAll(Arrays.asList(pages));
     }
 
-    public ITextComponent getTranslation(){
+    public Component getTranslation(){
         return TextComponents.translation(this.translationKey).get();
     }
 

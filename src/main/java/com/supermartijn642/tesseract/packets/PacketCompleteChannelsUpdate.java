@@ -6,8 +6,8 @@ import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.*;
 
@@ -39,8 +39,8 @@ public class PacketCompleteChannelsUpdate implements BasePacket {
     }
 
     @Override
-    public void write(PacketBuffer buffer){
-        CompoundNBT compound = new CompoundNBT();
+    public void write(FriendlyByteBuf buffer){
+        CompoundTag compound = new CompoundTag();
 
         Iterator<Channel> iterator = this.channels.iterator();
         for(int index = 0; iterator.hasNext(); index++)
@@ -50,8 +50,8 @@ public class PacketCompleteChannelsUpdate implements BasePacket {
     }
 
     @Override
-    public void read(PacketBuffer buffer){
-        CompoundNBT compound = buffer.readNbt();
+    public void read(FriendlyByteBuf buffer){
+        CompoundTag compound = buffer.readNbt();
 
         this.channels = new ArrayList<>();
         for(String key : compound.getAllKeys())

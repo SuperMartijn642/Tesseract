@@ -1,12 +1,12 @@
 package com.supermartijn642.tesseract.screen.info;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.core.gui.widget.AbstractButtonWidget;
 import com.supermartijn642.core.gui.widget.IHoverTextWidget;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -29,19 +29,19 @@ public class InfoArrowWidget extends AbstractButtonWidget implements IHoverTextW
     }
 
     @Override
-    protected ITextComponent getNarrationMessage(){
+    protected Component getNarrationMessage(){
         return this.getHoverText();
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks){
+    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks){
         ScreenUtils.bindTexture(BUTTONS);
         boolean active = this.left ? this.currentPage.get() > 0 : this.currentPage.get() < this.numberOfPages.get();
         ScreenUtils.drawTexture(matrixStack, this.x, this.y, this.width, this.height, this.left ? 0 : 11 / 18f, (active ? this.hovered ? 1 : 0 : 3) / 4f, 7 / 18f, 1 / 4f);
     }
 
     @Override
-    public ITextComponent getHoverText(){
-        return new TranslationTextComponent("gui.tesseract.info." + (this.left ? "back" : "forward"));
+    public Component getHoverText(){
+        return new TranslatableComponent("gui.tesseract.info." + (this.left ? "back" : "forward"));
     }
 }

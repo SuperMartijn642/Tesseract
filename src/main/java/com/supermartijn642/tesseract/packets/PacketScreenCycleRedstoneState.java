@@ -3,7 +3,7 @@ package com.supermartijn642.tesseract.packets;
 import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.core.network.TileEntityBasePacket;
 import com.supermartijn642.tesseract.TesseractTile;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 /**
  * Created 7/5/2020 by SuperMartijn642

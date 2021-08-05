@@ -5,9 +5,9 @@ import com.supermartijn642.tesseract.RedstoneState;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractTile;
 import com.supermartijn642.tesseract.packets.PacketScreenCycleRedstoneState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 /**
  * Created 7/5/2020 by SuperMartijn642
@@ -39,12 +39,12 @@ public class RedstoneButton extends CycleButton implements IHoverTextWidget {
     }
 
     @Override
-    protected ITextComponent getNarrationMessage(){
+    protected Component getNarrationMessage(){
         return this.getHoverText();
     }
 
     @Override
-    public ITextComponent getHoverText(){
-        return new TranslationTextComponent("gui.tesseract.redstone.speech", this.state.translate());
+    public Component getHoverText(){
+        return new TranslatableComponent("gui.tesseract.redstone.speech", this.state.translate());
     }
 }

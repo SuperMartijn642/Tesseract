@@ -1,6 +1,6 @@
 package com.supermartijn642.tesseract;
 
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 /**
  * Created 7/4/2020 by SuperMartijn642
@@ -15,8 +15,8 @@ public enum RedstoneState {
         this.translation = translation;
     }
 
-    public TranslationTextComponent translate(){
-        return new TranslationTextComponent(this.translation);
+    public TranslatableComponent translate(){
+        return new TranslatableComponent(this.translation);
     }
 
 }

@@ -4,8 +4,8 @@ import com.supermartijn642.core.network.BasePacket;
 import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.SharedConstants;
+import net.minecraft.SharedConstants;
+import net.minecraft.network.FriendlyByteBuf;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
@@ -26,14 +26,14 @@ public class PacketScreenAddChannel implements BasePacket {
     }
 
     @Override
-    public void write(PacketBuffer buffer){
+    public void write(FriendlyByteBuf buffer){
         buffer.writeInt(this.type.getIndex());
         buffer.writeUtf(this.name);
         buffer.writeBoolean(this.isPrivate);
     }
 
     @Override
-    public void read(PacketBuffer buffer){
+    public void read(FriendlyByteBuf buffer){
         this.type = EnumChannelType.byIndex(buffer.readInt());
         this.name = buffer.readUtf(32767);
         this.isPrivate = buffer.readBoolean();

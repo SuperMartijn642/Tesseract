@@ -5,11 +5,11 @@ import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.packets.PacketAddChannel;
 import com.supermartijn642.tesseract.packets.PacketCompleteChannelsUpdate;
 import com.supermartijn642.tesseract.packets.PacketRemoveChannel;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.FolderName;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -32,7 +32,7 @@ public class TesseractChannelManager {
     public static final TesseractChannelManager SERVER = new TesseractChannelManager();
     public static final TesseractChannelManager CLIENT = new TesseractChannelManager();
 
-    public static TesseractChannelManager getInstance(World world){
+    public static TesseractChannelManager getInstance(Level world){
         return world.isClientSide ? CLIENT : SERVER;
     }
 
@@ -58,7 +58,7 @@ public class TesseractChannelManager {
         this.sendRemoveChannelPacket(type, id);
     }
 
-    public void sortChannels(PlayerEntity player, EnumChannelType type){
+    public void sortChannels(Player player, EnumChannelType type){
         if(player == null || player.level == null || !player.level.isClientSide)
             return;
         types.putIfAbsent(type, new ChannelList(type));
@@ -87,7 +87,7 @@ public class TesseractChannelManager {
         }
     }
 
-    public void sendCompleteUpdatePacket(PlayerEntity player){
+    public void sendCompleteUpdatePacket(Player player){
         if(this == SERVER)
             Tesseract.CHANNEL.sendToPlayer(player, new PacketCompleteChannelsUpdate(true));
     }
@@ -104,7 +104,7 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onSave(WorldEvent.Save e){
-        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof World) || ((World)e.getWorld()).dimension() != World.OVERWORLD)
+        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof Level) || ((Level)e.getWorld()).dimension() != Level.OVERWORLD)
             return;
 
         for(ChannelList list : SERVER.types.values()){
@@ -117,11 +117,11 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onLoad(WorldEvent.Load e){
-        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof World) || ((World)e.getWorld()).dimension() != World.OVERWORLD)
+        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof Level) || ((Level)e.getWorld()).dimension() != Level.OVERWORLD)
             return;
 
-        minecraftServer = ((ServerWorld)e.getWorld()).getServer();
-        directory = new File(((ServerWorld)e.getWorld()).getServer().getWorldPath(FolderName.ROOT).toFile(), "tesseract");
+        minecraftServer = ((ServerLevel)e.getWorld()).getServer();
+        directory = new File(((ServerLevel)e.getWorld()).getServer().getWorldPath(LevelResource.ROOT).toFile(), "tesseract");
         for(EnumChannelType type : EnumChannelType.values()){
             ChannelList list = new ChannelList(type);
             SERVER.types.put(type, list);

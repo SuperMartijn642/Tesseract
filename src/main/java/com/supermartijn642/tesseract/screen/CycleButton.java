@@ -1,9 +1,9 @@
 package com.supermartijn642.tesseract.screen;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.core.gui.widget.AbstractButtonWidget;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Created 7/5/2020 by SuperMartijn642
@@ -22,7 +22,7 @@ public abstract class CycleButton extends AbstractButtonWidget {
     protected abstract int getCycleIndex();
 
     @Override
-    public void render(MatrixStack matrixStack, int p_renderButton_1_, int p_renderButton_2_, float p_renderButton_3_){
+    public void render(PoseStack matrixStack, int p_renderButton_1_, int p_renderButton_2_, float p_renderButton_3_){
         ScreenUtils.bindTexture(TEXTURE);
         ScreenUtils.drawTexture(matrixStack, this.x, this.y, this.width, this.height, (this.textureX + this.getCycleIndex() * 20) / 120f, (this.active ? this.hovered ? 1 : 0 : 2) / 3f, 1 / 6f, 1 / 3f);
     }

@@ -4,8 +4,8 @@ import com.supermartijn642.core.network.BasePacket;
 import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -34,13 +34,13 @@ public class PacketScreenRemoveChannel implements BasePacket {
     }
 
     @Override
-    public void write(PacketBuffer buffer){
+    public void write(FriendlyByteBuf buffer){
         buffer.writeInt(this.type.getIndex());
         buffer.writeInt(this.id);
     }
 
     @Override
-    public void read(PacketBuffer buffer){
+    public void read(FriendlyByteBuf buffer){
         this.type = EnumChannelType.byIndex(buffer.readInt());
         this.id = buffer.readInt();
     }

@@ -6,9 +6,9 @@ import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractTile;
 import com.supermartijn642.tesseract.TransferState;
 import com.supermartijn642.tesseract.packets.PacketScreenCycleTransferState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 /**
  * Created 7/6/2020 by SuperMartijn642
@@ -42,12 +42,12 @@ public class TransferButton extends CycleButton implements IHoverTextWidget {
     }
 
     @Override
-    protected ITextComponent getNarrationMessage(){
+    protected Component getNarrationMessage(){
         return this.getHoverText();
     }
 
     @Override
-    public ITextComponent getHoverText(){
-        return new TranslationTextComponent("gui.tesseract.transfer.speech", this.state.translate());
+    public Component getHoverText(){
+        return new TranslatableComponent("gui.tesseract.transfer.speech", this.state.translate());
     }
 }

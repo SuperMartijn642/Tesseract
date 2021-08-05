@@ -1,14 +1,14 @@
 package com.supermartijn642.tesseract.screen.info.blocks;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.util.math.vector.Quaternion;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Quaternion;
 
 /**
  * Created 7/16/2021 by SuperMartijn642
  */
 public class BlockRenderer {
 
-    public static void renderBlocks(MatrixStack matrixStack, float xRotation, float yRotation, float zRotation, float scale, RenderableBlock... blocks){
+    public static void renderBlocks(PoseStack matrixStack, float xRotation, float yRotation, float zRotation, float scale, RenderableBlock... blocks){
         matrixStack.pushPose();
         matrixStack.mulPose(new Quaternion(xRotation, yRotation, zRotation, true));
         matrixStack.scale(scale,scale,scale);
