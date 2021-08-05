@@ -9,12 +9,12 @@ import net.minecraft.util.math.vector.Quaternion;
 public class BlockRenderer {
 
     public static void renderBlocks(MatrixStack matrixStack, float xRotation, float yRotation, float zRotation, float scale, RenderableBlock... blocks){
-        matrixStack.push();
-        matrixStack.rotate(new Quaternion(xRotation, yRotation, zRotation, true));
+        matrixStack.pushPose();
+        matrixStack.mulPose(new Quaternion(xRotation, yRotation, zRotation, true));
         matrixStack.scale(scale,scale,scale);
         for(RenderableBlock block : blocks)
             block.render(matrixStack);
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 
 }

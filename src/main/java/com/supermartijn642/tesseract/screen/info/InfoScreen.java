@@ -35,7 +35,7 @@ public class InfoScreen extends BaseScreen {
 
     public InfoScreen(BlockPos pos){
         super(new TranslationTextComponent("gui.tesseract.info.title"));
-        this.pos = pos;this.addButton()
+        this.pos = pos;
     }
 
     @Override
@@ -80,14 +80,14 @@ public class InfoScreen extends BaseScreen {
         this.renderInfoTab(matrixStack, x + 67, 3, 24, 24, mouseX, mouseY, InfoTab.ITEMS);
         this.renderInfoTab(matrixStack, x + 91, 3, 24, 24, mouseX, mouseY, InfoTab.FLUID);
         this.renderInfoTab(matrixStack, x + 115, 3, 24, 24, mouseX, mouseY, InfoTab.ENERGY);
-        GlStateManager.enableAlphaTest();
+        GlStateManager._enableAlphaTest();
 
         // page
-        matrixStack.push();
+        matrixStack.pushPose();
         Page page = tab.getCurrentPage();
         matrixStack.translate(((int)this.sizeX() - page.getWidth()) / 2f, 40, 0);
         page.render(matrixStack);
-        matrixStack.pop();
+        matrixStack.popPose();
 
         // navigation
     }
@@ -102,7 +102,7 @@ public class InfoScreen extends BaseScreen {
             ScreenUtils.fillRect(matrixStack, x + width - 1, y, 1, height, 0xffffffff);
         }
 
-        ClientUtils.getItemRenderer().renderItemIntoGUI(tab.getIconItem(), (int)this.left() + x + width / 2 - 8, (int)this.top() + y + height / 2 - 8);
+        ClientUtils.getItemRenderer().renderGuiItem(tab.getIconItem(), (int)this.left() + x + width / 2 - 8, (int)this.top() + y + height / 2 - 8);
     }
 
     @Override

@@ -33,10 +33,10 @@ public class ClientProxy {
     }
 
     public static void openScreen(BlockPos pos){
-        ClientUtils.getMinecraft().displayGuiScreen(new TesseractScreen(pos));
+        ClientUtils.getMinecraft().setScreen(new TesseractScreen(pos));
     }
 
     public static void openInfoScreen(BlockPos pos){
-        ClientUtils.getMinecraft().displayGuiScreen(new InfoScreen(pos));
+        ClientUtils.getMinecraft().setScreen(new InfoScreen(pos));
     }
 }

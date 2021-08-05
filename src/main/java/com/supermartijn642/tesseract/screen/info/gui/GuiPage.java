@@ -48,13 +48,13 @@ public class GuiPage extends Page {
         InfoScreen.drawHoveringTab(matrixStack, textX, 0, TEXT_WIDTH, 50);
         ScreenUtils.bindTexture(this.useSecondBackground ? TESSERACT_GUI_TEXTURE_2 : TESSERACT_GUI_TEXTURE);
         ScreenUtils.drawTexture(matrixStack, guiX, 0, GUI_WIDTH, GUI_HEIGHT);
-        matrixStack.push();
+        matrixStack.pushPose();
         matrixStack.translate(guiX, 0, 0);
         matrixStack.scale(GUI_WIDTH / 558f, GUI_HEIGHT / 422f, 0);
         ScreenUtils.fillRect(matrixStack, this.rectX, this.rectY, this.rectWidth, 2, 0xffff0000);
         ScreenUtils.fillRect(matrixStack, this.rectX, this.rectY, 2, this.rectHeight, 0xffff0000);
         ScreenUtils.fillRect(matrixStack, this.rectX, this.rectY + this.rectHeight - 2, this.rectWidth, 2, 0xffff0000);
         ScreenUtils.fillRect(matrixStack, this.rectX + this.rectWidth - 2, this.rectY, 2, this.rectHeight, 0xffff0000);
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 }

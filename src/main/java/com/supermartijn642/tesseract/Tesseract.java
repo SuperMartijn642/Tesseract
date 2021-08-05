@@ -57,12 +57,12 @@ public class Tesseract {
 
         @SubscribeEvent
         public static void onTileRegistry(final RegistryEvent.Register<TileEntityType<?>> e){
-            e.getRegistry().register(TileEntityType.Builder.create(TesseractTile::new, tesseract).build(null).setRegistryName("tesseract_tile"));
+            e.getRegistry().register(TileEntityType.Builder.of(TesseractTile::new, tesseract).build(null).setRegistryName("tesseract_tile"));
         }
 
         @SubscribeEvent
         public static void onItemRegistry(final RegistryEvent.Register<Item> e){
-            e.getRegistry().register(new BlockItem(tesseract, new Item.Properties().group(ItemGroup.SEARCH)).setRegistryName("tesseract"));
+            e.getRegistry().register(new BlockItem(tesseract, new Item.Properties().tab(ItemGroup.TAB_SEARCH)).setRegistryName("tesseract"));
         }
 
         @SubscribeEvent
