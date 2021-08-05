@@ -1,8 +1,13 @@
 package com.supermartijn642.tesseract.screen.info;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.gui.BaseScreen;
 import com.supermartijn642.core.gui.ScreenUtils;
+import com.supermartijn642.tesseract.ClientProxy;
+import com.supermartijn642.tesseract.screen.InfoButton;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 
@@ -14,60 +19,90 @@ import java.util.List;
  */
 public class InfoScreen extends BaseScreen {
 
-    public static final int WIDTH = 172, HEIGHT = 256;
+    private static final ResourceLocation TESSERACT_HOVER_TAB = new ResourceLocation("tesseract", "textures/gui/info/hovering_tab.png");
+
+    public static final int WIDTH = 172, HEIGHT = 80;
 
     /**
      * Tesseract position to return to when this screen is closed
      */
-    private BlockPos pos;
-    private static Category category = Category.CATEGORIES.get(0);
-    private static Page page = category.getPage(0);
+    private final BlockPos pos;
+    private static InfoTab tab = InfoTab.GUI;
 
+    private InfoButton closeInfoButton;
     private InfoArrowWidget backButton, nextButton;
     private List<InfoPageButton> pageButtons = new LinkedList<>();
 
     public InfoScreen(BlockPos pos){
         super(new TranslationTextComponent("gui.tesseract.info.title"));
-        this.pos = pos;
+        this.pos = pos;this.addButton()
     }
 
     @Override
     protected float sizeX(){
-        return WIDTH;
+        return Math.max(WIDTH, tab.getCurrentPage().getWidth());
     }
 
     @Override
     protected float sizeY(){
-        return HEIGHT;
+        return HEIGHT + tab.getCurrentPage().getHeight();
     }
 
     @Override
     protected void addWidgets(){
-        this.backButton = this.addWidget(new InfoArrowWidget(0,HEIGHT - 14,7,7,true, () -> this.setPage(page.getIndex() - 1)));
-        this.nextButton = this.addWidget(new InfoArrowWidget(0,HEIGHT - 14,7,7,false, () -> this.setPage(page.getIndex() + 1)));
+        this.closeInfoButton = this.addWidget(new InfoButton(0,0, () -> ClientProxy.openScreen(this.pos)));
+        this.backButton = this.addWidget(new InfoArrowWidget(0, 0, 7, 7, true, () -> tab.currentPageIndex, tab::getNumberOfPages, this::setPage));
+        this.nextButton = this.addWidget(new InfoArrowWidget(0, 0, 7, 7, false, () -> tab.currentPageIndex, tab::getNumberOfPages, this::setPage));
         this.updateNavigationWidgets();
     }
 
     private void updateNavigationWidgets(){
-
+        int x = ((int)this.sizeX() - WIDTH) / 2;
+        this.closeInfoButton.x = x + 5;
+        this.closeInfoButton.y = 5;
     }
 
     private void setPage(int index){
-        if(index < 0 || index >= category.getPageCount())
+        if(index < 0 || index >= tab.getNumberOfPages())
             return;
 
-        page = category.getPage(index);
+        tab.currentPageIndex = index;
         this.updateNavigationWidgets();
     }
 
     @Override
     protected void render(MatrixStack matrixStack, int mouseX, int mouseY){
-        this.drawScreenBackground(matrixStack);
-        this.drawPageFrame(matrixStack);
+        // tabs
+        int x = ((int)this.sizeX() - WIDTH) / 2;
+        drawHoveringTab(matrixStack, x, 0, 30, 30);
+        drawHoveringTab(matrixStack, x+40, 0, 102, 30);
+        this.renderInfoTab(matrixStack, x + 43, 3, 24, 24, mouseX, mouseY, InfoTab.GUI);
+        this.renderInfoTab(matrixStack, x + 67, 3, 24, 24, mouseX, mouseY, InfoTab.ITEMS);
+        this.renderInfoTab(matrixStack, x + 91, 3, 24, 24, mouseX, mouseY, InfoTab.FLUID);
+        this.renderInfoTab(matrixStack, x + 115, 3, 24, 24, mouseX, mouseY, InfoTab.ENERGY);
+        GlStateManager.enableAlphaTest();
+
+        // page
         matrixStack.push();
-        matrixStack.translate(6, 6, 0);
-        page.renderTop(matrixStack,mouseX, mouseY);
+        Page page = tab.getCurrentPage();
+        matrixStack.translate(((int)this.sizeX() - page.getWidth()) / 2f, 40, 0);
+        page.render(matrixStack);
         matrixStack.pop();
+
+        // navigation
+    }
+
+    private void renderInfoTab(MatrixStack matrixStack, int x, int y, int width, int height, int mouseX, int mouseY, InfoTab tab){
+        if(tab == InfoScreen.tab)
+            ScreenUtils.fillRect(matrixStack, x, y, width, height, 0x69007050);
+        else if(mouseX > x && mouseX < x + width && mouseY > y && mouseY < y + height){
+            ScreenUtils.fillRect(matrixStack, x, y, width, 1, 0xffffffff);
+            ScreenUtils.fillRect(matrixStack, x, y + height - 1, width, 1, 0xffffffff);
+            ScreenUtils.fillRect(matrixStack, x, y, 1, height, 0xffffffff);
+            ScreenUtils.fillRect(matrixStack, x + width - 1, y, 1, height, 0xffffffff);
+        }
+
+        ClientUtils.getItemRenderer().renderItemIntoGUI(tab.getIconItem(), (int)this.left() + x + width / 2 - 8, (int)this.top() + y + height / 2 - 8);
     }
 
     @Override
@@ -75,13 +110,11 @@ public class InfoScreen extends BaseScreen {
 
     }
 
-    private void drawPageFrame(MatrixStack matrixStack){
-        ScreenUtils.fillRect(matrixStack, 5,5, this.sizeX() - 11, 1, 85 / 255f, 85 / 255f, 58 / 255f, 1);
-        ScreenUtils.fillRect(matrixStack, 5,5, 1, page.getTopHeight() + 1, 198 / 255f, 198 / 255f, 198 / 255f, 1);
-        ScreenUtils.fillRect(matrixStack, 5,6 + page.getTopHeight(), 1, 1, 168 / 255f, 168 / 255f, 168 / 255f, 1);
-        ScreenUtils.fillRect(matrixStack, this.sizeX() - 6,5, 1, 1, 168 / 255f, 168 / 255f, 168 / 255f, 1);
-        ScreenUtils.fillRect(matrixStack, 6,6 + page.getTopHeight(), this.sizeX() - 11, 1, 255 / 255f, 255 / 255f, 255 / 255f, 1);
-        ScreenUtils.fillRect(matrixStack, this.sizeX() - 6,6, 1, page.getTopHeight() + 1, 255 / 255f, 255 / 255f, 255 / 255f, 1);
-        ScreenUtils.fillRect(matrixStack, 6,6, this.sizeX() - 12, page.getTopHeight(), 122 / 255f, 122 / 255f, 122 / 255f, 1);
+    public static void drawHoveringTab(MatrixStack matrixStack, int x, int y, int width, int height){
+        ScreenUtils.bindTexture(TESSERACT_HOVER_TAB);
+        ScreenUtils.drawTexture(matrixStack, x, y, width - 3, height - 3, 0, 0, (width - 3) / 200f, (height - 3) / 200f);
+        ScreenUtils.drawTexture(matrixStack, x + width - 3, y, 3, height - 3, 197 / 200f, 0, 3 / 200f, (height - 3) / 200f);
+        ScreenUtils.drawTexture(matrixStack, x, y + height - 3, width - 3, 3, 0, 197 / 200f, (width - 3) / 200f, 3 / 200f);
+        ScreenUtils.drawTexture(matrixStack, x + width - 3, y + height - 3, 3, 3, 197 / 200f, 197 / 200f, 3 / 200f, 3 / 200f);
     }
 }

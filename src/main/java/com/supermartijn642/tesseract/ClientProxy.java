@@ -6,7 +6,8 @@ import com.supermartijn642.tesseract.screen.info.InfoScreen;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -24,12 +25,11 @@ public class ClientProxy {
     }
 
     @SubscribeEvent
-    public static void onModelBake(ModelBakeEvent e){
-        e.getModelLoader().getUnbakedModel(new ResourceLocation("tesseract","block/pipe"));
-        e.getModelLoader().getUnbakedModel(new ResourceLocation("tesseract","block/pipe_extract"));
-        e.getModelLoader().getUnbakedModel(new ResourceLocation("tesseract","block/pipe_extract_and_insert"));
-        e.getModelLoader().getUnbakedModel(new ResourceLocation("tesseract","block/pipe_insert"));
-        e.getModelManager().getModel(new ResourceLocation("tesseract","block/pipe_insert"));
+    public static void onModelBake(ModelRegistryEvent e){
+        ModelLoader.addSpecialModel(new ResourceLocation("tesseract","block/pipe"));
+        ModelLoader.addSpecialModel(new ResourceLocation("tesseract","block/pipe_extract"));
+        ModelLoader.addSpecialModel(new ResourceLocation("tesseract","block/pipe_extract_and_insert"));
+        ModelLoader.addSpecialModel(new ResourceLocation("tesseract","block/pipe_insert"));
     }
 
     public static void openScreen(BlockPos pos){
