@@ -24,7 +24,6 @@ import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -35,7 +34,7 @@ import java.util.List;
 public class BlockTesseract extends BaseBlock implements EntityBlock {
 
     public BlockTesseract(){
-        super("tesseract", false, Block.Properties.of(Material.HEAVY_METAL, MaterialColor.COLOR_GREEN).sound(SoundType.METAL).harvestTool(ToolType.PICKAXE).strength(1.5F, 6.0F));
+        super("tesseract", false, Block.Properties.of(Material.HEAVY_METAL, MaterialColor.COLOR_GREEN).sound(SoundType.METAL).strength(1.5F, 6.0F));
     }
 
     @Override
