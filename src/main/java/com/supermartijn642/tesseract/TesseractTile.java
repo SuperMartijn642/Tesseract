@@ -158,6 +158,15 @@ public class TesseractTile extends BaseTileEntity {
             this.reference = TesseractTracker.SERVER.add(this);
     }
 
+    /**
+     *  TODO: 9/24/2021  Remove this once https://github.com/MinecraftForge/MinecraftForge/issues/7926 is fixed
+     */
+    @Override
+    public void clearRemoved(){
+        if(!this.level.isClientSide)
+            this.reference = TesseractTracker.SERVER.add(this);
+    }
+
     @Override
     protected CompoundTag writeData(){
         CompoundTag compound = new CompoundTag();
