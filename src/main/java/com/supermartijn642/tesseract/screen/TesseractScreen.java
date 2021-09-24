@@ -262,6 +262,7 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
         RenderSystem.getModelViewStack().scale(0.8f, 0.8f, 1);
         this.itemRenderer.renderGuiItem(new ItemStack(type.item.get()), 0, 0);
         RenderSystem.getModelViewStack().popPose();
+        RenderSystem.applyModelViewMatrix();
         ScreenUtils.drawString(matrixStack, channel.type.getTranslation(), 129, 91, ScreenUtils.ACTIVE_TEXT_COLOR);
         // accessibility
         ScreenUtils.drawString(matrixStack, new TextComponent("Accessibility:").setStyle(Style.EMPTY.withItalic(true)), 117, 105, 0xff666666);
