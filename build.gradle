@@ -80,7 +80,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.0.40'
+    minecraft 'net.minecraftforge:forge:1.17.1-37.0.67'
 
     // Core lib
     implementation fg.deobf('curse.maven:supermartijn642s-core-lib-454372:3413424')
