@@ -23,7 +23,7 @@ public class RedstoneButton extends CycleButton implements IHoverTextWidget {
 
     public void update(TesseractTile tile){
         this.state = tile.getRedstoneState();
-        this.pos = tile.getPos();
+        this.pos = tile.getBlockPos();
     }
 
     @Override

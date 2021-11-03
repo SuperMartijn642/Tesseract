@@ -123,8 +123,8 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
 
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, TesseractTile tile){
-        GlStateManager.enableAlphaTest();
-        GlStateManager.enableBlend();
+        GlStateManager._enableAlphaTest();
+        GlStateManager._enableBlend();
         ScreenUtils.bindTexture(BACKGROUND);
         ScreenUtils.drawTexture(matrixStack, 0, 0, this.sizeX(), this.sizeY());
 
@@ -172,7 +172,7 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
 
         // transfer
         ScreenUtils.bindTexture(SIDE_TAB);
-        GlStateManager.enableAlphaTest();
+        GlStateManager._enableAlphaTest();
         ScreenUtils.drawTexture(matrixStack, -27, 150, 30, 32);
 
         // info and redstone
@@ -182,7 +182,7 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
 
     private void drawTab(MatrixStack matrixStack, EnumChannelType type, int x, ResourceLocation icon){
         ScreenUtils.bindTexture(type == TesseractScreen.type ? TAB_ON : TAB_OFF);
-        GlStateManager.enableAlphaTest();
+        GlStateManager._enableAlphaTest();
         ScreenUtils.drawTexture(matrixStack, x, type == TesseractScreen.type ? 0 : 2, 28, type == TesseractScreen.type ? 31 : 26);
 
         float width = 16, height = 16;
@@ -190,12 +190,12 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
 
 //        ScreenUtils.bindTexture(icon);
 //        ScreenUtils.drawTexture(matrixStack, iconX, iconY, width, height);
-        this.itemRenderer.renderItemIntoGUI(new ItemStack(type.item.get()), (int)(this.left() + iconX), (int)(this.top() + iconY));
+        this.itemRenderer.renderGuiItem(new ItemStack(type.item.get()), (int)(this.left() + iconX), (int)(this.top() + iconY));
     }
 
     private void drawChannels(MatrixStack matrixStack, int mouseX, int mouseY, TesseractTile tile){
         ScreenUtils.bindTexture(CHANNEL_BACKGROUND);
-        GlStateManager.enableAlphaTest();
+        GlStateManager._enableAlphaTest();
         ScreenUtils.drawTexture(matrixStack, 3, 31, 102, 156, 0, 0, 102 / 256f, 157 / 256f);
         ScreenUtils.drawTexture(matrixStack, 26, 187, 56, 16, 0, 0, 56 / 256f, 16 / 256f);
 
@@ -230,17 +230,17 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
             }
             PlayerRenderer.renderPlayerHead(channel.creator, matrixStack, x, y + 2, 9, 9);
             x += 12;
-            boolean isOwnedChannel = channel.creator.equals(ClientUtils.getPlayer().getUniqueID());
+            boolean isOwnedChannel = channel.creator.equals(ClientUtils.getPlayer().getUUID());
             // trim the channel name to fit
             int availableWidth = CHANNEL_CUTOFF_LENGTH - x - (isOwnedChannel ? 9 : 0);
             String name = channel.name;
-            if(this.font.getStringWidth(name) > availableWidth)
-                name = this.font.func_238420_b_().func_238361_b_(name, availableWidth - this.font.getStringWidth("..."), Style.EMPTY) + "...";
+            if(this.font.width(name) > availableWidth)
+                name = this.font.getSplitter().plainHeadByWidth(name, availableWidth - this.font.width("..."), Style.EMPTY) + "...";
             ScreenUtils.drawString(matrixStack, name, x, y + 3, 0xffffffff);
-            x += this.font.getStringWidth(name) + 3;
+            x += this.font.width(name) + 3;
             if(isOwnedChannel){
                 ScreenUtils.bindTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF);
-                GlStateManager.enableAlphaTest();
+                GlStateManager._enableAlphaTest();
                 ScreenUtils.drawTexture(matrixStack, x, y + 2, 9, 9);
             }
         }
@@ -248,28 +248,28 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
 
     private void drawSelectedChannelInfo(MatrixStack matrixStack, Channel channel){
         // channel name
-        matrixStack.push();
+        matrixStack.pushPose();
         matrixStack.translate(177,35, 0);
         matrixStack.scale(1.2f, 1.2f, 1);
         ScreenUtils.drawCenteredString(matrixStack, channel.name, 0, 0, ScreenUtils.ACTIVE_TEXT_COLOR);
-        matrixStack.pop();
+        matrixStack.popPose();
         // creator
-        ScreenUtils.drawString(matrixStack, new StringTextComponent("Creator:").setStyle(Style.EMPTY.setItalic(true)), 117, 55, 0xff666666);
+        ScreenUtils.drawString(matrixStack, new StringTextComponent("Creator:").setStyle(Style.EMPTY.withItalic(true)), 117, 55, 0xff666666);
         PlayerRenderer.renderPlayerHead(channel.creator, matrixStack, 117, 65, 9, 9);
         String creatorName = PlayerRenderer.getPlayerUsername(channel.creator);
         if(creatorName != null)
             ScreenUtils.drawString(matrixStack, creatorName, 129, 66, ScreenUtils.ACTIVE_TEXT_COLOR);
         // category
-        ScreenUtils.drawString(matrixStack, new StringTextComponent("Category:").setStyle(Style.EMPTY.setItalic(true)), 117, 80, 0xff666666);
-        GlStateManager.pushMatrix();
-        GlStateManager.translated(this.left() + 115, this.top() + 88, 0);
-        GlStateManager.scalef(0.8f, 0.8f, 1);
-        this.itemRenderer.renderItemIntoGUI(new ItemStack(type.item.get()), 0, 0);
-        GlStateManager.popMatrix();
+        ScreenUtils.drawString(matrixStack, new StringTextComponent("Category:").setStyle(Style.EMPTY.withItalic(true)), 117, 80, 0xff666666);
+        GlStateManager._pushMatrix();
+        GlStateManager._translated(this.left() + 115, this.top() + 88, 0);
+        GlStateManager._scalef(0.8f, 0.8f, 1);
+        this.itemRenderer.renderGuiItem(new ItemStack(type.item.get()), 0, 0);
+        GlStateManager._popMatrix();
         ScreenUtils.drawString(matrixStack, channel.type.getTranslation(), 129, 91, ScreenUtils.ACTIVE_TEXT_COLOR);
         // accessibility
-        ScreenUtils.drawString(matrixStack, new StringTextComponent("Accessibility:").setStyle(Style.EMPTY.setItalic(true)), 117, 105, 0xff666666);
-        GlStateManager.enableAlphaTest();
+        ScreenUtils.drawString(matrixStack, new StringTextComponent("Accessibility:").setStyle(Style.EMPTY.withItalic(true)), 117, 105, 0xff666666);
+        GlStateManager._enableAlphaTest();
         ScreenUtils.bindTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF);
         ScreenUtils.drawTexture(matrixStack, 116, 114, 11, 11);
         ScreenUtils.drawString(matrixStack, new TranslationTextComponent("gui.tesseract.channel." + (channel.isPrivate ? "private" : "public")), 129, 116, ScreenUtils.ACTIVE_TEXT_COLOR);
@@ -303,7 +303,7 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
                         this.selectedChannel = channels.get(index).id;
                         this.setButton.setText(new TranslationTextComponent("gui.tesseract." + (tile.getChannelId(type) == this.selectedChannel ? "unset" : "set")));
                         this.setButton.active = true;
-                        this.removeButton.active = channels.get(index).creator.equals(Minecraft.getInstance().player.getUniqueID());
+                        this.removeButton.active = channels.get(index).creator.equals(Minecraft.getInstance().player.getUUID());
                     }
                 }else{
                     this.selectedChannel = -1;

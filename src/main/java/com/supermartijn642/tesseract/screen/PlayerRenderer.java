@@ -49,9 +49,9 @@ public class PlayerRenderer {
         GameProfile profile = fetchPlayerProfile(player);
         if(profile != null){
             SkinManager skinManager = ClientUtils.getMinecraft().getSkinManager();
-            Map<MinecraftProfileTexture.Type,MinecraftProfileTexture> map = skinManager.loadSkinFromCache(profile);
+            Map<MinecraftProfileTexture.Type,MinecraftProfileTexture> map = skinManager.getInsecureSkinInformation(profile);
             if(map.containsKey(MinecraftProfileTexture.Type.SKIN))
-                return skinManager.loadSkin(map.get(MinecraftProfileTexture.Type.SKIN), MinecraftProfileTexture.Type.SKIN);
+                return skinManager.registerTexture(map.get(MinecraftProfileTexture.Type.SKIN), MinecraftProfileTexture.Type.SKIN);
         }
         return DefaultPlayerSkin.getDefaultSkin(player);
     }
@@ -102,7 +102,7 @@ public class PlayerRenderer {
                 PlayerProfileCache profileCache = getProfileCache();
                 MinecraftSessionService sessionService = getSessionService();
                 if(profileCache != null && sessionService != null){
-                    GameProfile gameprofile = profileCache.getGameProfileForUsername(input.getName());
+                    GameProfile gameprofile = profileCache.get(input.getName());
                     if(gameprofile != null){
                         Property property = Iterables.getFirst(gameprofile.getProperties().get("textures"), null);
                         if(property == null)
@@ -125,7 +125,7 @@ public class PlayerRenderer {
                 builder.append(s);
             if(builder.length() > 0){
                 // No tools to just read an array I guess
-                JsonArray array = JSONUtils.fromJson("{\"array\":" + builder + "}").getAsJsonArray("array");
+                JsonArray array = JSONUtils.parse("{\"array\":" + builder + "}").getAsJsonArray("array");
                 String latestName = null;
                 long changeDate = -1;
                 for(JsonElement element : array){
@@ -143,10 +143,10 @@ public class PlayerRenderer {
     }
 
     private static PlayerProfileCache getProfileCache(){
-        return ClientUtils.getMinecraft().getIntegratedServer().getPlayerProfileCache();
+        return ClientUtils.getMinecraft().getSingleplayerServer().getProfileCache();
     }
 
     private static MinecraftSessionService getSessionService(){
-        return ClientUtils.getMinecraft().getSessionService();
+        return ClientUtils.getMinecraft().getMinecraftSessionService();
     }
 }
