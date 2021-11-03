@@ -25,18 +25,18 @@ public class ClientProxy {
 
     @SubscribeEvent
     public static void onModelBake(ModelBakeEvent e){
-        e.getModelLoader().getUnbakedModel(new ResourceLocation("tesseract","block/pipe"));
-        e.getModelLoader().getUnbakedModel(new ResourceLocation("tesseract","block/pipe_extract"));
-        e.getModelLoader().getUnbakedModel(new ResourceLocation("tesseract","block/pipe_extract_and_insert"));
-        e.getModelLoader().getUnbakedModel(new ResourceLocation("tesseract","block/pipe_insert"));
+        e.getModelLoader().getModel(new ResourceLocation("tesseract","block/pipe"));
+        e.getModelLoader().getModel(new ResourceLocation("tesseract","block/pipe_extract"));
+        e.getModelLoader().getModel(new ResourceLocation("tesseract","block/pipe_extract_and_insert"));
+        e.getModelLoader().getModel(new ResourceLocation("tesseract","block/pipe_insert"));
         e.getModelManager().getModel(new ResourceLocation("tesseract","block/pipe_insert"));
     }
 
     public static void openScreen(BlockPos pos){
-        ClientUtils.getMinecraft().displayGuiScreen(new TesseractScreen(pos));
+        ClientUtils.getMinecraft().setScreen(new TesseractScreen(pos));
     }
 
     public static void openInfoScreen(BlockPos pos){
-        ClientUtils.getMinecraft().displayGuiScreen(new InfoScreen(pos));
+        ClientUtils.getMinecraft().setScreen(new InfoScreen(pos));
     }
 }

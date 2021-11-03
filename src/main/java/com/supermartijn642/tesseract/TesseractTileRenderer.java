@@ -20,9 +20,9 @@ public class TesseractTileRenderer extends TileEntityRenderer<TesseractTile> {
 
     private static final ResourceLocation END_SKY_TEXTURE = new ResourceLocation("textures/environment/end_sky.png");
     private static final ResourceLocation END_PORTAL_TEXTURE = new ResourceLocation("textures/entity/end_portal.png");
-    private static final FloatBuffer MODELVIEW = GLAllocation.createDirectFloatBuffer(16);
-    private static final FloatBuffer PROJECTION = GLAllocation.createDirectFloatBuffer(16);
-    private final FloatBuffer buffer = GLAllocation.createDirectFloatBuffer(16);
+    private static final FloatBuffer MODELVIEW = GLAllocation.createFloatBuffer(16);
+    private static final FloatBuffer PROJECTION = GLAllocation.createFloatBuffer(16);
+    private final FloatBuffer buffer = GLAllocation.createFloatBuffer(16);
 
     @Override
     public void render(TesseractTile tile, double x, double y, double z, float partialTicks, int destroyStage){
@@ -62,7 +62,7 @@ public class TesseractTileRenderer extends TileEntityRenderer<TesseractTile> {
 
             if(j >= 1){
                 this.bindTexture(END_PORTAL_TEXTURE);
-                Minecraft.getInstance().gameRenderer.setupFogColor(true);
+                Minecraft.getInstance().gameRenderer.resetFogColor(true);
             }
 
             if(j == 1){
@@ -86,55 +86,55 @@ public class TesseractTileRenderer extends TileEntityRenderer<TesseractTile> {
             GlStateManager.translatef(0.5F, 0.5F, 0.0F);
             GlStateManager.scalef(0.5F, 0.5F, 1.0F);
             float f2 = (float)(j + 1);
-            GlStateManager.translatef(17.0F / f2, (2.0F + f2 / 1.5F) * (Util.milliTime() % 800000.0F / 800000.0F), 0.0F);
+            GlStateManager.translatef(17.0F / f2, (2.0F + f2 / 1.5F) * (Util.getMillis() % 800000.0F / 800000.0F), 0.0F);
             GlStateManager.rotatef((f2 * f2 * 4321.0F + f2 * 9.0F) * 2.0F, 0.0F, 0.0F, 1.0F);
             GlStateManager.scalef(4.5F - f2 / 4.0F, 4.5F - f2 / 4.0F, 1.0F);
             GlStateManager.multMatrix(PROJECTION);
             GlStateManager.multMatrix(MODELVIEW);
             Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder bufferbuilder = tessellator.getBuffer();
+            BufferBuilder bufferbuilder = tessellator.getBuilder();
             bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
             float f3 = (random.nextFloat() * 0.5F + 0.1F) * f1;
             float f4 = (random.nextFloat() * 0.5F + 0.4F) * f1;
             float f5 = (random.nextFloat() * 0.5F + 0.5F) * f1;
 
             // SOUTH
-            bufferbuilder.pos(0, 0, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos((double)0 + 1.0D, 0, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos((double)0 + 1.0D, (double)0 + 1.0D, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos(0, (double)0 + 1.0D, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex(0, 0, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex((double)0 + 1.0D, 0, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex((double)0 + 1.0D, (double)0 + 1.0D, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex(0, (double)0 + 1.0D, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
 
             // NORTH
-            bufferbuilder.pos(0, (double)0 + 1.0D, 0).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos((double)0 + 1.0D, (double)0 + 1.0D, 0).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos((double)0 + 1.0D, 0, 0).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos(0, 0, 0).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex(0, (double)0 + 1.0D, 0).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex((double)0 + 1.0D, (double)0 + 1.0D, 0).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex((double)0 + 1.0D, 0, 0).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex(0, 0, 0).color(f3, f4, f5, 1.0F).endVertex();
 
             // EAST
-            bufferbuilder.pos((double)0 + 1.0D, (double)0 + 1.0D, 0).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos((double)0 + 1.0D, (double)0 + 1.0D, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos((double)0 + 1.0D, 0, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos((double)0 + 1.0D, 0, 0).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex((double)0 + 1.0D, (double)0 + 1.0D, 0).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex((double)0 + 1.0D, (double)0 + 1.0D, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex((double)0 + 1.0D, 0, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex((double)0 + 1.0D, 0, 0).color(f3, f4, f5, 1.0F).endVertex();
 
             // WEST
-            bufferbuilder.pos(0, 0, 0).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos(0, 0, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos(0, (double)0 + 1.0D, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos(0, (double)0 + 1.0D, 0).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex(0, 0, 0).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex(0, 0, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex(0, (double)0 + 1.0D, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex(0, (double)0 + 1.0D, 0).color(f3, f4, f5, 1.0F).endVertex();
 
             // DOWN
-            bufferbuilder.pos(0, 0, 0).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos((double)0 + 1.0D, 0, 0).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos((double)0 + 1.0D, 0, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos(0, 0, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex(0, 0, 0).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex((double)0 + 1.0D, 0, 0).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex((double)0 + 1.0D, 0, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex(0, 0, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
 
             // UP
-            bufferbuilder.pos(0, 1, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos((double)0 + 1.0D, 1, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos((double)0 + 1.0D, 1, 0).color(f3, f4, f5, 1.0F).endVertex();
-            bufferbuilder.pos(0, 1, 0).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex(0, 1, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex((double)0 + 1.0D, 1, (double)0 + 1.0D).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex((double)0 + 1.0D, 1, 0).color(f3, f4, f5, 1.0F).endVertex();
+            bufferbuilder.vertex(0, 1, 0).color(f3, f4, f5, 1.0F).endVertex();
 
-            tessellator.draw();
+            tessellator.end();
             GlStateManager.popMatrix();
             GlStateManager.matrixMode(5888);
             this.bindTexture(END_SKY_TEXTURE);
@@ -145,7 +145,7 @@ public class TesseractTileRenderer extends TileEntityRenderer<TesseractTile> {
         GlStateManager.disableTexGen(GlStateManager.TexGen.T);
         GlStateManager.disableTexGen(GlStateManager.TexGen.R);
         GlStateManager.enableLighting();
-        Minecraft.getInstance().gameRenderer.setupFogColor(false);
+        Minecraft.getInstance().gameRenderer.resetFogColor(false);
     }
 
     private FloatBuffer getBuffer(float p_147525_1_, float p_147525_2_, float p_147525_3_){

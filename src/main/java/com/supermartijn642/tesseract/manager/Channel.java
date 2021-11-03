@@ -79,7 +79,7 @@ public class Channel {
 
     public CompoundNBT write(){
         CompoundNBT compound = new CompoundNBT();
-        compound.putUniqueId("creator", this.creator);
+        compound.putUUID("creator", this.creator);
         compound.putBoolean("private", this.isPrivate);
         compound.putString("name", this.name);
         CompoundNBT tesseractCompound = new CompoundNBT();
@@ -91,14 +91,14 @@ public class Channel {
     }
 
     public void read(CompoundNBT compound){
-        this.creator = compound.getUniqueId("creator");
+        this.creator = compound.getUUID("creator");
         this.isPrivate = compound.getBoolean("private");
         this.name = compound.getString("name");
         this.tesseracts.clear();
         this.sendingTesseracts.clear();
         this.receivingTesseracts.clear();
         CompoundNBT tesseractCompound = compound.getCompound("references");
-        for(String key : tesseractCompound.keySet()){
+        for(String key : tesseractCompound.getAllKeys()){
             TesseractReference reference = TesseractTracker.SERVER.fromKey(tesseractCompound.getCompound(key));
             if(reference != null)
                 this.addTesseract(reference);
@@ -106,7 +106,7 @@ public class Channel {
 
         if(compound.contains("tesseracts")){ // for older versions
             tesseractCompound = compound.getCompound("tesseracts");
-            for(String key : tesseractCompound.keySet()){
+            for(String key : tesseractCompound.getAllKeys()){
                 CompoundNBT compound2 = tesseractCompound.getCompound(key);
                 int dimension = compound2.getInt("dim");
                 BlockPos pos = new BlockPos(compound2.getInt("posx"), compound2.getInt("posy"), compound2.getInt("posz"));
@@ -121,7 +121,7 @@ public class Channel {
         CompoundNBT tag = new CompoundNBT();
         tag.putInt("id", this.id);
         tag.putInt("type", this.type.getIndex());
-        tag.putUniqueId("creator", this.creator);
+        tag.putUUID("creator", this.creator);
         tag.putBoolean("private", this.isPrivate);
         tag.putString("name", this.name);
         return tag;
@@ -130,7 +130,7 @@ public class Channel {
     public static Channel readClientChannel(CompoundNBT tag){
         int id = tag.getInt("id");
         EnumChannelType type = EnumChannelType.byIndex(tag.getInt("type"));
-        UUID creator = tag.getUniqueId("creator");
+        UUID creator = tag.getUUID("creator");
         boolean isPrivate = tag.getBoolean("private");
         String name = tag.getString("name");
         return new Channel(id, type, creator, isPrivate, name);

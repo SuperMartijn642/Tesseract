@@ -88,13 +88,13 @@ public class TesseractTile extends BaseTileEntity {
     }
 
     public <T> List<T> getSurroundingCapabilities(Capability<T> capability){
-        if(this.world == null)
+        if(this.level == null)
             return Collections.emptyList();
 
         ArrayList<T> list = new ArrayList<>();
         for(Direction facing : Direction.values()){
             if(!this.capabilities.get(facing).containsKey(capability)){
-                TileEntity tile = this.world.getTileEntity(this.pos.offset(facing));
+                TileEntity tile = this.level.getBlockEntity(this.worldPosition.relative(facing));
                 if(tile != null && !(tile instanceof TesseractTile))
                     tile.getCapability(capability, facing.getOpposite()).ifPresent(
                         object -> {
@@ -153,7 +153,7 @@ public class TesseractTile extends BaseTileEntity {
 
     @Override
     public void onLoad(){
-        if(!this.world.isRemote)
+        if(!this.level.isClientSide)
             this.reference = TesseractTracker.SERVER.add(this);
     }
 
@@ -183,10 +183,10 @@ public class TesseractTile extends BaseTileEntity {
     }
 
     private Channel getChannel(EnumChannelType type){
-        if(this.channels.get(type) < 0 || this.world == null)
+        if(this.channels.get(type) < 0 || this.level == null)
             return null;
-        Channel channel = TesseractChannelManager.getInstance(this.world).getChannelById(type, this.channels.get(type));
-        if(channel == null && !this.world.isRemote){
+        Channel channel = TesseractChannelManager.getInstance(this.level).getChannelById(type, this.channels.get(type));
+        if(channel == null && !this.level.isClientSide){
             this.channels.put(type, -1);
             this.updateReference();
             this.dataChanged();
@@ -195,14 +195,14 @@ public class TesseractTile extends BaseTileEntity {
     }
 
     public void onNeighborChanged(BlockPos neighbor){
-        Direction facing = Direction.getFacingFromVector(neighbor.getX() - this.pos.getX(), neighbor.getY() - this.pos.getY(), neighbor.getZ() - this.pos.getZ());
+        Direction facing = Direction.getNearest(neighbor.getX() - this.worldPosition.getX(), neighbor.getY() - this.worldPosition.getY(), neighbor.getZ() - this.worldPosition.getZ());
         this.capabilities.get(facing).clear();
     }
 
     @Override
     public void dataChanged(){
         super.dataChanged();
-        this.world.notifyNeighbors(this.pos, this.getBlockState().getBlock());
+        this.level.blockUpdated(this.worldPosition, this.getBlockState().getBlock());
     }
 
     private void updateReference(){
@@ -212,13 +212,13 @@ public class TesseractTile extends BaseTileEntity {
     }
 
     public void onReplaced(){
-        if(this.world.isRemote){
+        if(this.level.isClientSide){
             for(EnumChannelType type : EnumChannelType.values()){
                 Channel channel = this.getChannel(type);
                 if(channel != null)
                     channel.removeTesseract(this.reference);
             }
-            TesseractTracker.SERVER.remove(this.world, this.pos);
+            TesseractTracker.SERVER.remove(this.level, this.worldPosition);
         }
     }
 }

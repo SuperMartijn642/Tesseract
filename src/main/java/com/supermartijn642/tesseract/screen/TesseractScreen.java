@@ -153,11 +153,11 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
         }
 
         if(mouseX >= 9 && mouseX < 31 && mouseY >= (type == EnumChannelType.ITEMS ? 2 : 4) && mouseY < 28)
-            this.renderTooltip(EnumChannelType.ITEMS.getTranslation().getFormattedText(), mouseX, mouseY);
+            this.renderTooltip(EnumChannelType.ITEMS.getTranslation().getColoredString(), mouseX, mouseY);
         else if(mouseX >= 38 && mouseX < 60 && mouseY >= (type == EnumChannelType.ENERGY ? 2 : 4) && mouseY < 28)
-            this.renderTooltip(EnumChannelType.ENERGY.getTranslation().getFormattedText(), mouseX, mouseY);
+            this.renderTooltip(EnumChannelType.ENERGY.getTranslation().getColoredString(), mouseX, mouseY);
         else if(mouseX >= 67 && mouseX < 89 && mouseY >= (type == EnumChannelType.FLUID ? 2 : 4) && mouseY < 28)
-            this.renderTooltip(EnumChannelType.FLUID.getTranslation().getFormattedText(), mouseX, mouseY);
+            this.renderTooltip(EnumChannelType.FLUID.getTranslation().getColoredString(), mouseX, mouseY);
     }
 
     private void drawTabs(){
@@ -190,8 +190,8 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
 
 //        ScreenUtils.bindTexture(icon);
 //        ScreenUtils.drawTexture(matrixStack, iconX, iconY, width, height);
-        RenderHelper.enableGUIStandardItemLighting();
-        this.itemRenderer.renderItemIntoGUI(new ItemStack(type.item.get()), (int)iconX, (int)iconY);
+        RenderHelper.turnOnGui();
+        this.itemRenderer.renderGuiItem(new ItemStack(type.item.get()), (int)iconX, (int)iconY);
     }
 
     private void drawChannels(int mouseX, int mouseY, TesseractTile tile){
@@ -231,14 +231,14 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
             }
             PlayerRenderer.renderPlayerHead(channel.creator, x, y + 2, 9, 9);
             x += 12;
-            boolean isOwnedChannel = channel.creator.equals(ClientUtils.getPlayer().getUniqueID());
+            boolean isOwnedChannel = channel.creator.equals(ClientUtils.getPlayer().getUUID());
             // trim the channel name to fit
             int availableWidth = CHANNEL_CUTOFF_LENGTH - x - (isOwnedChannel ? 9 : 0);
             String name = channel.name;
-            if(this.font.getStringWidth(name) > availableWidth)
-                name = this.font.trimStringToWidth(name, availableWidth - this.font.getStringWidth("...")) + "...";
+            if(this.font.width(name) > availableWidth)
+                name = this.font.substrByWidth(name, availableWidth - this.font.width("...")) + "...";
             ScreenUtils.drawString(name, x, y + 3, 0xffffffff);
-            x += this.font.getStringWidth(name) + 3;
+            x += this.font.width(name) + 3;
             if(isOwnedChannel){
                 ScreenUtils.bindTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF);
                 GlStateManager.enableAlphaTest();
@@ -265,7 +265,7 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
         GlStateManager.pushMatrix();
         GlStateManager.translated(115, 88, 0);
         GlStateManager.scalef(0.8f, 0.8f, 1);
-        this.itemRenderer.renderItemIntoGUI(new ItemStack(type.item.get()), 0, 0);
+        this.itemRenderer.renderGuiItem(new ItemStack(type.item.get()), 0, 0);
         GlStateManager.popMatrix();
         ScreenUtils.drawString(channel.type.getTranslation(), 129, 91, ScreenUtils.ACTIVE_TEXT_COLOR);
         // accessibility
@@ -304,7 +304,7 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
                         this.selectedChannel = channels.get(index).id;
                         this.setButton.setText(new TranslationTextComponent("gui.tesseract." + (tile.getChannelId(type) == this.selectedChannel ? "unset" : "set")));
                         this.setButton.active = true;
-                        this.removeButton.active = channels.get(index).creator.equals(Minecraft.getInstance().player.getUniqueID());
+                        this.removeButton.active = channels.get(index).creator.equals(Minecraft.getInstance().player.getUUID());
                     }
                 }else{
                     this.selectedChannel = -1;
