@@ -29,7 +29,7 @@ public class CombinedEnergyStorage implements IEnergyStorage {
 
         loop:
         for(TesseractReference location : this.channel.receivingTesseracts){
-            if(location.isValid()){
+            if(location.isValid() && location.canReceive(EnumChannelType.ENERGY)){
                 TesseractTile tile = location.getTesseract();
                 if(tile != this.requester){
                     for(IEnergyStorage storage : tile.getSurroundingCapabilities(CapabilityEnergy.ENERGY)){
@@ -57,7 +57,7 @@ public class CombinedEnergyStorage implements IEnergyStorage {
 
         loop:
         for(TesseractReference location : this.channel.sendingTesseracts){
-            if(location.isValid()){
+            if(location.isValid() && location.canSend(EnumChannelType.ENERGY)){
                 TesseractTile tile = location.getTesseract();
                 if(tile != this.requester){
                     for(IEnergyStorage storage : tile.getSurroundingCapabilities(CapabilityEnergy.ENERGY)){
