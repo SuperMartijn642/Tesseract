@@ -28,24 +28,24 @@ public class PacketScreenAddChannel implements BasePacket {
     @Override
     public void write(PacketBuffer buffer){
         buffer.writeInt(this.type.getIndex());
-        buffer.writeString(this.name);
+        buffer.writeUtf(this.name);
         buffer.writeBoolean(this.isPrivate);
     }
 
     @Override
     public void read(PacketBuffer buffer){
         this.type = EnumChannelType.byIndex(buffer.readInt());
-        this.name = buffer.readString(32767);
+        this.name = buffer.readUtf(32767);
         this.isPrivate = buffer.readBoolean();
     }
 
     @Override
     public boolean verify(PacketContext context){
-        return this.type != null && !this.name.trim().isEmpty() && this.name.trim().equals(SharedConstants.filterAllowedCharacters(this.name.trim()));
+        return this.type != null && !this.name.trim().isEmpty() && this.name.trim().equals(SharedConstants.filterText(this.name.trim()));
     }
 
     @Override
     public void handle(PacketContext context){
-        TesseractChannelManager.SERVER.addChannel(this.type, context.getSendingPlayer().getUniqueID(), this.isPrivate, this.name);
+        TesseractChannelManager.SERVER.addChannel(this.type, context.getSendingPlayer().getUUID(), this.isPrivate, this.name);
     }
 }

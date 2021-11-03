@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 public class TesseractTileRenderer extends TileEntityRenderer<TesseractTile> {
 
     private static final Random RANDOM = new Random(31100L);
-    private static final List<RenderType> RENDER_TYPES = IntStream.range(0, 16).mapToObj((p_228882_0_) -> RenderType.getEndPortal(p_228882_0_ + 1)).collect(ImmutableList.toImmutableList());
+    private static final List<RenderType> RENDER_TYPES = IntStream.range(0, 16).mapToObj((p_228882_0_) -> RenderType.endPortal(p_228882_0_ + 1)).collect(ImmutableList.toImmutableList());
 
     public TesseractTileRenderer(TileEntityRendererDispatcher dispatcher){
         super(dispatcher);
@@ -30,7 +30,7 @@ public class TesseractTileRenderer extends TileEntityRenderer<TesseractTile> {
         if(!tile.renderOn())
             return;
 
-        matrixStack.push();
+        matrixStack.pushPose();
 
         matrixStack.translate(0.5, 0.5, 0.5);
         matrixStack.scale(0.65f, 0.65f, 0.65f);
@@ -38,14 +38,14 @@ public class TesseractTileRenderer extends TileEntityRenderer<TesseractTile> {
 
         RANDOM.setSeed(31100L);
         int i = 15;
-        Matrix4f matrix4f = matrixStack.getLast().getMatrix();
+        Matrix4f matrix4f = matrixStack.last().pose();
         this.renderCube(0.15F, matrix4f, buffer.getBuffer(RENDER_TYPES.get(0)));
 
         for(int j = 1; j < i; ++j){
             this.renderCube(2.0F / (18 - j), matrix4f, buffer.getBuffer(RENDER_TYPES.get(j)));
         }
 
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 
     private void renderCube(float p_228883_3_, Matrix4f matrix4f, IVertexBuilder builder){
@@ -61,9 +61,9 @@ public class TesseractTileRenderer extends TileEntityRenderer<TesseractTile> {
     }
 
     private void renderFace(Matrix4f matrix4f, IVertexBuilder builder, float x1, float x2, float y1, float y2, float p_228884_8_, float p_228884_9_, float p_228884_10_, float p_228884_11_, float red, float green, float blue){
-        builder.pos(matrix4f, x1, y1, p_228884_8_).color(red, green, blue, 1.0F).endVertex();
-        builder.pos(matrix4f, x2, y1, p_228884_9_).color(red, green, blue, 1.0F).endVertex();
-        builder.pos(matrix4f, x2, y2, p_228884_10_).color(red, green, blue, 1.0F).endVertex();
-        builder.pos(matrix4f, x1, y2, p_228884_11_).color(red, green, blue, 1.0F).endVertex();
+        builder.vertex(matrix4f, x1, y1, p_228884_8_).color(red, green, blue, 1.0F).endVertex();
+        builder.vertex(matrix4f, x2, y1, p_228884_9_).color(red, green, blue, 1.0F).endVertex();
+        builder.vertex(matrix4f, x2, y2, p_228884_10_).color(red, green, blue, 1.0F).endVertex();
+        builder.vertex(matrix4f, x1, y2, p_228884_11_).color(red, green, blue, 1.0F).endVertex();
     }
 }

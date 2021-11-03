@@ -27,7 +27,7 @@ public class LockButton extends AbstractButtonWidget implements IHoverTextWidget
 
     @Override
     protected ITextComponent getNarrationMessage(){
-        return new TranslationTextComponent("gui.narrate.button", new TranslationTextComponent("narrator.button.difficulty_lock")).appendText(". ").appendSibling(this.isLocked() ? new TranslationTextComponent("narrator.button.difficulty_lock.locked") : new TranslationTextComponent("narrator.button.difficulty_lock.unlocked"));
+        return new TranslationTextComponent("gui.narrate.button", new TranslationTextComponent("narrator.button.difficulty_lock")).append(". ").append(this.isLocked() ? new TranslationTextComponent("narrator.button.difficulty_lock.locked") : new TranslationTextComponent("narrator.button.difficulty_lock.unlocked"));
     }
 
     @Override

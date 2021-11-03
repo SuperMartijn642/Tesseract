@@ -34,12 +34,12 @@ import java.util.List;
 public class BlockTesseract extends BaseBlock {
 
     public BlockTesseract(){
-        super("tesseract", false, Block.Properties.create(Material.ANVIL, MaterialColor.GREEN).sound(SoundType.METAL).harvestTool(ToolType.PICKAXE).hardnessAndResistance(1.5F, 6.0F));
+        super("tesseract", false, Block.Properties.of(Material.HEAVY_METAL, MaterialColor.COLOR_GREEN).sound(SoundType.METAL).harvestTool(ToolType.PICKAXE).strength(1.5F, 6.0F));
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit){
-        if(worldIn.isRemote)
+    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit){
+        if(worldIn.isClientSide)
             ClientProxy.openScreen(pos);
         return ActionResultType.SUCCESS;
     }
@@ -56,7 +56,7 @@ public class BlockTesseract extends BaseBlock {
     }
 
     @Override
-    public VoxelShape getRenderShape(BlockState state, IBlockReader worldIn, BlockPos pos){
+    public VoxelShape getOcclusionShape(BlockState state, IBlockReader worldIn, BlockPos pos){
         return VoxelShapes.empty();
     }
 
@@ -67,23 +67,23 @@ public class BlockTesseract extends BaseBlock {
 
     @Override
     public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving){
-        TileEntity tile = worldIn.getTileEntity(pos);
+        TileEntity tile = worldIn.getBlockEntity(pos);
         if(tile instanceof TesseractTile){
-            ((TesseractTile)tile).setPowered(worldIn.isBlockPowered(pos) || worldIn.isBlockPowered(pos.up()));
+            ((TesseractTile)tile).setPowered(worldIn.hasNeighborSignal(pos) || worldIn.hasNeighborSignal(pos.above()));
             ((TesseractTile)tile).onNeighborChanged(fromPos);
         }
     }
 
     @Override
-    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving){
-        TileEntity tile = worldIn.getTileEntity(pos);
+    public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving){
+        TileEntity tile = worldIn.getBlockEntity(pos);
         if(tile instanceof TesseractTile)
             ((TesseractTile)tile).onReplaced();
-        super.onReplaced(state, worldIn, pos, newState, isMoving);
+        super.onRemove(state, worldIn, pos, newState, isMoving);
     }
 
     @Override
-    public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
-        tooltip.add(new TranslationTextComponent("tesseract.tesseract.info").applyTextStyle(TextFormatting.AQUA));
+    public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn){
+        tooltip.add(new TranslationTextComponent("tesseract.tesseract.info").withStyle(TextFormatting.AQUA));
     }
 }

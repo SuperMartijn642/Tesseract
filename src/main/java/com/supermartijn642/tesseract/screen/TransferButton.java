@@ -25,7 +25,7 @@ public class TransferButton extends CycleButton implements IHoverTextWidget {
 
     public void update(TesseractTile tile, EnumChannelType type){
         this.state = tile.getTransferState(type);
-        this.pos = tile.getPos();
+        this.pos = tile.getBlockPos();
         this.type = type;
     }
 

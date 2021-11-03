@@ -34,16 +34,16 @@ public class TesseractTracker {
 //    public static final TesseractTracker CLIENT = new TesseractTracker();
 
     public static TesseractTracker getInstance(World world){
-        return world.isRemote ? null /*CLIENT*/ : SERVER;
+        return world.isClientSide ? null /*CLIENT*/ : SERVER;
     }
 
     private final IntObjectMap<HashMap<BlockPos,TesseractReference>> tesseracts = new IntObjectHashMap<>();
     private final Set<TesseractReference> toBeRemoved = new HashSet<>();
 
     public TesseractReference add(TesseractTile self){
-        int dimension = self.getWorld().dimension.getType().getId();
+        int dimension = self.getLevel().dimension.getType().getId();
         this.tesseracts.putIfAbsent(dimension, new HashMap<>());
-        return this.tesseracts.get(dimension).computeIfAbsent(self.getPos(), key -> new TesseractReference(self));
+        return this.tesseracts.get(dimension).computeIfAbsent(self.getBlockPos(), key -> new TesseractReference(self));
     }
 
     @Deprecated
@@ -53,7 +53,7 @@ public class TesseractTracker {
 
         DimensionType type = DimensionType.getById(dimension);
         World world = DimensionManager.getWorld(minecraftServer, type, false, true);
-        TileEntity tile = world.getTileEntity(pos);
+        TileEntity tile = world.getBlockEntity(pos);
         return tile instanceof TesseractTile ? this.add((TesseractTile)tile) : null;
     }
 
@@ -98,10 +98,10 @@ public class TesseractTracker {
 
     @SubscribeEvent
     public static void onSave(WorldEvent.Save e){
-        if(e.getWorld().isRemote() || e.getWorld().getDimension().getType() != DimensionType.OVERWORLD)
+        if(e.getWorld().isClientSide() || e.getWorld().getDimension().getType() != DimensionType.OVERWORLD)
             return;
 
-        File directory = new File(((ServerWorld)e.getWorld()).getSaveHandler().getWorldDirectory(), "tesseract/tracking");
+        File directory = new File(((ServerWorld)e.getWorld()).getLevelStorage().getFolder(), "tesseract/tracking");
         int index = 0;
         for(Map.Entry<Integer,HashMap<BlockPos,TesseractReference>> dimensionEntry : SERVER.tesseracts.entrySet()){
             for(Map.Entry<BlockPos,TesseractReference> entry : dimensionEntry.getValue().entrySet()){
@@ -119,14 +119,14 @@ public class TesseractTracker {
 
     @SubscribeEvent
     public static void onLoad(WorldEvent.Load e){
-        if(e.getWorld().isRemote() || e.getWorld().getDimension().getType() != DimensionType.OVERWORLD)
+        if(e.getWorld().isClientSide() || e.getWorld().getDimension().getType() != DimensionType.OVERWORLD)
             return;
 
         minecraftServer = ((ServerWorld)e.getWorld()).getServer();
 
         SERVER.tesseracts.clear();
 
-        File directory = new File(((ServerWorld)e.getWorld()).getSaveHandler().getWorldDirectory(), "tesseract/tracking");
+        File directory = new File(((ServerWorld)e.getWorld()).getLevelStorage().getFolder(), "tesseract/tracking");
         File[] files = directory.listFiles();
         if(files != null){
             for(File file : directory.listFiles()){
@@ -146,7 +146,7 @@ public class TesseractTracker {
 
     @SubscribeEvent
     public static void onTick(TickEvent.WorldTickEvent e){
-        if(e.world.isRemote || e.phase != TickEvent.Phase.END || e.world.getDimension().getType() != DimensionType.OVERWORLD)
+        if(e.world.isClientSide || e.phase != TickEvent.Phase.END || e.world.getDimension().getType() != DimensionType.OVERWORLD)
             return;
 
         SERVER.toBeRemoved.forEach(SERVER::removeAndUpdate);

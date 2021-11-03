@@ -58,7 +58,7 @@ public class ChannelList {
     }
 
     public List<Channel> sortForPlayer(PlayerEntity player){
-        final UUID uuid = player.getUniqueID();
+        final UUID uuid = player.getUUID();
 
         this.channels.removeIf(channel -> channel.isPrivate && !channel.creator.equals(uuid));
 
