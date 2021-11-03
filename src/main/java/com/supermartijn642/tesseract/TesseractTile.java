@@ -110,12 +110,12 @@ public class TesseractTile extends BaseTileEntity {
 
     public boolean canSend(EnumChannelType type){
         return this.transferState.get(type).canSend() &&
-            this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW);
+            (this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW));
     }
 
     public boolean canReceive(EnumChannelType type){
         return this.transferState.get(type).canReceive() &&
-            this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW);
+            (this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW));
     }
 
     public int getChannelId(EnumChannelType type){
