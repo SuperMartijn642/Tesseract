@@ -38,7 +38,7 @@ public class TesseractButton extends ButtonWidget {
         this.drawButtonBackground(matrixStack, (float)this.x, (float)this.y, (float)this.width, (float)this.height, (float)(this.active ? (this.isHovered() ? 5 : 0) : 10) / 15.0F);
         float textX = (float)this.x + (float)this.width / 2.0F;
         float textY = (float)this.y + (float)this.height / 2.0F - 4.0F;
-        ScreenUtils.drawCenteredStringWithShadow(matrixStack, Minecraft.getInstance().fontRenderer, this.text, textX, textY, this.active ? -1 : 2147483647);
+        ScreenUtils.drawCenteredStringWithShadow(matrixStack, Minecraft.getInstance().font, this.text, textX, textY, this.active ? -1 : 2147483647);
     }
 
     private void drawButtonBackground(MatrixStack matrixStack, float x, float y, float width, float height, float yOffset){

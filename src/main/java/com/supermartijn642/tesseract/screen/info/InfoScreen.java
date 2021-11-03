@@ -64,10 +64,10 @@ public class InfoScreen extends BaseScreen {
     protected void render(MatrixStack matrixStack, int mouseX, int mouseY){
         this.drawScreenBackground(matrixStack);
         this.drawPageFrame(matrixStack);
-        matrixStack.push();
+        matrixStack.pushPose();
         matrixStack.translate(6, 6, 0);
         page.renderTop(matrixStack,mouseX, mouseY);
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 
     @Override
