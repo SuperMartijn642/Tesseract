@@ -85,7 +85,9 @@ dependencies {
     compile fg.deobf('curse.maven:supermartijn642s-config-lib-438332:3357667')
 
     // Block Renderer
-    runtimeOnly fg.deobf("curse.maven:block-renderer-380456:3294692")
+    runtimeOnly fg.deobf('curse.maven:block-renderer-380456:3294692')
     // Just Enough Items
     runtimeOnly fg.deobf('curse.maven:jei-238222:3345971')
+    // Mekanism
+    runtimeOnly fg.deobf('curse.maven:mekanism-268560:3514187')
 }
