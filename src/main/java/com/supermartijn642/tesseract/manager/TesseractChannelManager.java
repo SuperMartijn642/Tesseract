@@ -33,7 +33,7 @@ public class TesseractChannelManager {
     public static final TesseractChannelManager CLIENT = new TesseractChannelManager();
 
     public static TesseractChannelManager getInstance(World world){
-        return world.isRemote ? CLIENT : SERVER;
+        return world.isClientSide ? CLIENT : SERVER;
     }
 
     private final HashMap<EnumChannelType,ChannelList> types = new HashMap<>();
@@ -59,7 +59,7 @@ public class TesseractChannelManager {
     }
 
     public void sortChannels(PlayerEntity player, EnumChannelType type){
-        if(player == null || player.world == null || !player.world.isRemote)
+        if(player == null || player.level == null || !player.level.isClientSide)
             return;
         types.putIfAbsent(type, new ChannelList(type));
         types.get(type).sortForPlayer(player);
@@ -104,7 +104,7 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onSave(WorldEvent.Save e){
-        if(e.getWorld().isRemote() || !(e.getWorld() instanceof World) || ((World)e.getWorld()).getDimensionKey() != World.OVERWORLD)
+        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof World) || ((World)e.getWorld()).dimension() != World.OVERWORLD)
             return;
 
         for(ChannelList list : SERVER.types.values()){
@@ -117,11 +117,11 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onLoad(WorldEvent.Load e){
-        if(e.getWorld().isRemote() || !(e.getWorld() instanceof World) || ((World)e.getWorld()).getDimensionKey() != World.OVERWORLD)
+        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof World) || ((World)e.getWorld()).dimension() != World.OVERWORLD)
             return;
 
         minecraftServer = ((ServerWorld)e.getWorld()).getServer();
-        directory = new File(((ServerWorld)e.getWorld()).getServer().func_240776_a_(FolderName.DOT).toFile(), "tesseract");
+        directory = new File(((ServerWorld)e.getWorld()).getServer().getWorldPath(FolderName.ROOT).toFile(), "tesseract");
         for(EnumChannelType type : EnumChannelType.values()){
             ChannelList list = new ChannelList(type);
             SERVER.types.put(type, list);
@@ -132,7 +132,7 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onJoin(PlayerEvent.PlayerLoggedInEvent e){
-        if(!e.getPlayer().getEntityWorld().isRemote)
+        if(!e.getPlayer().getCommandSenderWorld().isClientSide)
             SERVER.sendCompleteUpdatePacket(e.getPlayer());
     }
 }

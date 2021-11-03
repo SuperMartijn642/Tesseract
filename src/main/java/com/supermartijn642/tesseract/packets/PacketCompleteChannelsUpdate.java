@@ -46,15 +46,15 @@ public class PacketCompleteChannelsUpdate implements BasePacket {
         for(int index = 0; iterator.hasNext(); index++)
             compound.put(Integer.toString(index), iterator.next().writeClientChannel());
 
-        buffer.writeCompoundTag(compound);
+        buffer.writeNbt(compound);
     }
 
     @Override
     public void read(PacketBuffer buffer){
-        CompoundNBT compound = buffer.readCompoundTag();
+        CompoundNBT compound = buffer.readNbt();
 
         this.channels = new ArrayList<>();
-        for(String key : compound.keySet())
+        for(String key : compound.getAllKeys())
             this.channels.add(Channel.readClientChannel(compound.getCompound(key)));
     }
 

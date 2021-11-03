@@ -81,7 +81,7 @@ public class TesseractAddChannelScreen extends TileEntityBaseScreen<TesseractTil
             return false;
         }
 
-        List<Channel> channels = TesseractChannelManager.CLIENT.getChannelsCreatedBy(this.type, ClientUtils.getPlayer().getUniqueID());
+        List<Channel> channels = TesseractChannelManager.CLIENT.getChannelsCreatedBy(this.type, ClientUtils.getPlayer().getUUID());
         boolean isUnique = true;
         for(Channel channel : channels){
             if(channel.name.equals(name)){

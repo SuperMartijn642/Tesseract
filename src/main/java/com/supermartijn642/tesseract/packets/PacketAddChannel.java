@@ -23,12 +23,12 @@ public class PacketAddChannel implements BasePacket {
 
     @Override
     public void write(PacketBuffer buffer){
-        buffer.writeCompoundTag(this.channel.writeClientChannel());
+        buffer.writeNbt(this.channel.writeClientChannel());
     }
 
     @Override
     public void read(PacketBuffer buffer){
-        this.channel = Channel.readClientChannel(buffer.readCompoundTag());
+        this.channel = Channel.readClientChannel(buffer.readNbt());
     }
 
     @Override
