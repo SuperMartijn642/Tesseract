@@ -112,7 +112,7 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
         this.redstoneButton.update(tile);
 
         // info button
-        this.addWidget(new InfoButton(-25, 37, () -> ClientProxy.openInfoScreen(this.tilePos)));//.active = false; // TODO: make this active
+        this.addWidget(new InfoButton(-25, 37, () -> ClientProxy.openInfoScreen(this.tilePos))).active = false; // TODO: make this active
     }
 
     @Override
