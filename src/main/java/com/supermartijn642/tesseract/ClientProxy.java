@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ForgeModelBakery;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -25,10 +25,10 @@ public class ClientProxy {
 
     @SubscribeEvent
     public static void onModelBake(ModelRegistryEvent e){
-        ModelLoader.addSpecialModel(new ResourceLocation("tesseract", "block/pipe"));
-        ModelLoader.addSpecialModel(new ResourceLocation("tesseract", "block/pipe_extract"));
-        ModelLoader.addSpecialModel(new ResourceLocation("tesseract", "block/pipe_extract_and_insert"));
-        ModelLoader.addSpecialModel(new ResourceLocation("tesseract", "block/pipe_insert"));
+        ForgeModelBakery.addSpecialModel(new ResourceLocation("tesseract", "block/pipe"));
+        ForgeModelBakery.addSpecialModel(new ResourceLocation("tesseract", "block/pipe_extract"));
+        ForgeModelBakery.addSpecialModel(new ResourceLocation("tesseract", "block/pipe_extract_and_insert"));
+        ForgeModelBakery.addSpecialModel(new ResourceLocation("tesseract", "block/pipe_insert"));
     }
 
     public static void openScreen(BlockPos pos){
