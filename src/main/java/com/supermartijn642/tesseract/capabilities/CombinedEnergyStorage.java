@@ -22,6 +22,9 @@ public class CombinedEnergyStorage implements IEnergyStorage {
 
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate){
+        if(this.pushRecurrentCall())
+            return 0;
+
         if(!this.requester.canSend(EnumChannelType.ENERGY) || maxReceive <= 0)
             return 0;
 
@@ -45,11 +48,16 @@ public class CombinedEnergyStorage implements IEnergyStorage {
             }
         }
 
+        this.popRecurrentCall();
+
         return maxReceive - amount;
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate){
+        if(this.pushRecurrentCall())
+            return 0;
+
         if(!this.requester.canReceive(EnumChannelType.ENERGY) || maxExtract <= 0)
             return 0;
 
@@ -73,11 +81,16 @@ public class CombinedEnergyStorage implements IEnergyStorage {
             }
         }
 
+        this.popRecurrentCall();
+
         return maxExtract - amount;
     }
 
     @Override
     public int getEnergyStored(){
+        if(this.pushRecurrentCall())
+            return 0;
+
         int amount = 0;
         for(TesseractReference location : this.channel.tesseracts){
             if(location.isValid()){
@@ -88,11 +101,17 @@ public class CombinedEnergyStorage implements IEnergyStorage {
                 }
             }
         }
+
+        this.popRecurrentCall();
+
         return amount;
     }
 
     @Override
     public int getMaxEnergyStored(){
+        if(this.pushRecurrentCall())
+            return 0;
+
         int amount = 0;
         for(TesseractReference location : this.channel.tesseracts){
             if(location.isValid()){
@@ -103,6 +122,9 @@ public class CombinedEnergyStorage implements IEnergyStorage {
                 }
             }
         }
+
+        this.popRecurrentCall();
+
         return amount;
     }
 
@@ -114,5 +136,20 @@ public class CombinedEnergyStorage implements IEnergyStorage {
     @Override
     public boolean canReceive(){
         return this.requester.canSend(EnumChannelType.ENERGY);
+    }
+
+    /**
+     * Checks whether this is a recurrent call to this combined capability.
+     * If not, it will just increase the recurrent call counter.
+     */
+    private boolean pushRecurrentCall(){
+        if(this.requester.recurrentCalls >= 1)
+            return true;
+        this.requester.recurrentCalls++;
+        return false;
+    }
+
+    private void popRecurrentCall(){
+        this.requester.recurrentCalls--;
     }
 }
