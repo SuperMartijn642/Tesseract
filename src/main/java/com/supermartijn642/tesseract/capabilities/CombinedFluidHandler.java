@@ -9,7 +9,6 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 
 /**
@@ -27,6 +26,9 @@ public class CombinedFluidHandler implements IFluidHandler {
 
     @Override
     public IFluidTankProperties[] getTankProperties(){
+        if(this.pushRecurrentCall())
+            return new IFluidTankProperties[0];
+
         ArrayList<IFluidTankProperties[]> list = new ArrayList<>(this.channel.tesseracts.size());
         int size = 0;
         for(TesseractReference reference : this.channel.tesseracts){
@@ -51,11 +53,17 @@ public class CombinedFluidHandler implements IFluidHandler {
                 index++;
             }
         }
+
+        this.popRecurrentCall();
+
         return properties;
     }
 
     @Override
     public int fill(FluidStack resource, boolean doFill){
+        if(this.pushRecurrentCall())
+            return 0;
+
         if(!this.requester.canSend(EnumChannelType.FLUID) || resource == null || resource.amount <= 0)
             return 0;
 
@@ -76,11 +84,17 @@ public class CombinedFluidHandler implements IFluidHandler {
                 }
             }
         }
+
+        this.popRecurrentCall();
+
         return amount;
     }
 
     @Override
     public FluidStack drain(FluidStack resource, boolean doDrain){
+        if(this.pushRecurrentCall())
+            return null;
+
         if(!this.requester.canReceive(EnumChannelType.FLUID) || resource == null || resource.amount <= 0)
             return null;
 
@@ -105,6 +119,8 @@ public class CombinedFluidHandler implements IFluidHandler {
             }
         }
 
+        this.popRecurrentCall();
+
         if(fluid.amount == resource.amount)
             return null;
 
@@ -114,6 +130,9 @@ public class CombinedFluidHandler implements IFluidHandler {
 
     @Override
     public FluidStack drain(int maxDrain, boolean doDrain){
+        if(this.pushRecurrentCall())
+            return null;
+
         if(!this.requester.canReceive(EnumChannelType.FLUID) || maxDrain <= 0)
             return null;
 
@@ -146,10 +165,27 @@ public class CombinedFluidHandler implements IFluidHandler {
             }
         }
 
+        this.popRecurrentCall();
+
         if(fluid == null)
             return null;
 
         fluid.amount = maxDrain - fluid.amount;
         return fluid;
+    }
+
+    /**
+     * Checks whether this is a recurrent call to this combined capability.
+     * If not, it will just increase the recurrent call counter.
+     */
+    private boolean pushRecurrentCall(){
+        if(this.requester.recurrentCalls >= 1)
+            return true;
+        this.requester.recurrentCalls++;
+        return false;
+    }
+
+    private void popRecurrentCall(){
+        this.requester.recurrentCalls--;
     }
 }

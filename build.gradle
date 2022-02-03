@@ -66,9 +66,9 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2855'
 
     // Core Lib
-    compile fg.deobf('curse.maven:supermartijn642s-core-lib-454372:3357859')//fg.deobf('com.supermartijn642.core:supermartijn642corelib:1.0.4-dev-mc1.12')
+    compile fg.deobf('curse.maven:supermartijn642s-core-lib-454372:3612379')//fg.deobf('com.supermartijn642.core:supermartijn642corelib:1.0.4-dev-mc1.12')
     // Config Lib
-    compile fg.deobf('curse.maven:supermartijn642s-config-lib-438332:3357662')
+    compile fg.deobf('curse.maven:supermartijn642s-config-lib-438332:3413933')
 }
 
 //sourceSets {
