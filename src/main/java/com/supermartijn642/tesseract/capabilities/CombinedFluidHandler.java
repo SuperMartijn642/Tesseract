@@ -25,6 +25,9 @@ public class CombinedFluidHandler implements IFluidHandler {
 
     @Override
     public int getTanks(){
+        if(this.pushRecurrentCall())
+            return 0;
+
         int tanks = 0;
         for(TesseractReference location : this.channel.tesseracts){
             if(location.isValid()){
@@ -35,69 +38,99 @@ public class CombinedFluidHandler implements IFluidHandler {
                 }
             }
         }
+
+        this.popRecurrentCall();
+
         return tanks;
     }
 
     @Nonnull
     @Override
     public FluidStack getFluidInTank(int tank){
+        if(this.pushRecurrentCall())
+            return FluidStack.EMPTY;
+
         int tanks = 0;
         for(TesseractReference location : this.channel.tesseracts){
             if(location.isValid()){
                 TesseractTile tile = location.getTesseract();
                 if(tile != this.requester){
                     for(IFluidHandler handler : tile.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
-                        if(tank - tanks < handler.getTanks())
-                            return handler.getFluidInTank(tank - tanks);
-                        else
+                        if(tank - tanks < handler.getTanks()){
+                            FluidStack stack = handler.getFluidInTank(tank - tanks);
+                            this.popRecurrentCall();
+                            return stack;
+                        }else
                             tanks += Math.max(handler.getTanks(), 0);
                     }
                 }
             }
         }
+
+        this.popRecurrentCall();
+
         return FluidStack.EMPTY;
     }
 
     @Override
     public int getTankCapacity(int tank){
+        if(this.pushRecurrentCall())
+            return 0;
+
         int tanks = 0;
         for(TesseractReference location : this.channel.tesseracts){
             if(location.isValid()){
                 TesseractTile tile = location.getTesseract();
                 if(tile != this.requester){
                     for(IFluidHandler handler : tile.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
-                        if(tank - tanks < handler.getTanks())
-                            return handler.getTankCapacity(tank - tanks);
-                        else
+                        if(tank - tanks < handler.getTanks()){
+                            int capacity = handler.getTankCapacity(tank - tanks);
+                            this.popRecurrentCall();
+                            return capacity;
+                        }else
                             tanks += Math.max(handler.getTanks(), 0);
                     }
                 }
             }
         }
+
+        this.popRecurrentCall();
+
         return 0;
     }
 
     @Override
     public boolean isFluidValid(int tank, @Nonnull FluidStack stack){
+        if(this.pushRecurrentCall())
+            return false;
+
         int tanks = 0;
         for(TesseractReference location : this.channel.tesseracts){
             if(location.isValid()){
                 TesseractTile tile = location.getTesseract();
                 if(tile != this.requester){
                     for(IFluidHandler handler : tile.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
-                        if(tank - tanks < handler.getTanks())
-                            return handler.isFluidValid(tank - tanks, stack);
-                        else
+                        if(tank - tanks < handler.getTanks()){
+                            boolean valid = handler.isFluidValid(tank - tanks, stack);
+                            this.popRecurrentCall();
+                            return valid;
+                        }else
                             tanks += Math.max(handler.getTanks(), 0);
                     }
                 }
             }
         }
+
+        this.popRecurrentCall();
+
         return false;
     }
 
     @Override
     public int fill(FluidStack resource, FluidAction action){
+        if(this.pushRecurrentCall())
+            return 0;
+
         if(!this.requester.canSend(EnumChannelType.FLUID) || resource.isEmpty())
             return 0;
 
@@ -118,12 +151,18 @@ public class CombinedFluidHandler implements IFluidHandler {
                 }
             }
         }
+
+        this.popRecurrentCall();
+
         return amount;
     }
 
     @Nonnull
     @Override
     public FluidStack drain(FluidStack resource, FluidAction action){
+        if(this.pushRecurrentCall())
+            return FluidStack.EMPTY;
+
         if(!this.requester.canReceive(EnumChannelType.FLUID) || resource == null || resource.isEmpty())
             return FluidStack.EMPTY;
 
@@ -148,6 +187,8 @@ public class CombinedFluidHandler implements IFluidHandler {
             }
         }
 
+        this.popRecurrentCall();
+
         if(fluid.getAmount() == resource.getAmount())
             return FluidStack.EMPTY;
 
@@ -158,6 +199,9 @@ public class CombinedFluidHandler implements IFluidHandler {
     @Nonnull
     @Override
     public FluidStack drain(int maxDrain, FluidAction action){
+        if(this.pushRecurrentCall())
+            return FluidStack.EMPTY;
+
         if(!this.requester.canReceive(EnumChannelType.FLUID) || maxDrain <= 0)
             return FluidStack.EMPTY;
 
@@ -190,10 +234,27 @@ public class CombinedFluidHandler implements IFluidHandler {
             }
         }
 
+        this.popRecurrentCall();
+
         if(fluid == null)
             return FluidStack.EMPTY;
 
         fluid.setAmount(maxDrain - fluid.getAmount());
         return fluid;
+    }
+
+    /**
+     * Checks whether this is a recurrent call to this combined capability.
+     * If not, it will just increase the recurrent call counter.
+     */
+    private boolean pushRecurrentCall(){
+        if(this.requester.recurrentCalls >= 1)
+            return true;
+        this.requester.recurrentCalls++;
+        return false;
+    }
+
+    private void popRecurrentCall(){
+        this.requester.recurrentCalls--;
     }
 }
