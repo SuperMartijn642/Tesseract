@@ -2,6 +2,7 @@ package com.supermartijn642.tesseract.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.core.gui.TileEntityBaseScreen;
 import com.supermartijn642.core.gui.widget.TextFieldWidget;
@@ -12,7 +13,6 @@ import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.packets.PacketScreenAddChannel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class TesseractAddChannelScreen extends TileEntityBaseScreen<TesseractTil
     private LockButton lockButton;
 
     protected TesseractAddChannelScreen(BlockPos pos, EnumChannelType type){
-        super(new TranslatableComponent("gui.tesseract.add.title." + type.name().toLowerCase(Locale.ROOT)), pos);
+        super(TextComponents.translation("gui.tesseract.add.title." + type.name().toLowerCase(Locale.ROOT)).get(), pos);
         this.type = type;
     }
 
@@ -53,9 +53,9 @@ public class TesseractAddChannelScreen extends TileEntityBaseScreen<TesseractTil
     protected void addWidgets(TesseractTile tile){
         this.nameField = this.addWidget(new TextFieldWidget(7, 21, 107, 18, "", CHANNEL_MAX_CHARACTERS, this::checkChannelName));
         this.nameField.setSuggestion(ClientUtils.translate("gui.tesseract.add.suggestion"));
-        this.addButton = this.addWidget(new TesseractButton(8, 43, 61, 14, new TranslatableComponent("gui.tesseract.add.add"), this::addChannel));
+        this.addButton = this.addWidget(new TesseractButton(8, 43, 61, 14, TextComponents.translation("gui.tesseract.add.add").get(), this::addChannel));
         this.addButton.active = false;
-        TesseractButton cancelButton = this.addWidget(new TesseractButton(75, 43, 61, 14, new TranslatableComponent("gui.tesseract.add.cancel"),
+        TesseractButton cancelButton = this.addWidget(new TesseractButton(75, 43, 61, 14, TextComponents.translation("gui.tesseract.add.cancel").get(),
             () -> ClientUtils.displayScreen(new TesseractScreen(this.tilePos))));
         cancelButton.setRedBackground();
         this.lockButton = this.addWidget(new LockButton(117, 20));

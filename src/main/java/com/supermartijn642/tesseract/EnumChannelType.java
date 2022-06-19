@@ -1,7 +1,7 @@
 package com.supermartijn642.tesseract;
 
+import com.supermartijn642.core.TextComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.capabilities.Capability;
@@ -41,7 +41,7 @@ public enum EnumChannelType {
     }
 
     public Component getTranslation(){
-        return new TranslatableComponent(this.translationKey);
+        return TextComponents.translation(this.translationKey).get();
     }
 
     public static EnumChannelType byIndex(int index){

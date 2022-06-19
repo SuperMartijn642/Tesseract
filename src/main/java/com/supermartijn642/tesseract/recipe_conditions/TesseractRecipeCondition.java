@@ -23,7 +23,7 @@ public class TesseractRecipeCondition implements ICondition {
     }
 
     @Override
-    public boolean test(){
+    public boolean test(IContext context){
         return TesseractConfig.enableThermalRecipe.get() && ModList.get().isLoaded("thermal");
     }
 

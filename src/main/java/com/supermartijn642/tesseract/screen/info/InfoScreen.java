@@ -2,12 +2,12 @@ package com.supermartijn642.tesseract.screen.info;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.gui.BaseScreen;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.tesseract.ClientProxy;
 import com.supermartijn642.tesseract.screen.InfoButton;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.LinkedList;
@@ -33,7 +33,7 @@ public class InfoScreen extends BaseScreen {
     private List<InfoPageButton> pageButtons = new LinkedList<>();
 
     public InfoScreen(BlockPos pos){
-        super(new TranslatableComponent("gui.tesseract.info.title"));
+        super(TextComponents.translation("gui.tesseract.info.title").get());
         this.pos = pos;
     }
 

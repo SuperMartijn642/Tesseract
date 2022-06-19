@@ -1,6 +1,7 @@
 package com.supermartijn642.tesseract;
 
-import net.minecraft.network.chat.TranslatableComponent;
+import com.supermartijn642.core.TextComponents;
+import net.minecraft.network.chat.Component;
 
 /**
  * Created 7/4/2020 by SuperMartijn642
@@ -15,8 +16,8 @@ public enum TransferState {
         this.translation = translation;
     }
 
-    public TranslatableComponent translate(){
-        return new TranslatableComponent(this.translation);
+    public Component translate(){
+        return TextComponents.translation(this.translation).get();
     }
 
     public boolean canSend(){

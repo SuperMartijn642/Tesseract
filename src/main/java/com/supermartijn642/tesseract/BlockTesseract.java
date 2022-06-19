@@ -1,10 +1,10 @@
 package com.supermartijn642.tesseract;
 
+import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.block.BaseBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
@@ -79,6 +79,6 @@ public class BlockTesseract extends BaseBlock implements EntityBlock {
 
     @Override
     public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn){
-        tooltip.add(new TranslatableComponent("tesseract.tesseract.info").withStyle(ChatFormatting.AQUA));
+        tooltip.add(TextComponents.translation("tesseract.tesseract.info").color(ChatFormatting.AQUA).get());
     }
 }

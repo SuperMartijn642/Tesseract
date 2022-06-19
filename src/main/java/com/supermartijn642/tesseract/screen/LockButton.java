@@ -1,12 +1,12 @@
 package com.supermartijn642.tesseract.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.core.gui.widget.AbstractButtonWidget;
 import com.supermartijn642.core.gui.widget.IHoverTextWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -14,6 +14,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * Created 4/13/2021 by SuperMartijn642
  */
 public class LockButton extends AbstractButtonWidget implements IHoverTextWidget {
+
     private boolean locked;
 
     public LockButton(int x, int y){
@@ -28,7 +29,7 @@ public class LockButton extends AbstractButtonWidget implements IHoverTextWidget
 
     @Override
     protected Component getNarrationMessage(){
-        return new TranslatableComponent("gui.narrate.button", new TranslatableComponent("narrator.button.difficulty_lock")).append(". ").append(this.isLocked() ? new TranslatableComponent("narrator.button.difficulty_lock.locked") : new TranslatableComponent("narrator.button.difficulty_lock.unlocked"));
+        return TextComponents.translation("gui.narrate.button", TextComponents.translation("narrator.button.difficulty_lock")).string(". ").translation(this.isLocked() ? "narrator.button.difficulty_lock.locked" : "narrator.button.difficulty_lock.unlocked").get();
     }
 
     @Override
@@ -56,7 +57,7 @@ public class LockButton extends AbstractButtonWidget implements IHoverTextWidget
 
     @Override
     public Component getHoverText(){
-        return new TranslatableComponent("gui.tesseract.channel." + (this.locked ? "private" : "public"));
+        return TextComponents.translation("gui.tesseract.channel." + (this.locked ? "private" : "public")).get();
     }
 
     @OnlyIn(Dist.CLIENT)

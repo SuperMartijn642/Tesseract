@@ -1,11 +1,11 @@
 package com.supermartijn642.tesseract.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.core.gui.widget.AbstractButtonWidget;
 import com.supermartijn642.core.gui.widget.IHoverTextWidget;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -32,6 +32,6 @@ public class InfoButton extends AbstractButtonWidget implements IHoverTextWidget
 
     @Override
     public Component getHoverText(){
-        return new TranslatableComponent("gui.tesseract.info_button");
+        return TextComponents.translation("gui.tesseract.info_button").get();
     }
 }

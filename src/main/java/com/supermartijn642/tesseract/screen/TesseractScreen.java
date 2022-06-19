@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
+import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.core.gui.TileEntityBaseScreen;
 import com.supermartijn642.tesseract.ClientProxy;
@@ -16,10 +17,8 @@ import com.supermartijn642.tesseract.packets.PacketScreenRemoveChannel;
 import com.supermartijn642.tesseract.packets.PacketScreenSetChannel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
@@ -71,39 +70,39 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
     }
 
     public TesseractScreen(BlockPos pos){
-        super(new TranslatableComponent("gui.tesseract.title"), pos);
+        super(TextComponents.translation("gui.tesseract.title").get(), pos);
     }
 
     @Override
     protected void addWidgets(TesseractTile tile){
         // set button
-        this.setButton = this.addWidget(new TesseractButton(113, 185, 61, 18, new TranslatableComponent("gui.tesseract.set"), () -> {
+        this.setButton = this.addWidget(new TesseractButton(113, 185, 61, 18, TextComponents.translation("gui.tesseract.set").get(), () -> {
             TesseractTile tile2 = this.getObjectOrClose();
             if(tile2 != null){
                 if(tile2.getChannelId(type) == this.selectedChannel){
                     Tesseract.CHANNEL.sendToServer(new PacketScreenSetChannel(type, -1, this.tilePos));
-                    this.setButton.setText(new TranslatableComponent("gui.tesseract.set"));
+                    this.setButton.setText(TextComponents.translation("gui.tesseract.set").get());
                 }else{
                     Tesseract.CHANNEL.sendToServer(new PacketScreenSetChannel(type, this.selectedChannel, this.tilePos));
-                    this.setButton.setText(new TranslatableComponent("gui.tesseract.unset"));
+                    this.setButton.setText(TextComponents.translation("gui.tesseract.unset").get());
                 }
             }
         }));
         this.setButton.active = false;
 
         // remove button
-        this.removeButton = this.addWidget(new TesseractButton(180, 185, 61, 18, new TranslatableComponent("gui.tesseract.remove"), () -> {
+        this.removeButton = this.addWidget(new TesseractButton(180, 185, 61, 18, TextComponents.translation("gui.tesseract.remove").get(), () -> {
             Tesseract.CHANNEL.sendToServer(new PacketScreenRemoveChannel(type, this.selectedChannel));
             this.selectedChannel = -1;
             this.setButton.active = false;
-            this.setButton.setText(new TranslatableComponent("gui.tesseract.set"));
+            this.setButton.setText(TextComponents.translation("gui.tesseract.set").get());
             this.removeButton.active = false;
         }));
         this.removeButton.setRedBackground();
         this.removeButton.active = false;
 
         // add button
-        this.addWidget(new TesseractButton(29, 190, 50, 10, new TranslatableComponent("gui.tesseract.add"), () -> ClientUtils.displayScreen(new TesseractAddChannelScreen(this.tilePos, type))));
+        this.addWidget(new TesseractButton(29, 190, 50, 10, TextComponents.translation("gui.tesseract.add").get(), () -> ClientUtils.displayScreen(new TesseractAddChannelScreen(this.tilePos, type))));
 
         // transfer button
         this.transferButton = this.addWidget(new TransferButton(-21, 156));
@@ -128,7 +127,7 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
         ScreenUtils.bindTexture(BACKGROUND);
         ScreenUtils.drawTexture(matrixStack, 0, 0, this.sizeX(), this.sizeY());
 
-        BaseComponent s = new TranslatableComponent("gui.tesseract." + type.name().toLowerCase(Locale.ROOT));
+        Component s = TextComponents.translation("gui.tesseract." + type.name().toLowerCase(Locale.ROOT)).get();
         ScreenUtils.drawCenteredString(matrixStack, this.font, s, 177, 14, 0xffffffff);
 
         this.drawTabs(matrixStack);
@@ -148,7 +147,7 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
             if(mouseX >= x && mouseX < x + 9 && mouseY >= y + 2 && mouseY < y + 11){
                 String creatorName = PlayerRenderer.getPlayerUsername(channel.creator);
                 if(creatorName != null)
-                    this.renderTooltip(matrixStack, new TextComponent(creatorName), mouseX, mouseY);
+                    this.renderTooltip(matrixStack, TextComponents.string(creatorName).get(), mouseX, mouseY);
             }
         }
 
@@ -250,13 +249,13 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
         ScreenUtils.drawCenteredString(matrixStack, channel.name, 0, 0, ScreenUtils.ACTIVE_TEXT_COLOR);
         matrixStack.popPose();
         // creator
-        ScreenUtils.drawString(matrixStack, new TextComponent("Creator:").setStyle(Style.EMPTY.withItalic(true)), 117, 55, 0xff666666);
+        ScreenUtils.drawString(matrixStack, TextComponents.string("Creator:").italic().get(), 117, 55, 0xff666666);
         PlayerRenderer.renderPlayerHead(channel.creator, matrixStack, 117, 65, 9, 9);
         String creatorName = PlayerRenderer.getPlayerUsername(channel.creator);
         if(creatorName != null)
             ScreenUtils.drawString(matrixStack, creatorName, 129, 66, ScreenUtils.ACTIVE_TEXT_COLOR);
         // category
-        ScreenUtils.drawString(matrixStack, new TextComponent("Category:").setStyle(Style.EMPTY.withItalic(true)), 117, 80, 0xff666666);
+        ScreenUtils.drawString(matrixStack, TextComponents.string("Category:").italic().get(), 117, 80, 0xff666666);
         RenderSystem.getModelViewStack().pushPose();
         RenderSystem.getModelViewStack().translate(this.left() + 115, this.top() + 88, 0);
         RenderSystem.getModelViewStack().scale(0.8f, 0.8f, 1);
@@ -265,10 +264,10 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
         RenderSystem.applyModelViewMatrix();
         ScreenUtils.drawString(matrixStack, channel.type.getTranslation(), 129, 91, ScreenUtils.ACTIVE_TEXT_COLOR);
         // accessibility
-        ScreenUtils.drawString(matrixStack, new TextComponent("Accessibility:").setStyle(Style.EMPTY.withItalic(true)), 117, 105, 0xff666666);
+        ScreenUtils.drawString(matrixStack, TextComponents.string("Accessibility:").italic().get(), 117, 105, 0xff666666);
         ScreenUtils.bindTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF);
         ScreenUtils.drawTexture(matrixStack, 116, 114, 11, 11);
-        ScreenUtils.drawString(matrixStack, new TranslatableComponent("gui.tesseract.channel." + (channel.isPrivate ? "private" : "public")), 129, 116, ScreenUtils.ACTIVE_TEXT_COLOR);
+        ScreenUtils.drawString(matrixStack, TextComponents.translation("gui.tesseract.channel." + (channel.isPrivate ? "private" : "public")).get(), 129, 116, ScreenUtils.ACTIVE_TEXT_COLOR);
     }
 
     private void setChannelType(EnumChannelType type){
@@ -276,7 +275,7 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
         this.scrollOffset = 0;
         this.selectedChannel = -1;
         this.setButton.active = false;
-        this.setButton.setText(new TranslatableComponent("gui.tesseract.set"));
+        this.setButton.setText(TextComponents.translation("gui.tesseract.set").get());
         this.removeButton.active = false;
     }
 
@@ -297,14 +296,14 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
                     TesseractTile tile = this.getObjectOrClose();
                     if(tile != null){
                         this.selectedChannel = channels.get(index).id;
-                        this.setButton.setText(new TranslatableComponent("gui.tesseract." + (tile.getChannelId(type) == this.selectedChannel ? "unset" : "set")));
+                        this.setButton.setText(TextComponents.translation("gui.tesseract." + (tile.getChannelId(type) == this.selectedChannel ? "unset" : "set")).get());
                         this.setButton.active = true;
                         this.removeButton.active = channels.get(index).creator.equals(Minecraft.getInstance().player.getUUID());
                     }
                 }else{
                     this.selectedChannel = -1;
                     this.setButton.active = false;
-                    this.setButton.setText(new TranslatableComponent("gui.tesseract.set"));
+                    this.setButton.setText(TextComponents.translation("gui.tesseract.set").get());
                     this.removeButton.active = false;
                 }
             }
