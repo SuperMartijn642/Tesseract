@@ -4,11 +4,8 @@ import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.tesseract.screen.TesseractScreen;
 import com.supermartijn642.tesseract.screen.info.InfoScreen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ForgeModelBakery;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -23,13 +20,13 @@ public class ClientProxy {
         e.registerBlockEntityRenderer(Tesseract.tesseract_tile, context -> new TesseractTileRenderer());
     }
 
-    @SubscribeEvent
-    public static void onModelBake(ModelRegistryEvent e){
-        ForgeModelBakery.addSpecialModel(new ResourceLocation("tesseract", "block/pipe"));
-        ForgeModelBakery.addSpecialModel(new ResourceLocation("tesseract", "block/pipe_extract"));
-        ForgeModelBakery.addSpecialModel(new ResourceLocation("tesseract", "block/pipe_extract_and_insert"));
-        ForgeModelBakery.addSpecialModel(new ResourceLocation("tesseract", "block/pipe_insert"));
-    }
+//    @SubscribeEvent
+//    public static void onModelBake(ModelEvent.RegisterAdditional e){
+//        e.register(new ResourceLocation("tesseract", "block/pipe"));
+//        e.register(new ResourceLocation("tesseract", "block/pipe_extract"));
+//        e.register(new ResourceLocation("tesseract", "block/pipe_extract_and_insert"));
+//        e.register(new ResourceLocation("tesseract", "block/pipe_insert"));
+//    }
 
     public static void openScreen(BlockPos pos){
         ClientUtils.getMinecraft().setScreen(new TesseractScreen(pos));

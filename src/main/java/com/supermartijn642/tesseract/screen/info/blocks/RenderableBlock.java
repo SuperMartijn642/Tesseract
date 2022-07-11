@@ -5,12 +5,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.supermartijn642.core.ClientUtils;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.EmptyModelData;
 
 /**
  * Created 7/16/2021 by SuperMartijn642
@@ -48,7 +46,7 @@ public abstract class RenderableBlock {
             @Override
             public void renderInternal(PoseStack matrixStack){
                 BakedModel model = ClientUtils.getBlockRenderer().getBlockModelShaper().getModelManager().getModel(modelLocation);
-                ClientUtils.getBlockRenderer().getModelRenderer().renderModel(matrixStack.last(), MODEL_BUFFER.getBuffer(RenderType.solid()), null, model, 1, 1, 1, 0, 0, EmptyModelData.INSTANCE);
+//                ClientUtils.getBlockRenderer().getModelRenderer().renderModel(matrixStack.last(), MODEL_BUFFER.getBuffer(RenderType.solid()), null, model, 1, 1, 1, 0, 0, ModelData.EMPTY);
             }
         };
     }
@@ -58,7 +56,7 @@ public abstract class RenderableBlock {
             @Override
             public void renderInternal(PoseStack matrixStack){
                 BakedModel model = ClientUtils.getBlockRenderer().getBlockModel(block.defaultBlockState());
-                ClientUtils.getBlockRenderer().getModelRenderer().renderModel(matrixStack.last(), MODEL_BUFFER.getBuffer(RenderType.solid()), null, model, 1, 1, 1, 0, 0, EmptyModelData.INSTANCE);
+//                ClientUtils.getBlockRenderer().getModelRenderer().renderModel(matrixStack.last(), MODEL_BUFFER.getBuffer(RenderType.solid()), null, model, 1, 1, 1, 0, 0, ModelData.EMPTY);
             }
         };
     }
@@ -68,7 +66,7 @@ public abstract class RenderableBlock {
             @Override
             public void renderInternal(PoseStack matrixStack){
                 BakedModel model = ClientUtils.getBlockRenderer().getBlockModel(state);
-                ClientUtils.getBlockRenderer().getModelRenderer().renderModel(matrixStack.last(), MODEL_BUFFER.getBuffer(RenderType.solid()), null, model, 1, 1, 1, 0, 0, EmptyModelData.INSTANCE);
+//                ClientUtils.getBlockRenderer().getModelRenderer().renderModel(matrixStack.last(), MODEL_BUFFER.getBuffer(RenderType.solid()), null, model, 1, 1, 1, 0, 0, ModelData.EMPTY);
             }
         };
     }
