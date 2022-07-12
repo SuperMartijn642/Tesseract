@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.io.File;
@@ -97,11 +97,11 @@ public class TesseractTracker {
     }
 
     @SubscribeEvent
-    public static void onSave(WorldEvent.Save e){
-        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof Level) || ((Level)e.getWorld()).dimension() != Level.OVERWORLD)
+    public static void onSave(LevelEvent.Save e){
+        if(e.getLevel().isClientSide() || !(e.getLevel() instanceof Level) || ((Level)e.getLevel()).dimension() != Level.OVERWORLD)
             return;
 
-        File directory = new File(((ServerLevel)e.getWorld()).getServer().getWorldPath(LevelResource.ROOT).toFile(), "tesseract/tracking");
+        File directory = new File(((ServerLevel)e.getLevel()).getServer().getWorldPath(LevelResource.ROOT).toFile(), "tesseract/tracking");
         int index = 0;
         for(Map.Entry<String,HashMap<BlockPos,TesseractReference>> dimensionEntry : SERVER.tesseracts.entrySet()){
             for(Map.Entry<BlockPos,TesseractReference> entry : dimensionEntry.getValue().entrySet()){
@@ -118,15 +118,15 @@ public class TesseractTracker {
     }
 
     @SubscribeEvent
-    public static void onLoad(WorldEvent.Load e){
-        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof Level) || ((Level)e.getWorld()).dimension() != Level.OVERWORLD)
+    public static void onLoad(LevelEvent.Load e){
+        if(e.getLevel().isClientSide() || !(e.getLevel() instanceof Level) || ((Level)e.getLevel()).dimension() != Level.OVERWORLD)
             return;
 
-        minecraftServer = ((ServerLevel)e.getWorld()).getServer();
+        minecraftServer = ((ServerLevel)e.getLevel()).getServer();
 
         SERVER.tesseracts.clear();
 
-        File directory = new File(((ServerLevel)e.getWorld()).getServer().getWorldPath(LevelResource.ROOT).toFile(), "tesseract/tracking");
+        File directory = new File(((ServerLevel)e.getLevel()).getServer().getWorldPath(LevelResource.ROOT).toFile(), "tesseract/tracking");
         File[] files = directory.listFiles();
         if(files != null){
             for(File file : directory.listFiles()){
@@ -145,8 +145,8 @@ public class TesseractTracker {
     }
 
     @SubscribeEvent
-    public static void onTick(TickEvent.WorldTickEvent e){
-        if(e.world.isClientSide || e.phase != TickEvent.Phase.END || e.world.dimension() != Level.OVERWORLD)
+    public static void onTick(TickEvent.LevelTickEvent e){
+        if(e.level.isClientSide || e.phase != TickEvent.Phase.END || e.level.dimension() != Level.OVERWORLD)
             return;
 
         SERVER.toBeRemoved.forEach(SERVER::removeAndUpdate);

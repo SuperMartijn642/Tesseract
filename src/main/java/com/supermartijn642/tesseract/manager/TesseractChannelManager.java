@@ -11,7 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.io.File;
@@ -103,8 +103,8 @@ public class TesseractChannelManager {
     }
 
     @SubscribeEvent
-    public static void onSave(WorldEvent.Save e){
-        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof Level) || ((Level)e.getWorld()).dimension() != Level.OVERWORLD)
+    public static void onSave(LevelEvent.Save e){
+        if(e.getLevel().isClientSide() || !(e.getLevel() instanceof Level) || ((Level)e.getLevel()).dimension() != Level.OVERWORLD)
             return;
 
         for(ChannelList list : SERVER.types.values()){
@@ -116,12 +116,12 @@ public class TesseractChannelManager {
     }
 
     @SubscribeEvent
-    public static void onLoad(WorldEvent.Load e){
-        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof Level) || ((Level)e.getWorld()).dimension() != Level.OVERWORLD)
+    public static void onLoad(LevelEvent.Load e){
+        if(e.getLevel().isClientSide() || !(e.getLevel() instanceof Level) || ((Level)e.getLevel()).dimension() != Level.OVERWORLD)
             return;
 
-        minecraftServer = ((ServerLevel)e.getWorld()).getServer();
-        directory = new File(((ServerLevel)e.getWorld()).getServer().getWorldPath(LevelResource.ROOT).toFile(), "tesseract");
+        minecraftServer = ((ServerLevel)e.getLevel()).getServer();
+        directory = new File(((ServerLevel)e.getLevel()).getServer().getWorldPath(LevelResource.ROOT).toFile(), "tesseract");
         for(EnumChannelType type : EnumChannelType.values()){
             ChannelList list = new ChannelList(type);
             SERVER.types.put(type, list);
@@ -132,7 +132,7 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onJoin(PlayerEvent.PlayerLoggedInEvent e){
-        if(!e.getPlayer().getCommandSenderWorld().isClientSide)
-            SERVER.sendCompleteUpdatePacket(e.getPlayer());
+        if(!e.getEntity().getCommandSenderWorld().isClientSide)
+            SERVER.sendCompleteUpdatePacket(e.getEntity());
     }
 }
