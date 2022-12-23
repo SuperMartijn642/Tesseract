@@ -1,0 +1,36 @@
+{
+  "parent": "minecraft:recipes/root",
+  "display": {
+    "icon": {
+      "item": "tesseract:tesseract"
+    },
+    "title": {
+      "translate": "tesseract.advancement.recipes/decorations/tesseract.title"
+    },
+    "description": {
+      "translate": "tesseract.advancement.recipes/decorations/tesseract.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "tesseract:tesseract"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "tesseract:tesseract"
+    ]
+  }
+}

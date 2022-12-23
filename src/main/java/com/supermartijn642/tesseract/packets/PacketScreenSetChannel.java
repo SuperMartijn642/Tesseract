@@ -1,16 +1,16 @@
 package com.supermartijn642.tesseract.packets;
 
+import com.supermartijn642.core.network.BlockEntityBasePacket;
 import com.supermartijn642.core.network.PacketContext;
-import com.supermartijn642.core.network.TileEntityBasePacket;
 import com.supermartijn642.tesseract.EnumChannelType;
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
  */
-public class PacketScreenSetChannel extends TileEntityBasePacket<TesseractTile> {
+public class PacketScreenSetChannel extends BlockEntityBasePacket<TesseractBlockEntity> {
 
     private EnumChannelType type;
     private int id;
@@ -39,7 +39,7 @@ public class PacketScreenSetChannel extends TileEntityBasePacket<TesseractTile> 
     }
 
     @Override
-    protected void handle(TesseractTile tile, PacketContext context){
-        tile.setChannel(this.type, this.id);
+    protected void handle(TesseractBlockEntity entity, PacketContext context){
+        entity.setChannel(this.type, this.id);
     }
 }
