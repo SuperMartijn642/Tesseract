@@ -1,6 +1,6 @@
 package com.supermartijn642.tesseract;
 
-import com.supermartijn642.core.block.BaseTileEntity;
+import com.supermartijn642.core.block.BaseBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.manager.TesseractReference;
@@ -23,7 +23,7 @@ import java.util.*;
 /**
  * Created 3/19/2020 by SuperMartijn642
  */
-public class TesseractTile extends BaseTileEntity {
+public class TesseractBlockEntity extends BaseBlockEntity {
 
     private TesseractReference reference;
     private final EnumMap<EnumChannelType,Integer> channels = new EnumMap<>(EnumChannelType.class);
@@ -37,7 +37,7 @@ public class TesseractTile extends BaseTileEntity {
 
     private final Map<Direction,Map<Capability<?>,Object>> capabilities = new HashMap<>();
 
-    public TesseractTile(BlockPos pos, BlockState state){
+    public TesseractBlockEntity(BlockPos pos, BlockState state){
         super(Tesseract.tesseract_tile, pos, state);
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, -1);
@@ -99,15 +99,16 @@ public class TesseractTile extends BaseTileEntity {
         ArrayList<T> list = new ArrayList<>();
         for(Direction facing : Direction.values()){
             if(!this.capabilities.get(facing).containsKey(capability)){
-                BlockEntity tile = this.level.getBlockEntity(this.worldPosition.relative(facing));
-                if(tile != null && !(tile instanceof TesseractTile))
-                    tile.getCapability(capability, facing.getOpposite()).ifPresent(
+                BlockEntity entity = this.level.getBlockEntity(this.worldPosition.relative(facing));
+                if(entity != null && !(entity instanceof TesseractBlockEntity))
+                    entity.getCapability(capability, facing.getOpposite()).ifPresent(
                         object -> {
                             this.capabilities.get(facing).put(capability, object);
                             list.add(object);
                         }
                     );
             }else
+                //noinspection unchecked
                 list.add((T)this.capabilities.get(facing).get(capability));
         }
         return list;
@@ -163,7 +164,7 @@ public class TesseractTile extends BaseTileEntity {
     }
 
     /**
-     *  TODO: 9/24/2021  Remove this once https://github.com/MinecraftForge/MinecraftForge/issues/7926 is fixed
+     * TODO: 9/24/2021  Remove this once https://github.com/MinecraftForge/MinecraftForge/issues/7926 is fixed
      */
     @Override
     public void clearRemoved(){

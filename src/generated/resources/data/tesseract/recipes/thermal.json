@@ -1,0 +1,30 @@
+{
+  "type": "supermartijn642corelib:conditional",
+  "conditions": [
+    {
+      "type": "tesseract:thermal_recipe"
+    }
+  ],
+  "recipe": {
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+      "ABA",
+      "BCB",
+      "ABA"
+    ],
+    "key": {
+      "A": {
+        "tag": "forge:ingots/enderium"
+      },
+      "B": {
+        "item": "thermal:obsidian_glass"
+      },
+      "C": {
+        "item": "thermal:machine_frame"
+      }
+    },
+    "result": {
+      "item": "tesseract:tesseract"
+    }
+  }
+}

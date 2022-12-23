@@ -3,30 +3,33 @@ package com.supermartijn642.tesseract;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
+import com.supermartijn642.core.render.CustomBlockEntityRenderer;
+import com.supermartijn642.core.render.RenderConfiguration;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
  */
-public class TesseractTileRenderer implements BlockEntityRenderer<TesseractTile> {
+public class TesseractBlockEntityRenderer implements CustomBlockEntityRenderer<TesseractBlockEntity> {
+
+    private static final RenderConfiguration RENDER_CONFIGURATION = RenderConfiguration.wrap(RenderType.endPortal());
 
     @Override
-    public void render(TesseractTile tile, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int combinedLight, int combinedOverlay){
-        if(!tile.renderOn())
+    public void render(TesseractBlockEntity entity, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, int combinedOverlay){
+        if(!entity.renderOn())
             return;
 
-        matrixStack.pushPose();
+        poseStack.pushPose();
 
-        matrixStack.translate(0.5, 0.5, 0.5);
-        matrixStack.scale(0.65f, 0.65f, 0.65f);
-        matrixStack.translate(-0.5, -0.5, -0.5);
+        poseStack.translate(0.5, 0.5, 0.5);
+        poseStack.scale(0.65f, 0.65f, 0.65f);
+        poseStack.translate(-0.5, -0.5, -0.5);
 
-        Matrix4f matrix4f = matrixStack.last().pose();
-        this.renderCube(matrix4f, buffer.getBuffer(RenderType.endPortal()));
+        Matrix4f matrix4f = poseStack.last().pose();
+        this.renderCube(matrix4f, RENDER_CONFIGURATION.begin(bufferSource));
 
-        matrixStack.popPose();
+        poseStack.popPose();
     }
 
     private void renderCube(Matrix4f matrix4f, VertexConsumer builder){
