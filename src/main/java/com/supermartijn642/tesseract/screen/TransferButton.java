@@ -1,19 +1,20 @@
 package com.supermartijn642.tesseract.screen;
 
-import com.supermartijn642.core.gui.widget.IHoverTextWidget;
+import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.TransferState;
 import com.supermartijn642.tesseract.packets.PacketScreenCycleTransferState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+
+import java.util.function.Consumer;
 
 /**
  * Created 7/6/2020 by SuperMartijn642
  */
-public class TransferButton extends CycleButton implements IHoverTextWidget {
+public class TransferButton extends CycleButton {
 
     public TransferState state;
     private BlockPos pos;
@@ -23,7 +24,7 @@ public class TransferButton extends CycleButton implements IHoverTextWidget {
         super(x, y, 0);
     }
 
-    public void update(TesseractTile tile, EnumChannelType type){
+    public void update(TesseractBlockEntity tile, EnumChannelType type){
         this.state = tile.getTransferState(type);
         this.pos = tile.getBlockPos();
         this.type = type;
@@ -42,12 +43,12 @@ public class TransferButton extends CycleButton implements IHoverTextWidget {
     }
 
     @Override
-    protected Component getNarrationMessage(){
-        return this.getHoverText();
+    public Component getNarrationMessage(){
+        return TextComponents.translation("gui.tesseract.transfer.speech", this.state.translate()).get();
     }
 
     @Override
-    public Component getHoverText(){
-        return new TranslatableComponent("gui.tesseract.transfer.speech", this.state.translate());
+    protected void getTooltips(Consumer<Component> tooltips){
+        tooltips.accept(TextComponents.translation("gui.tesseract.transfer.speech", this.state.translate()).get());
     }
 }
