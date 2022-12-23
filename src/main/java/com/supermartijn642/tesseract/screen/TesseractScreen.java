@@ -6,11 +6,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.gui.ScreenUtils;
-import com.supermartijn642.core.gui.TileEntityBaseScreen;
-import com.supermartijn642.tesseract.ClientProxy;
+import com.supermartijn642.core.gui.WidgetScreen;
+import com.supermartijn642.core.gui.widget.BlockEntityBaseWidget;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.packets.PacketScreenRemoveChannel;
@@ -21,6 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 import java.util.Locale;
@@ -28,7 +29,7 @@ import java.util.Locale;
 /**
  * Created 4/23/2020 by SuperMartijn642
  */
-public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
+public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity> {
 
     private static final int MAX_DISPLAYED_CHANNELS = 12;
     private static final int CHANNEL_CUTOFF_LENGTH = 100;
@@ -59,31 +60,22 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
     private int selectedChannel = -1;
     private int scrollOffset = 0;
 
-    @Override
-    protected float sizeX(TesseractTile tile){
-        return BACKGROUND_WIDTH;
+    public int offsetLeft, offsetTop;
+
+    public TesseractScreen(Level level, BlockPos pos){
+        super(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, level, pos);
     }
 
     @Override
-    protected float sizeY(TesseractTile tile){
-        return BACKGROUND_HEIGHT;
-    }
-
-    public TesseractScreen(BlockPos pos){
-        super(TextComponents.translation("gui.tesseract.title").get(), pos);
-    }
-
-    @Override
-    protected void addWidgets(TesseractTile tile){
+    protected void addWidgets(TesseractBlockEntity entity){
         // set button
         this.setButton = this.addWidget(new TesseractButton(113, 185, 61, 18, TextComponents.translation("gui.tesseract.set").get(), () -> {
-            TesseractTile tile2 = this.getObjectOrClose();
-            if(tile2 != null){
-                if(tile2.getChannelId(type) == this.selectedChannel){
-                    Tesseract.CHANNEL.sendToServer(new PacketScreenSetChannel(type, -1, this.tilePos));
+            if(this.object != null){
+                if(this.object.getChannelId(type) == this.selectedChannel){
+                    Tesseract.CHANNEL.sendToServer(new PacketScreenSetChannel(type, -1, this.blockEntityPos));
                     this.setButton.setText(TextComponents.translation("gui.tesseract.set").get());
                 }else{
-                    Tesseract.CHANNEL.sendToServer(new PacketScreenSetChannel(type, this.selectedChannel, this.tilePos));
+                    Tesseract.CHANNEL.sendToServer(new PacketScreenSetChannel(type, this.selectedChannel, this.blockEntityPos));
                     this.setButton.setText(TextComponents.translation("gui.tesseract.unset").get());
                 }
             }
@@ -102,61 +94,72 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
         this.removeButton.active = false;
 
         // add button
-        this.addWidget(new TesseractButton(29, 190, 50, 10, TextComponents.translation("gui.tesseract.add").get(), () -> ClientUtils.displayScreen(new TesseractAddChannelScreen(this.tilePos, type))));
+        this.addWidget(new TesseractButton(29, 190, 50, 10, TextComponents.translation("gui.tesseract.add").get(), () -> ClientUtils.displayScreen(WidgetScreen.of(new TesseractAddChannelScreen(this.blockEntityLevel, this.blockEntityPos, type)))));
 
         // transfer button
         this.transferButton = this.addWidget(new TransferButton(-21, 156));
-        this.transferButton.update(tile, type);
+        this.transferButton.update(entity, type);
         // redstone button
-        this.redstoneButton = this.addWidget(new RedstoneButton(-25, 59));
-        this.redstoneButton.update(tile);
+        this.redstoneButton = this.addWidget(new RedstoneButton(-25, 37));
+        this.redstoneButton.update(entity);
 
-        // info button
-        this.addWidget(new InfoButton(-25, 37, () -> ClientProxy.openInfoScreen(this.tilePos))).active = false; // TODO: make this active
+        super.addWidgets(entity);
     }
 
     @Override
-    protected void tick(TesseractTile tile){
-        this.transferButton.update(tile, type);
-        this.redstoneButton.update(tile);
+    protected void update(TesseractBlockEntity entity){
+        this.transferButton.update(entity, type);
+        this.redstoneButton.update(entity);
+
+        super.update(entity);
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, TesseractTile tile){
+    protected void renderBackground(PoseStack poseStack, int mouseX, int mouseY, TesseractBlockEntity object){
+        this.setFocused(true);
+        super.renderBackground(poseStack, mouseX, mouseY, object);
+    }
+
+    @Override
+    public void render(PoseStack poseStack, int mouseX, int mouseY, TesseractBlockEntity entity){
         GlStateManager._enableBlend();
         ScreenUtils.bindTexture(BACKGROUND);
-        ScreenUtils.drawTexture(matrixStack, 0, 0, this.sizeX(), this.sizeY());
+        ScreenUtils.drawTexture(poseStack, 0, 0, this.width(), this.height());
 
         Component s = TextComponents.translation("gui.tesseract." + type.name().toLowerCase(Locale.ROOT)).get();
-        ScreenUtils.drawCenteredString(matrixStack, this.font, s, 177, 14, 0xffffffff);
+        ScreenUtils.drawCenteredString(poseStack, s, 177, 14, 0xffffffff);
 
-        this.drawTabs(matrixStack);
-        this.drawChannels(matrixStack, mouseX, mouseY, tile);
+        this.drawTabs(poseStack);
+        this.drawChannels(poseStack, mouseX, mouseY, entity);
 
         Channel channel = TesseractChannelManager.CLIENT.getChannelById(type, this.selectedChannel);
         if(channel != null)
-            this.drawSelectedChannelInfo(matrixStack, channel);
+            this.drawSelectedChannelInfo(poseStack, channel);
+
+        super.render(poseStack, mouseX, mouseY, entity);
     }
 
     @Override
-    protected void renderTooltips(PoseStack matrixStack, int mouseX, int mouseY, TesseractTile tile){
+    protected void renderTooltips(PoseStack poseStack, int mouseX, int mouseY, TesseractBlockEntity entity){
         List<Channel> channels = TesseractChannelManager.CLIENT.getChannels(TesseractScreen.type);
         for(int i = 0; i < MAX_DISPLAYED_CHANNELS && i + this.scrollOffset < channels.size(); i++){
             Channel channel = channels.get(i + this.scrollOffset);
-            int x = tile.getChannelId(type) == channel.id ? 17 : 5, y = 31 + i * 13;
+            int x = entity.getChannelId(type) == channel.id ? 17 : 5, y = 31 + i * 13;
             if(mouseX >= x && mouseX < x + 9 && mouseY >= y + 2 && mouseY < y + 11){
                 String creatorName = PlayerRenderer.getPlayerUsername(channel.creator);
                 if(creatorName != null)
-                    this.renderTooltip(matrixStack, TextComponents.string(creatorName).get(), mouseX, mouseY);
+                    ScreenUtils.drawTooltip(poseStack, creatorName, mouseX, mouseY);
             }
         }
 
         if(mouseX >= 9 && mouseX < 31 && mouseY >= (type == EnumChannelType.ITEMS ? 2 : 4) && mouseY < 28)
-            this.renderTooltip(matrixStack, EnumChannelType.ITEMS.getTranslation(), mouseX, mouseY);
+            ScreenUtils.drawTooltip(poseStack, EnumChannelType.ITEMS.getTranslation(), mouseX, mouseY);
         else if(mouseX >= 38 && mouseX < 60 && mouseY >= (type == EnumChannelType.ENERGY ? 2 : 4) && mouseY < 28)
-            this.renderTooltip(matrixStack, EnumChannelType.ENERGY.getTranslation(), mouseX, mouseY);
+            ScreenUtils.drawTooltip(poseStack, EnumChannelType.ENERGY.getTranslation(), mouseX, mouseY);
         else if(mouseX >= 67 && mouseX < 89 && mouseY >= (type == EnumChannelType.FLUID ? 2 : 4) && mouseY < 28)
-            this.renderTooltip(matrixStack, EnumChannelType.FLUID.getTranslation(), mouseX, mouseY);
+            ScreenUtils.drawTooltip(poseStack, EnumChannelType.FLUID.getTranslation(), mouseX, mouseY);
+
+        super.renderTooltips(poseStack, mouseX, mouseY, entity);
     }
 
     private void drawTabs(PoseStack matrixStack){
@@ -175,7 +178,7 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
 
         // info and redstone
         ScreenUtils.bindTexture(REDSTONE_TAB);
-        ScreenUtils.drawTexture(matrixStack, -30, 32, 30, 52);
+        ScreenUtils.drawTexture(matrixStack, -30, 32, 30, 30);
     }
 
     private void drawTab(PoseStack matrixStack, EnumChannelType type, int x, ResourceLocation icon){
@@ -185,12 +188,10 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
         float width = 16, height = 16;
         float iconX = x + (28 - width) / 2f, iconY = (TesseractScreen.type == type ? 0 : 2) + (29 - height) / 2f;
 
-//        ScreenUtils.bindTexture(icon);
-//        ScreenUtils.drawTexture(matrixStack, iconX, iconY, width, height);
-        this.itemRenderer.renderGuiItem(new ItemStack(type.item.get()), (int)(this.left() + iconX), (int)(this.top() + iconY));
+        ClientUtils.getItemRenderer().renderGuiItem(new ItemStack(type.item.get()), (int)(this.offsetLeft + iconX), (int)(this.offsetTop + iconY));
     }
 
-    private void drawChannels(PoseStack matrixStack, int mouseX, int mouseY, TesseractTile tile){
+    private void drawChannels(PoseStack matrixStack, int mouseX, int mouseY, TesseractBlockEntity tile){
         ScreenUtils.bindTexture(CHANNEL_BACKGROUND);
         ScreenUtils.drawTexture(matrixStack, 3, 31, 102, 156, 0, 0, 102 / 256f, 157 / 256f);
         ScreenUtils.drawTexture(matrixStack, 26, 187, 56, 16, 0, 0, 56 / 256f, 16 / 256f);
@@ -230,10 +231,10 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
             // trim the channel name to fit
             int availableWidth = CHANNEL_CUTOFF_LENGTH - x - (isOwnedChannel ? 9 : 0);
             String name = channel.name;
-            if(this.font.width(name) > availableWidth)
-                name = this.font.getSplitter().plainHeadByWidth(name, availableWidth - this.font.width("..."), Style.EMPTY) + "...";
+            if(ClientUtils.getFontRenderer().width(name) > availableWidth)
+                name = ClientUtils.getFontRenderer().getSplitter().plainHeadByWidth(name, availableWidth - ClientUtils.getFontRenderer().width("..."), Style.EMPTY) + "...";
             ScreenUtils.drawString(matrixStack, name, x, y + 3, 0xffffffff);
-            x += this.font.width(name) + 3;
+            x += ClientUtils.getFontRenderer().width(name) + 3;
             if(isOwnedChannel){
                 ScreenUtils.bindTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF);
                 ScreenUtils.drawTexture(matrixStack, x, y + 2, 9, 9);
@@ -257,9 +258,9 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
         // category
         ScreenUtils.drawString(matrixStack, TextComponents.string("Category:").italic().get(), 117, 80, 0xff666666);
         RenderSystem.getModelViewStack().pushPose();
-        RenderSystem.getModelViewStack().translate(this.left() + 115, this.top() + 88, 0);
+        RenderSystem.getModelViewStack().translate(this.offsetLeft + 115, this.offsetTop + 88, 0);
         RenderSystem.getModelViewStack().scale(0.8f, 0.8f, 1);
-        this.itemRenderer.renderGuiItem(new ItemStack(type.item.get()), 0, 0);
+        ClientUtils.getItemRenderer().renderGuiItem(new ItemStack(type.item.get()), 0, 0);
         RenderSystem.getModelViewStack().popPose();
         RenderSystem.applyModelViewMatrix();
         ScreenUtils.drawString(matrixStack, channel.type.getTranslation(), 129, 91, ScreenUtils.ACTIVE_TEXT_COLOR);
@@ -280,47 +281,55 @@ public class TesseractScreen extends TileEntityBaseScreen<TesseractTile> {
     }
 
     @Override
-    protected void onMousePress(int mouseX, int mouseY, int button){
-        if(button == 0){
+    protected boolean mousePressed(int mouseX, int mouseY, int button, boolean hasBeenHandled, TesseractBlockEntity entity){
+        if(!hasBeenHandled && button == 0){
             if(mouseY >= 2 && mouseY < 2 + 26){ // tabs
-                if(mouseX >= 6 && mouseX < 6 + 28 && type != EnumChannelType.ITEMS)
+                if(mouseX >= 6 && mouseX < 6 + 28 && type != EnumChannelType.ITEMS){
                     this.setChannelType(EnumChannelType.ITEMS);
-                else if(mouseX >= 35 && mouseX < 35 + 28 && type != EnumChannelType.ENERGY)
+                    hasBeenHandled = true;
+                }else if(mouseX >= 35 && mouseX < 35 + 28 && type != EnumChannelType.ENERGY){
                     this.setChannelType(EnumChannelType.ENERGY);
-                else if(mouseX >= 64 && mouseX < 64 + 28 && type != EnumChannelType.FLUID)
+                    hasBeenHandled = true;
+                }else if(mouseX >= 64 && mouseX < 64 + 28 && type != EnumChannelType.FLUID){
                     this.setChannelType(EnumChannelType.FLUID);
+                    hasBeenHandled = true;
+                }
             }else if(mouseX >= 3 && mouseX < 105 && mouseY >= 31 && mouseY < 187){ // channels
                 int index = (mouseY - 31) / 13 + this.scrollOffset;
                 List<Channel> channels = TesseractChannelManager.CLIENT.getChannels(TesseractScreen.type);
                 if(index < channels.size()){
-                    TesseractTile tile = this.getObjectOrClose();
-                    if(tile != null){
-                        this.selectedChannel = channels.get(index).id;
-                        this.setButton.setText(TextComponents.translation("gui.tesseract." + (tile.getChannelId(type) == this.selectedChannel ? "unset" : "set")).get());
-                        this.setButton.active = true;
-                        this.removeButton.active = channels.get(index).creator.equals(Minecraft.getInstance().player.getUUID());
-                    }
+                    this.selectedChannel = channels.get(index).id;
+                    this.setButton.setText(TextComponents.translation("gui.tesseract." + (entity.getChannelId(type) == this.selectedChannel ? "unset" : "set")).get());
+                    this.setButton.active = true;
+                    this.removeButton.active = channels.get(index).creator.equals(Minecraft.getInstance().player.getUUID());
                 }else{
                     this.selectedChannel = -1;
                     this.setButton.active = false;
                     this.setButton.setText(TextComponents.translation("gui.tesseract.set").get());
                     this.removeButton.active = false;
                 }
+                hasBeenHandled = true;
             }
         }
-    }
 
-    private void scroll(int amount){
-        if(TesseractChannelManager.CLIENT.getChannels(type).size() > MAX_DISPLAYED_CHANNELS){
-            this.scrollOffset = Math.max(this.scrollOffset + amount, 0);
-            this.scrollOffset = Math.min(this.scrollOffset, TesseractChannelManager.CLIENT.getChannels(type).size() - MAX_DISPLAYED_CHANNELS);
-        }else
-            this.scrollOffset = 0;
+        return super.mousePressed(mouseX, mouseY, button, hasBeenHandled, entity);
     }
 
     @Override
-    protected void onMouseScroll(int mouseX, int mouseY, double scroll){
-        if(mouseX >= 15 && mouseX < 135 && mouseY >= 28 + 25 && mouseY < 28 + 25 + 143)
-            this.scroll(-(int)scroll);
+    protected boolean mouseScrolled(int mouseX, int mouseY, double scrollAmount, boolean hasBeenHandled, TesseractBlockEntity entity){
+        if(!hasBeenHandled){
+            if(TesseractChannelManager.CLIENT.getChannels(type).size() > MAX_DISPLAYED_CHANNELS){
+                this.scrollOffset = Math.max(this.scrollOffset - (int)scrollAmount, 0);
+                this.scrollOffset = Math.min(this.scrollOffset, TesseractChannelManager.CLIENT.getChannels(type).size() - MAX_DISPLAYED_CHANNELS);
+            }else
+                this.scrollOffset = 0;
+        }
+
+        return super.mouseScrolled(mouseX, mouseY, scrollAmount, hasBeenHandled, entity);
+    }
+
+    @Override
+    protected Component getNarrationMessage(TesseractBlockEntity entity){
+        return TextComponents.translation("gui.tesseract.title").get();
     }
 }

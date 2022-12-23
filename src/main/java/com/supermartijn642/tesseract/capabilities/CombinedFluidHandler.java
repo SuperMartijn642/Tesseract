@@ -1,7 +1,7 @@
 package com.supermartijn642.tesseract.capabilities;
 
 import com.supermartijn642.tesseract.EnumChannelType;
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import net.minecraftforge.fluids.FluidStack;
@@ -16,9 +16,9 @@ import javax.annotation.Nonnull;
 public class CombinedFluidHandler implements IFluidHandler {
 
     private final Channel channel;
-    private final TesseractTile requester;
+    private final TesseractBlockEntity requester;
 
-    public CombinedFluidHandler(Channel channel, TesseractTile requester){
+    public CombinedFluidHandler(Channel channel, TesseractBlockEntity requester){
         this.channel = channel;
         this.requester = requester;
     }
@@ -31,7 +31,7 @@ public class CombinedFluidHandler implements IFluidHandler {
         int tanks = 0;
         for(TesseractReference location : this.channel.tesseracts){
             if(location.isValid()){
-                TesseractTile tile = location.getTesseract();
+                TesseractBlockEntity tile = location.getTesseract();
                 if(tile != this.requester){
                     for(IFluidHandler handler : tile.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY))
                         tanks += Math.max(handler.getTanks(), 0);
@@ -53,7 +53,7 @@ public class CombinedFluidHandler implements IFluidHandler {
         int tanks = 0;
         for(TesseractReference location : this.channel.tesseracts){
             if(location.isValid()){
-                TesseractTile tile = location.getTesseract();
+                TesseractBlockEntity tile = location.getTesseract();
                 if(tile != this.requester){
                     for(IFluidHandler handler : tile.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
                         if(tank - tanks < handler.getTanks()){
@@ -80,7 +80,7 @@ public class CombinedFluidHandler implements IFluidHandler {
         int tanks = 0;
         for(TesseractReference location : this.channel.tesseracts){
             if(location.isValid()){
-                TesseractTile tile = location.getTesseract();
+                TesseractBlockEntity tile = location.getTesseract();
                 if(tile != this.requester){
                     for(IFluidHandler handler : tile.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
                         if(tank - tanks < handler.getTanks()){
@@ -107,7 +107,7 @@ public class CombinedFluidHandler implements IFluidHandler {
         int tanks = 0;
         for(TesseractReference location : this.channel.tesseracts){
             if(location.isValid()){
-                TesseractTile tile = location.getTesseract();
+                TesseractBlockEntity tile = location.getTesseract();
                 if(tile != this.requester){
                     for(IFluidHandler handler : tile.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
                         if(tank - tanks < handler.getTanks()){
@@ -140,7 +140,7 @@ public class CombinedFluidHandler implements IFluidHandler {
         loop:
         for(TesseractReference location : this.channel.receivingTesseracts){
             if(location.isValid()){
-                TesseractTile tile = location.getTesseract();
+                TesseractBlockEntity tile = location.getTesseract();
                 if(tile != this.requester){
                     for(IFluidHandler handler : tile.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
                         amount += handler.fill(fluid, action);
@@ -171,7 +171,7 @@ public class CombinedFluidHandler implements IFluidHandler {
         loop:
         for(TesseractReference location : this.channel.sendingTesseracts){
             if(location.isValid()){
-                TesseractTile tile = location.getTesseract();
+                TesseractBlockEntity tile = location.getTesseract();
                 if(tile != this.requester){
                     for(IFluidHandler handler : tile.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
                         FluidStack stack = handler.drain(fluid.copy(), FluidAction.SIMULATE);
@@ -210,7 +210,7 @@ public class CombinedFluidHandler implements IFluidHandler {
         loop:
         for(TesseractReference location : this.channel.sendingTesseracts){
             if(location.isValid()){
-                TesseractTile tile = location.getTesseract();
+                TesseractBlockEntity tile = location.getTesseract();
                 if(tile != this.requester){
                     for(IFluidHandler handler : tile.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
                         if(fluid == null){

@@ -1,6 +1,6 @@
 package com.supermartijn642.tesseract.manager;
 
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -40,7 +40,7 @@ public class TesseractTracker {
     private final HashMap<String,HashMap<BlockPos,TesseractReference>> tesseracts = new HashMap<>();
     private final Set<TesseractReference> toBeRemoved = new HashSet<>();
 
-    public TesseractReference add(TesseractTile self){
+    public TesseractReference add(TesseractBlockEntity self){
         String dimension = self.getLevel().dimension().location().toString();
         this.tesseracts.putIfAbsent(dimension, new HashMap<>());
         return this.tesseracts.get(dimension).computeIfAbsent(self.getBlockPos(), key -> new TesseractReference(self));
@@ -52,13 +52,13 @@ public class TesseractTracker {
             return null;
 
         ResourceKey<Level> key = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dimension));
-        Level world = TesseractChannelManager.minecraftServer.getLevel(key);
-        BlockEntity tile = world.getBlockEntity(pos);
-        return tile instanceof TesseractTile ? this.add((TesseractTile)tile) : null;
+        Level level = TesseractChannelManager.minecraftServer.getLevel(key);
+        BlockEntity entity = level.getBlockEntity(pos);
+        return entity instanceof TesseractBlockEntity ? this.add((TesseractBlockEntity)entity) : null;
     }
 
-    public void remove(Level world, BlockPos pos){
-        String dimension = world.dimension().location().toString();
+    public void remove(Level level, BlockPos pos){
+        String dimension = level.dimension().location().toString();
         this.remove(dimension, pos);
     }
 
@@ -75,8 +75,8 @@ public class TesseractTracker {
         this.tesseracts.get(reference.getDimension()).remove(reference.getPos());
     }
 
-    public TesseractReference get(Level world, BlockPos pos){
-        String dimension = world.dimension().location().toString();
+    public TesseractReference get(Level level, BlockPos pos){
+        String dimension = level.dimension().location().toString();
         return this.tesseracts.putIfAbsent(dimension, new HashMap<>()).get(pos);
     }
 

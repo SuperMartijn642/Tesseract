@@ -1,6 +1,7 @@
 package com.supermartijn642.tesseract;
 
 import com.supermartijn642.core.TextComponents;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 
 /**
@@ -17,7 +18,6 @@ public enum RedstoneState {
     }
 
     public Component translate(){
-        return TextComponents.translation(this.translation).get();
+        return TextComponents.translation(this.translation).color(ChatFormatting.GOLD).get();
     }
-
 }

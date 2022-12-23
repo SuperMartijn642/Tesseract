@@ -1,7 +1,7 @@
 package com.supermartijn642.tesseract.capabilities;
 
 import com.supermartijn642.tesseract.EnumChannelType;
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import net.minecraft.world.item.ItemStack;
@@ -16,9 +16,9 @@ import javax.annotation.Nonnull;
 public class CombinedItemHandler implements IItemHandler {
 
     private final Channel channel;
-    private final TesseractTile requester;
+    private final TesseractBlockEntity requester;
 
-    public CombinedItemHandler(Channel channel, TesseractTile requester){
+    public CombinedItemHandler(Channel channel, TesseractBlockEntity requester){
         this.channel = channel;
         this.requester = requester;
     }
@@ -31,7 +31,7 @@ public class CombinedItemHandler implements IItemHandler {
         int slots = 0;
         for(TesseractReference reference : this.channel.tesseracts){
             if(reference.isValid()){
-                TesseractTile tile = reference.getTesseract();
+                TesseractBlockEntity tile = reference.getTesseract();
                 if(tile != this.requester){
                     for(IItemHandler handler : tile.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY))
                         slots += handler.getSlots();
@@ -53,7 +53,7 @@ public class CombinedItemHandler implements IItemHandler {
         int slots = 0;
         for(TesseractReference reference : this.channel.tesseracts){
             if(reference.isValid()){
-                TesseractTile tile = reference.getTesseract();
+                TesseractBlockEntity tile = reference.getTesseract();
                 if(tile != this.requester){
                     for(IItemHandler handler : tile.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
                         if(slot - slots < handler.getSlots()){
@@ -84,7 +84,7 @@ public class CombinedItemHandler implements IItemHandler {
         int slots = 0;
         for(TesseractReference reference : this.channel.tesseracts){
             if(reference.isValid()){
-                TesseractTile tile = reference.getTesseract();
+                TesseractBlockEntity tile = reference.getTesseract();
                 if(tile != this.requester){
                     for(IItemHandler handler : tile.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
                         if(slot - slots < handler.getSlots()){
@@ -115,7 +115,7 @@ public class CombinedItemHandler implements IItemHandler {
         int slots = 0;
         for(TesseractReference reference : this.channel.tesseracts){
             if(reference.isValid()){
-                TesseractTile tile = reference.getTesseract();
+                TesseractBlockEntity tile = reference.getTesseract();
                 if(tile != this.requester){
                     for(IItemHandler handler : tile.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
                         if(slot - slots < handler.getSlots()){
@@ -142,7 +142,7 @@ public class CombinedItemHandler implements IItemHandler {
         int slots = 0;
         for(TesseractReference reference : this.channel.tesseracts){
             if(reference.isValid()){
-                TesseractTile tile = reference.getTesseract();
+                TesseractBlockEntity tile = reference.getTesseract();
                 if(tile != this.requester){
                     for(IItemHandler handler : tile.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
                         if(slot - slots < handler.getSlots()){
@@ -169,7 +169,7 @@ public class CombinedItemHandler implements IItemHandler {
         int slots = 0;
         for(TesseractReference reference : this.channel.tesseracts){
             if(reference.isValid()){
-                TesseractTile tile = reference.getTesseract();
+                TesseractBlockEntity tile = reference.getTesseract();
                 if(tile != this.requester){
                     for(IItemHandler handler : tile.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
                         if(slot - slots < handler.getSlots()){
