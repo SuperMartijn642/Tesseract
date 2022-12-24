@@ -1,6 +1,6 @@
 package com.supermartijn642.tesseract.manager;
 
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.minecraft.nbt.CompoundNBT;
@@ -40,7 +40,7 @@ public class TesseractTracker {
     private final IntObjectMap<HashMap<BlockPos,TesseractReference>> tesseracts = new IntObjectHashMap<>();
     private final Set<TesseractReference> toBeRemoved = new HashSet<>();
 
-    public TesseractReference add(TesseractTile self){
+    public TesseractReference add(TesseractBlockEntity self){
         int dimension = self.getLevel().dimension.getType().getId();
         this.tesseracts.putIfAbsent(dimension, new HashMap<>());
         return this.tesseracts.get(dimension).computeIfAbsent(self.getBlockPos(), key -> new TesseractReference(self));
@@ -52,13 +52,13 @@ public class TesseractTracker {
             return null;
 
         DimensionType type = DimensionType.getById(dimension);
-        World world = DimensionManager.getWorld(minecraftServer, type, false, true);
-        TileEntity tile = world.getBlockEntity(pos);
-        return tile instanceof TesseractTile ? this.add((TesseractTile)tile) : null;
+        World level = DimensionManager.getWorld(minecraftServer, type, false, true);
+        TileEntity entity = level.getBlockEntity(pos);
+        return entity instanceof TesseractBlockEntity ? this.add((TesseractBlockEntity)entity) : null;
     }
 
-    public void remove(World world, BlockPos pos){
-        int dimension = world.dimension.getType().getId();
+    public void remove(World level, BlockPos pos){
+        int dimension = level.dimension.getType().getId();
         this.remove(dimension, pos);
     }
 
@@ -75,8 +75,8 @@ public class TesseractTracker {
         this.tesseracts.get(reference.getDimension()).remove(reference.getPos());
     }
 
-    public TesseractReference get(World world, BlockPos pos){
-        int dimension = world.dimension.getType().getId();
+    public TesseractReference get(World level, BlockPos pos){
+        int dimension = level.dimension.getType().getId();
         return this.tesseracts.putIfAbsent(dimension, new HashMap<>()).get(pos);
     }
 

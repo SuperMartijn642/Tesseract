@@ -1,14 +1,14 @@
 package com.supermartijn642.tesseract.packets;
 
+import com.supermartijn642.core.network.BlockEntityBasePacket;
 import com.supermartijn642.core.network.PacketContext;
-import com.supermartijn642.core.network.TileEntityBasePacket;
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.util.math.BlockPos;
 
 /**
  * Created 7/5/2020 by SuperMartijn642
  */
-public class PacketScreenCycleRedstoneState extends TileEntityBasePacket<TesseractTile> {
+public class PacketScreenCycleRedstoneState extends BlockEntityBasePacket<TesseractBlockEntity> {
 
     public PacketScreenCycleRedstoneState(BlockPos pos){
         super(pos);
@@ -18,7 +18,7 @@ public class PacketScreenCycleRedstoneState extends TileEntityBasePacket<Tessera
     }
 
     @Override
-    protected void handle(TesseractTile tile, PacketContext context){
-        tile.cycleRedstoneState();
+    protected void handle(TesseractBlockEntity entity, PacketContext context){
+        entity.cycleRedstoneState();
     }
 }

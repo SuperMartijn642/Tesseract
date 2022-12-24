@@ -1,10 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "conditions": [
-    {
-      "type": "tesseract:thermal_recipe"
-    }
-  ],
   "pattern": [
     "ABA",
     "BCB",
@@ -12,13 +7,13 @@
   ],
   "key": {
     "A": {
-      "item": "thermal:enderium_ingot"
+      "tag": "forge:obsidian"
     },
     "B": {
-      "item": "thermal:obsidian_glass"
+      "tag": "forge:ender_pearls"
     },
     "C": {
-      "item": "thermal:machine_frame"
+      "tag": "forge:storage_blocks/diamond"
     }
   },
   "result": {
