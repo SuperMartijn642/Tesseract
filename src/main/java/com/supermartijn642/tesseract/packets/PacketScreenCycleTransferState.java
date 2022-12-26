@@ -1,16 +1,16 @@
 package com.supermartijn642.tesseract.packets;
 
+import com.supermartijn642.core.network.BlockEntityBasePacket;
 import com.supermartijn642.core.network.PacketContext;
-import com.supermartijn642.core.network.TileEntityBasePacket;
 import com.supermartijn642.tesseract.EnumChannelType;
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 
 /**
  * Created 7/5/2020 by SuperMartijn642
  */
-public class PacketScreenCycleTransferState extends TileEntityBasePacket<TesseractTile> {
+public class PacketScreenCycleTransferState extends BlockEntityBasePacket<TesseractBlockEntity> {
 
     private EnumChannelType type;
 
@@ -35,7 +35,7 @@ public class PacketScreenCycleTransferState extends TileEntityBasePacket<Tessera
     }
 
     @Override
-    protected void handle(TesseractTile tile, PacketContext context){
-        tile.cycleTransferState(this.type);
+    protected void handle(TesseractBlockEntity entity, PacketContext context){
+        entity.cycleTransferState(this.type);
     }
 }

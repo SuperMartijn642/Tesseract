@@ -1,6 +1,6 @@
 package com.supermartijn642.tesseract;
 
-import com.supermartijn642.core.block.BaseTileEntity;
+import com.supermartijn642.core.block.BaseBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.manager.TesseractReference;
@@ -22,7 +22,7 @@ import java.util.*;
 /**
  * Created 3/19/2020 by SuperMartijn642
  */
-public class TesseractTile extends BaseTileEntity {
+public class TesseractBlockEntity extends BaseBlockEntity {
 
     private TesseractReference reference;
     private final EnumMap<EnumChannelType,Integer> channels = new EnumMap<>(EnumChannelType.class);
@@ -36,7 +36,7 @@ public class TesseractTile extends BaseTileEntity {
 
     private final Map<Direction,Map<Capability<?>,Object>> capabilities = new HashMap<>();
 
-    public TesseractTile(){
+    public TesseractBlockEntity(){
         super(Tesseract.tesseract_tile);
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, -1);
@@ -99,7 +99,7 @@ public class TesseractTile extends BaseTileEntity {
         for(Direction facing : Direction.values()){
             if(!this.capabilities.get(facing).containsKey(capability)){
                 TileEntity tile = this.level.getBlockEntity(this.worldPosition.relative(facing));
-                if(tile != null && !(tile instanceof TesseractTile))
+                if(tile != null && !(tile instanceof TesseractBlockEntity))
                     tile.getCapability(capability, facing.getOpposite()).ifPresent(
                         object -> {
                             this.capabilities.get(facing).put(capability, object);

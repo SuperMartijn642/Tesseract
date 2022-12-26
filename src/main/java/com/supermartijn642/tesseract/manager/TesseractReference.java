@@ -2,7 +2,7 @@ package com.supermartijn642.tesseract.manager;
 
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -24,13 +24,13 @@ public class TesseractReference {
     private final EnumMap<EnumChannelType,Boolean> canSend = new EnumMap<>(EnumChannelType.class);
     private final EnumMap<EnumChannelType,Boolean> canReceive = new EnumMap<>(EnumChannelType.class);
 
-    public TesseractReference(TesseractTile tile){
-        this.dimension = tile.getLevel().dimension.getType().getId();
-        this.pos = tile.getBlockPos();
+    public TesseractReference(TesseractBlockEntity entity){
+        this.dimension = entity.getLevel().dimension.getType().getId();
+        this.pos = entity.getBlockPos();
         for(EnumChannelType type : EnumChannelType.values()){
-            this.channels.put(type, tile.getChannelId(type));
-            this.canSend.put(type, tile.canSend(type));
-            this.canReceive.put(type, tile.canReceive(type));
+            this.channels.put(type, entity.getChannelId(type));
+            this.canSend.put(type, entity.canSend(type));
+            this.canReceive.put(type, entity.canReceive(type));
         }
     }
 
@@ -48,7 +48,7 @@ public class TesseractReference {
         return this.dimension;
     }
 
-    public World getWorld(){
+    public World getLevel(){
         DimensionType type = DimensionType.getById(this.dimension);
         if(type == null || TesseractChannelManager.minecraftServer == null)
             return null;
@@ -60,8 +60,8 @@ public class TesseractReference {
     }
 
     public boolean isValid(){
-        World world = this.getWorld();
-        boolean isValid = world != null && world.getBlockState(this.pos).getBlock() == Tesseract.tesseract && world.getBlockEntity(this.pos) instanceof TesseractTile;
+        World level = this.getLevel();
+        boolean isValid = level != null && level.getBlockState(this.pos).getBlock() == Tesseract.tesseract && level.getBlockEntity(this.pos) instanceof TesseractBlockEntity;
 
         if(!isValid)
             TesseractTracker.SERVER.remove(this.dimension, this.pos);
@@ -69,8 +69,8 @@ public class TesseractReference {
         return isValid;
     }
 
-    public TesseractTile getTesseract(){
-        return (TesseractTile)this.getWorld().getBlockEntity(this.pos);
+    public TesseractBlockEntity getTesseract(){
+        return (TesseractBlockEntity)this.getLevel().getBlockEntity(this.pos);
     }
 
     public CompoundNBT write(){
@@ -99,14 +99,14 @@ public class TesseractReference {
         return this.channels.get(type);
     }
 
-    public void update(TesseractTile tile){
+    public void update(TesseractBlockEntity entity){
         for(EnumChannelType type : EnumChannelType.values()){
-            int channelId = tile.getChannelId(type);
+            int channelId = entity.getChannelId(type);
             this.channels.put(type, channelId);
-            this.canSend.put(type, tile.canSend(type));
-            this.canReceive.put(type, tile.canReceive(type));
+            this.canSend.put(type, entity.canSend(type));
+            this.canReceive.put(type, entity.canReceive(type));
             if(channelId == -1){
-                Channel channel = TesseractChannelManager.getInstance(tile.getLevel()).getChannelById(type, channelId);
+                Channel channel = TesseractChannelManager.getInstance(entity.getLevel()).getChannelById(type, channelId);
                 if(channel != null)
                     channel.updateTesseract(this);
             }
