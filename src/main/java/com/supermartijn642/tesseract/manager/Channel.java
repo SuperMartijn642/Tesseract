@@ -1,7 +1,7 @@
 package com.supermartijn642.tesseract.manager;
 
 import com.supermartijn642.tesseract.EnumChannelType;
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.capabilities.CombinedEnergyStorage;
 import com.supermartijn642.tesseract.capabilities.CombinedFluidHandler;
 import com.supermartijn642.tesseract.capabilities.CombinedItemHandler;
@@ -136,15 +136,15 @@ public class Channel {
         return new Channel(id, type, creator, isPrivate, name);
     }
 
-    public CombinedItemHandler getItemHandler(TesseractTile self){
+    public CombinedItemHandler getItemHandler(TesseractBlockEntity self){
         return new CombinedItemHandler(this, self);
     }
 
-    public CombinedFluidHandler getFluidHandler(TesseractTile self){
+    public CombinedFluidHandler getFluidHandler(TesseractBlockEntity self){
         return new CombinedFluidHandler(this, self);
     }
 
-    public CombinedEnergyStorage getEnergyStorage(TesseractTile self){
+    public CombinedEnergyStorage getEnergyStorage(TesseractBlockEntity self){
         return new CombinedEnergyStorage(this, self);
     }
 

@@ -1,7 +1,7 @@
 package com.supermartijn642.tesseract.screen;
 
 import com.supermartijn642.core.gui.ScreenUtils;
-import com.supermartijn642.core.gui.widget.ButtonWidget;
+import com.supermartijn642.core.gui.widget.premade.ButtonWidget;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
@@ -15,6 +15,7 @@ public class TesseractButton extends ButtonWidget {
 
     private ITextComponent text;
     private ResourceLocation background = BUTTON_BACKGROUND;
+    public boolean active = true;
 
     public TesseractButton(int x, int y, int width, int height, ITextComponent text, Runnable onPress){
         super(x, y, width, height, text, onPress);
@@ -32,8 +33,8 @@ public class TesseractButton extends ButtonWidget {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks){
-        this.drawButtonBackground((float)this.x, (float)this.y, (float)this.width, (float)this.height, (float)(this.active ? (this.isHovered() ? 5 : 0) : 10) / 15.0F);
+    public void render(int mouseX, int mouseY){
+        this.drawButtonBackground((float)this.x, (float)this.y, (float)this.width, (float)this.height, (float)(this.active ? (this.isFocused() ? 5 : 0) : 10) / 15.0F);
         float textX = (float)this.x + (float)this.width / 2.0F;
         float textY = (float)this.y + (float)this.height / 2.0F - 4.0F;
         ScreenUtils.drawCenteredStringWithShadow(this.text, textX, textY, this.active ? -1 : 2147483647);

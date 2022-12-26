@@ -1,14 +1,10 @@
 package com.supermartijn642.tesseract;
 
+import com.supermartijn642.core.TextComponents;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
 
 import java.util.function.Supplier;
 
@@ -17,24 +13,18 @@ import java.util.function.Supplier;
  */
 public enum EnumChannelType {
 
-    ITEMS(0, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, () -> Item.getItemFromBlock(Blocks.CHEST), "gui.tesseract.type.items"),
-    FLUID(1, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, () -> Items.BUCKET, "gui.tesseract.type.fluid"),
-    ENERGY(2, CapabilityEnergy.ENERGY, () -> Items.REDSTONE, "gui.tesseract.type.energy");
+    ITEMS(0, () -> Item.getItemFromBlock(Blocks.CHEST), "gui.tesseract.type.items"),
+    FLUID(1, () -> Items.BUCKET, "gui.tesseract.type.fluid"),
+    ENERGY(2, () -> Items.REDSTONE, "gui.tesseract.type.energy");
 
     private final int index;
-    private final Capability<?> capability;
     public final Supplier<Item> item;
     public final String translationKey;
 
-    EnumChannelType(int index, Capability<?> capability, Supplier<Item> item, String translationKey){
+    EnumChannelType(int index, Supplier<Item> item, String translationKey){
         this.index = index;
-        this.capability = capability;
         this.item = item;
         this.translationKey = translationKey;
-    }
-
-    public Capability<?> getCapability(){
-        return this.capability;
     }
 
     public int getIndex(){
@@ -42,7 +32,7 @@ public enum EnumChannelType {
     }
 
     public ITextComponent getTranslation(){
-        return new TextComponentTranslation(this.translationKey);
+        return TextComponents.translation(this.translationKey).get();
     }
 
     public static EnumChannelType byIndex(int index){
@@ -51,5 +41,4 @@ public enum EnumChannelType {
                 return type;
         return null;
     }
-
 }

@@ -1,6 +1,0 @@
-{
-  "conditions": {
-    "enableThermalRecipe": "com.supermartijn642.tesseract.recipe_conditions.TesseractRecipeCondition",
-    "forge:not": "com.supermartijn642.tesseract.recipe_conditions.NotRecipeCondition"
-  }
-}

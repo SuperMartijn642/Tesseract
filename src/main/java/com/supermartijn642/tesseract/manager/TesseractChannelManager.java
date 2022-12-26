@@ -99,9 +99,9 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onSave(WorldEvent.Save e){
-        World world = e.getWorld();
+        World level = e.getWorld();
 
-        if(world != null && !world.isRemote && world.provider.getDimensionType() == DimensionType.OVERWORLD){
+        if(level != null && !level.isRemote && level.provider.getDimensionType() == DimensionType.OVERWORLD){
             File dir = new File(DimensionManager.getCurrentSaveRootDirectory(), "tesseract");
 
             for(ChannelList list : SERVER.types.values()){
@@ -115,13 +115,13 @@ public class TesseractChannelManager {
 
     @SubscribeEvent
     public static void onLoad(WorldEvent.Load e){
-        World world = e.getWorld();
-        if(world != null && !world.isRemote && world.provider.getDimensionType() == DimensionType.OVERWORLD){
-            File dir = new File(DimensionManager.getCurrentSaveRootDirectory(), "tesseract");
+        World level = e.getWorld();
+        if(level != null && !level.isRemote && level.provider.getDimensionType() == DimensionType.OVERWORLD){
+            File directory = new File(DimensionManager.getCurrentSaveRootDirectory(), "tesseract");
             for(EnumChannelType type : EnumChannelType.values()){
                 ChannelList list = new ChannelList(type);
                 SERVER.types.put(type, list);
-                File folder = new File(dir, type.name().toLowerCase(Locale.ENGLISH));
+                File folder = new File(directory, type.name().toLowerCase(Locale.ENGLISH));
                 list.read(folder);
             }
         }

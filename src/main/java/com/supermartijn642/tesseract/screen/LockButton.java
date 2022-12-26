@@ -1,20 +1,20 @@
 package com.supermartijn642.tesseract.screen;
 
+import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.gui.ScreenUtils;
-import com.supermartijn642.core.gui.widget.AbstractButtonWidget;
-import com.supermartijn642.core.gui.widget.IHoverTextWidget;
+import com.supermartijn642.core.gui.widget.premade.AbstractButtonWidget;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.function.Consumer;
 
 /**
  * Created 4/13/2021 by SuperMartijn642
  */
-public class LockButton extends AbstractButtonWidget implements IHoverTextWidget {
+public class LockButton extends AbstractButtonWidget {
 
     private boolean locked;
+    private boolean active = true;
 
     public LockButton(int x, int y){
         super(x, y, 20, 20, null);
@@ -27,18 +27,18 @@ public class LockButton extends AbstractButtonWidget implements IHoverTextWidget
     }
 
     @Override
-    protected ITextComponent getNarrationMessage(){
-        return new TextComponentTranslation("gui.narrate.button", new TextComponentTranslation("narrator.button.difficulty_lock")).appendText(". ").appendSibling(this.isLocked() ? new TextComponentTranslation("narrator.button.difficulty_lock.locked") : new TextComponentTranslation("narrator.button.difficulty_lock.unlocked"));
+    public ITextComponent getNarrationMessage(){
+        return TextComponents.translation("gui.narrate.button", TextComponents.translation("narrator.button.difficulty_lock")).string(". ").translation(this.isLocked() ? "narrator.button.difficulty_lock.locked" : "narrator.button.difficulty_lock.unlocked").get();
     }
 
     @Override
-    public void render(int x, int y, float partialTicks){
+    public void render(int x, int y){
         ScreenUtils.bindTexture(new ResourceLocation("textures/gui/widgets.png"));
 
         Icon icon;
         if(!this.active)
             icon = this.locked ? Icon.LOCKED_DISABLED : Icon.UNLOCKED_DISABLED;
-        else if(this.hovered)
+        else if(this.isFocused())
             icon = this.locked ? Icon.LOCKED_HOVER : Icon.UNLOCKED_HOVER;
         else
             icon = this.locked ? Icon.LOCKED : Icon.UNLOCKED;
@@ -55,13 +55,11 @@ public class LockButton extends AbstractButtonWidget implements IHoverTextWidget
     }
 
     @Override
-    public ITextComponent getHoverText(){
-        return new TextComponentTranslation("gui.tesseract.channel." + (this.locked ? "private" : "public"));
+    protected void getTooltips(Consumer<ITextComponent> tooltips){
+        tooltips.accept(TextComponents.translation("gui.tesseract.channel." + (this.locked ? "private" : "public")).get());
     }
 
-    @SideOnly(Side.CLIENT)
-    enum Icon
-    {
+    enum Icon {
         LOCKED(0, 146),
         LOCKED_HOVER(0, 166),
         LOCKED_DISABLED(0, 186),
@@ -72,19 +70,16 @@ public class LockButton extends AbstractButtonWidget implements IHoverTextWidget
         private final int x;
         private final int y;
 
-        private Icon(int xIn, int yIn)
-        {
+        Icon(int xIn, int yIn){
             this.x = xIn;
             this.y = yIn;
         }
 
-        public int getX()
-        {
+        public int getX(){
             return this.x;
         }
 
-        public int getY()
-        {
+        public int getY(){
             return this.y;
         }
     }

@@ -1,0 +1,16 @@
+{
+  "block.tesseract.tesseract": "Tesseract",
+  "gui.tesseract.title": "Tesseract",
+  "gui.tesseract.items": "TESSERACT - ARTICLES",
+  "gui.tesseract.fluid": "TESSERACT - FLUIDE",
+  "gui.tesseract.energy": "TESSERACT - ÉNERGIE",
+  "gui.tesseract.set": "CHOISIR",
+  "gui.tesseract.remove": "SUPPRIMER",
+  "gui.tesseract.add": "AJOUTER",
+  "gui.tesseract.transfer.send": "ENVOYER",
+  "gui.tesseract.transfer.receive": "REÇU",
+  "gui.tesseract.transfer.both": "ENVOYER ET REÇU",
+  "gui.tesseract.redstone.disabled": "DÉSACTIVÉ",
+  "gui.tesseract.redstone.high": "FORT",
+  "gui.tesseract.redstone.low": "FAIBLE"
+}

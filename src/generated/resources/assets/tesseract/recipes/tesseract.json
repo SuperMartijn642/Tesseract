@@ -1,0 +1,33 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "ABA",
+    "BCB",
+    "ABA"
+  ],
+  "key": {
+    "A": {
+      "type": "forge:ore_dict",
+      "ore": "obsidian"
+    },
+    "B": {
+      "type": "forge:ore_dict",
+      "ore": "enderpearl"
+    },
+    "C": {
+      "type": "forge:ore_dict",
+      "ore": "blockDiamond"
+    }
+  },
+  "result": {
+    "item": "tesseract:tesseract"
+  },
+  "conditions": [
+    {
+      "type": "supermartijn642corelib:not",
+      "condition": {
+        "type": "tesseract:thermal_recipe"
+      }
+    }
+  ]
+}

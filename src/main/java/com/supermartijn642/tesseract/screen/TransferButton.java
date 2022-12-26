@@ -1,19 +1,20 @@
 package com.supermartijn642.tesseract.screen;
 
-import com.supermartijn642.core.gui.widget.IHoverTextWidget;
+import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.TransferState;
 import com.supermartijn642.tesseract.packets.PacketScreenCycleTransferState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+
+import java.util.function.Consumer;
 
 /**
  * Created 7/6/2020 by SuperMartijn642
  */
-public class TransferButton extends CycleButton implements IHoverTextWidget {
+public class TransferButton extends CycleButton {
 
     public TransferState state;
     private BlockPos pos;
@@ -23,7 +24,7 @@ public class TransferButton extends CycleButton implements IHoverTextWidget {
         super(x, y, 0);
     }
 
-    public void update(TesseractTile tile, EnumChannelType type){
+    public void update(TesseractBlockEntity tile, EnumChannelType type){
         this.state = tile.getTransferState(type);
         this.pos = tile.getPos();
         this.type = type;
@@ -42,12 +43,12 @@ public class TransferButton extends CycleButton implements IHoverTextWidget {
     }
 
     @Override
-    protected ITextComponent getNarrationMessage(){
-        return this.getHoverText();
+    public ITextComponent getNarrationMessage(){
+        return TextComponents.translation("gui.tesseract.transfer.speech", this.state.translate()).get();
     }
 
     @Override
-    public ITextComponent getHoverText(){
-        return new TextComponentTranslation("gui.tesseract.transfer.speech", this.state.translate());
+    protected void getTooltips(Consumer<ITextComponent> tooltips){
+        tooltips.accept(TextComponents.translation("gui.tesseract.transfer.speech", this.state.translate()).get());
     }
 }

@@ -1,0 +1,30 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "ABA",
+    "BCB",
+    "ABA"
+  ],
+  "key": {
+    "A": {
+      "type": "forge:ore_dict",
+      "ore": "ingotEnderium"
+    },
+    "B": {
+      "type": "forge:ore_dict",
+      "ore": "blockGlassHardened"
+    },
+    "C": {
+      "type": "forge:ore_dict",
+      "ore": "blockDiamond"
+    }
+  },
+  "result": {
+    "item": "tesseract:tesseract"
+  },
+  "conditions": [
+    {
+      "type": "tesseract:thermal_recipe"
+    }
+  ]
+}

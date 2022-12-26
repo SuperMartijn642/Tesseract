@@ -1,6 +1,6 @@
 package com.supermartijn642.tesseract.manager;
 
-import com.supermartijn642.tesseract.TesseractTile;
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -36,7 +36,7 @@ public class TesseractTracker {
     private final IntObjectMap<HashMap<BlockPos,TesseractReference>> tesseracts = new IntObjectHashMap<>();
     private final Set<TesseractReference> toBeRemoved = new HashSet<>();
 
-    public TesseractReference add(TesseractTile self){
+    public TesseractReference add(TesseractBlockEntity self){
         int dimension = self.getWorld().provider.getDimension();
         this.tesseracts.putIfAbsent(dimension, new HashMap<>());
         return this.tesseracts.get(dimension).computeIfAbsent(self.getPos(), key -> new TesseractReference(self));
@@ -44,13 +44,13 @@ public class TesseractTracker {
 
     @Deprecated
     public TesseractReference tryAdd(int dimension, BlockPos pos){
-        World world = DimensionManager.getWorld(dimension);
-        TileEntity tile = world.getTileEntity(pos);
-        return tile instanceof TesseractTile ? this.add((TesseractTile)tile) : null;
+        World level = DimensionManager.getWorld(dimension);
+        TileEntity entity = level.getTileEntity(pos);
+        return entity instanceof TesseractBlockEntity ? this.add((TesseractBlockEntity)entity) : null;
     }
 
-    public void remove(World world, BlockPos pos){
-        int dimension = world.provider.getDimension();
+    public void remove(World level, BlockPos pos){
+        int dimension = level.provider.getDimension();
         this.remove(dimension, pos);
     }
 
@@ -67,8 +67,8 @@ public class TesseractTracker {
         this.tesseracts.get(reference.getDimension()).remove(reference.getPos());
     }
 
-    public TesseractReference get(World world, BlockPos pos){
-        int dimension = world.provider.getDimension();
+    public TesseractReference get(World level, BlockPos pos){
+        int dimension = level.provider.getDimension();
         return this.tesseracts.putIfAbsent(dimension, new HashMap<>()).get(pos);
     }
 
@@ -90,9 +90,9 @@ public class TesseractTracker {
 
     @SubscribeEvent
     public static void onSave(WorldEvent.Save e){
-        World world = e.getWorld();
+        World level = e.getWorld();
 
-        if(world != null && !world.isRemote && world.provider.getDimensionType() == DimensionType.OVERWORLD){
+        if(level != null && !level.isRemote && level.provider.getDimensionType() == DimensionType.OVERWORLD){
             File directory = new File(DimensionManager.getCurrentSaveRootDirectory(), "tesseract/tracking");
 
             int index = 0;
@@ -113,8 +113,8 @@ public class TesseractTracker {
 
     @SubscribeEvent
     public static void onLoad(WorldEvent.Load e){
-        World world = e.getWorld();
-        if(world != null && !world.isRemote && world.provider.getDimensionType() == DimensionType.OVERWORLD){
+        World level = e.getWorld();
+        if(level != null && !level.isRemote && level.provider.getDimensionType() == DimensionType.OVERWORLD){
             SERVER.tesseracts.clear();
 
             File directory = new File(DimensionManager.getCurrentSaveRootDirectory(), "tesseract/tracking");
