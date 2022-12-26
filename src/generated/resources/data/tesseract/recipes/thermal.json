@@ -2,10 +2,7 @@
   "type": "supermartijn642corelib:conditional",
   "conditions": [
     {
-      "condition": {
-        "type": "tesseract:thermal_recipe"
-      },
-      "type": "supermartijn642corelib:not"
+      "type": "tesseract:thermal_recipe"
     }
   ],
   "recipe": {
@@ -17,13 +14,13 @@
     ],
     "key": {
       "A": {
-        "tag": "forge:obsidian"
+        "tag": "forge:ingots/enderium"
       },
       "B": {
-        "tag": "forge:ender_pearls"
+        "item": "thermal:obsidian_glass"
       },
       "C": {
-        "tag": "forge:storage_blocks/diamond"
+        "item": "thermal:machine_frame"
       }
     },
     "result": {

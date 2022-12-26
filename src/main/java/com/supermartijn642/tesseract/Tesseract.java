@@ -12,6 +12,7 @@ import com.supermartijn642.tesseract.generators.*;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import com.supermartijn642.tesseract.packets.*;
+import com.supermartijn642.tesseract.recipe_conditions.TesseractRecipeCondition;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DistExecutor;
@@ -55,6 +56,7 @@ public class Tesseract {
         handler.registerBlock("tesseract", TesseractBlock::new);
         handler.registerBlockEntityType("tesseract_tile", () -> BaseBlockEntityType.create(TesseractBlockEntity::new, tesseract));
         handler.registerItem("tesseract", () -> new BaseBlockItem(tesseract, ItemProperties.create().group(CreativeItemGroup.getDecoration())));
+        handler.registerResourceConditionSerializer("thermal_recipe", TesseractRecipeCondition.SERIALIZER);
     }
 
     private static void registerGenerators(){

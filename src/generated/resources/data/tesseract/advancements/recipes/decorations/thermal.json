@@ -1,10 +1,7 @@
 {
   "conditions": [
     {
-      "condition": {
-        "type": "tesseract:thermal_recipe"
-      },
-      "type": "supermartijn642corelib:not"
+      "type": "tesseract:thermal_recipe"
     }
   ],
   "parent": "minecraft:recipes/root",
@@ -13,10 +10,10 @@
       "item": "tesseract:tesseract"
     },
     "title": {
-      "translate": "tesseract.advancement.recipes/decorations/tesseract.title"
+      "translate": "tesseract.advancement.recipes/decorations/thermal.title"
     },
     "description": {
-      "translate": "tesseract.advancement.recipes/decorations/tesseract.description"
+      "translate": "tesseract.advancement.recipes/decorations/thermal.description"
     },
     "frame": "task",
     "show_toast": false,
@@ -27,7 +24,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "tesseract:tesseract"
+        "recipe": "tesseract:thermal"
       }
     }
   },
@@ -38,7 +35,7 @@
   ],
   "rewards": {
     "recipes": [
-      "tesseract:tesseract"
+      "tesseract:thermal"
     ]
   }
 }
