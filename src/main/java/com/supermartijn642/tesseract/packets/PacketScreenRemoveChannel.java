@@ -5,9 +5,6 @@ import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
@@ -23,14 +20,6 @@ public class PacketScreenRemoveChannel implements BasePacket {
     }
 
     public PacketScreenRemoveChannel(){
-    }
-
-    public void handle(Supplier<NetworkEvent.Context> ctx){
-        ctx.get().setPacketHandled(true);
-        if(this.type != null && this.id >= 0)
-            ctx.get().enqueueWork(() -> {
-                TesseractChannelManager.SERVER.removeChannel(this.type, this.id);
-            });
     }
 
     @Override
