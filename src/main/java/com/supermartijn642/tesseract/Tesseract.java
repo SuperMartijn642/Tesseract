@@ -2,6 +2,7 @@ package com.supermartijn642.tesseract;
 
 import com.supermartijn642.core.block.BaseBlockEntityType;
 import com.supermartijn642.core.item.BaseBlockItem;
+import com.supermartijn642.core.item.CreativeItemGroup;
 import com.supermartijn642.core.item.ItemProperties;
 import com.supermartijn642.core.network.PacketChannel;
 import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
@@ -12,7 +13,6 @@ import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import com.supermartijn642.tesseract.packets.*;
 import com.supermartijn642.tesseract.recipe_conditions.TesseractRecipeCondition;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DistExecutor;
@@ -55,7 +55,7 @@ public class Tesseract {
         RegistrationHandler handler = RegistrationHandler.get("tesseract");
         handler.registerBlock("tesseract", TesseractBlock::new);
         handler.registerBlockEntityType("tesseract_tile", () -> BaseBlockEntityType.create(TesseractBlockEntity::new, tesseract));
-        handler.registerItem("tesseract", () -> new BaseBlockItem(tesseract, ItemProperties.create().group(CreativeModeTab.TAB_DECORATIONS)));
+        handler.registerItem("tesseract", () -> new BaseBlockItem(tesseract, ItemProperties.create().group(CreativeItemGroup.getDecoration())));
         handler.registerResourceConditionSerializer("thermal_recipe", TesseractRecipeCondition.SERIALIZER);
     }
 
