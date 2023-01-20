@@ -55,7 +55,7 @@ public class Tesseract {
         RegistrationHandler handler = RegistrationHandler.get("tesseract");
         handler.registerBlock("tesseract", TesseractBlock::new);
         handler.registerBlockEntityType("tesseract_tile", () -> BaseBlockEntityType.create(TesseractBlockEntity::new, tesseract));
-        handler.registerItem("tesseract", () -> new BaseBlockItem(tesseract, ItemProperties.create().group(CreativeItemGroup.getDecoration())));
+        handler.registerItem("tesseract", () -> new BaseBlockItem(tesseract, ItemProperties.create().group(CreativeItemGroup.getFunctionalBlocks())));
         handler.registerResourceConditionSerializer("thermal_recipe", TesseractRecipeCondition.SERIALIZER);
     }
 
@@ -66,5 +66,6 @@ public class Tesseract {
         handler.addGenerator(TesseractLootTableGenerator::new);
         handler.addGenerator(TesseractRecipeGenerator::new);
         handler.addGenerator(TesseractTagGenerator::new);
+        handler.addGenerator(TesseractAtlasSourceGenerator::new);
     }
 }

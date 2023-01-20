@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:blocks/off"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:blocks/center"
+    }
+  ]
+}

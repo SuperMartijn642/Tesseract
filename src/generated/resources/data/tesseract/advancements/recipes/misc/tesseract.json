@@ -1,22 +1,14 @@
 {
-  "conditions": [
-    {
-      "condition": {
-        "type": "tesseract:thermal_recipe"
-      },
-      "type": "supermartijn642corelib:not"
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "display": {
     "icon": {
       "item": "tesseract:tesseract"
     },
     "title": {
-      "translate": "tesseract.advancement.recipes/decorations/tesseract.title"
+      "translate": "tesseract.advancement.recipes/misc/tesseract.title"
     },
     "description": {
-      "translate": "tesseract.advancement.recipes/decorations/tesseract.description"
+      "translate": "tesseract.advancement.recipes/misc/tesseract.description"
     },
     "frame": "task",
     "show_toast": false,

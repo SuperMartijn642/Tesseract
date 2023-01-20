@@ -4,7 +4,7 @@ import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -52,7 +52,7 @@ public class TesseractReference {
     public Level getLevel(){
         if(TesseractChannelManager.minecraftServer == null)
             return null;
-        ResourceKey<Level> key = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(this.dimension));
+        ResourceKey<Level> key = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(this.dimension));
         return TesseractChannelManager.minecraftServer.getLevel(key);
     }
 

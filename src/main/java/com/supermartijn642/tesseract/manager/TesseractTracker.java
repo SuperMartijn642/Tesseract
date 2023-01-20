@@ -2,7 +2,7 @@ package com.supermartijn642.tesseract.manager;
 
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceKey;
@@ -51,7 +51,7 @@ public class TesseractTracker {
         if(minecraftServer == null)
             return null;
 
-        ResourceKey<Level> key = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(dimension));
+        ResourceKey<Level> key = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(dimension));
         Level level = TesseractChannelManager.minecraftServer.getLevel(key);
         BlockEntity entity = level.getBlockEntity(pos);
         return entity instanceof TesseractBlockEntity ? this.add((TesseractBlockEntity)entity) : null;
