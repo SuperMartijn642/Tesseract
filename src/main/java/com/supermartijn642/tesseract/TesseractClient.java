@@ -18,13 +18,6 @@ public class TesseractClient {
     }
 
     public static void openScreen(BlockPos pos){
-        ClientUtils.displayScreen(new WidgetScreen<TesseractScreen>(new TesseractScreen(ClientUtils.getWorld(), pos)) {
-            @Override
-            public void render(int mouseX, int mouseY, float partialTicks){
-                this.widget.offsetLeft = (this.width - this.widget.width()) / 2;
-                this.widget.offsetTop = (this.height - this.widget.height()) / 2;
-                super.render(mouseX, mouseY, partialTicks);
-            }
-        });
+        ClientUtils.displayScreen(WidgetScreen.of(new TesseractScreen(ClientUtils.getWorld(), pos)));
     }
 }

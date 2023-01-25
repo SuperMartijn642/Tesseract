@@ -58,8 +58,6 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
     private int selectedChannel = -1;
     private int scrollOffset = 0;
 
-    public int offsetLeft, offsetTop;
-
     public TesseractScreen(World level, BlockPos pos){
         super(0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, level, pos);
     }
@@ -188,7 +186,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         float width = 16, height = 16;
         float iconX = x + (28 - width) / 2f, iconY = (TesseractScreen.type == type ? 0 : 2) + (29 - height) / 2f;
 
-        ClientUtils.getItemRenderer().renderGuiItem(new ItemStack(type.item.get()), (int)(this.offsetLeft + iconX), (int)(this.offsetTop + iconY));
+        ClientUtils.getItemRenderer().renderGuiItem(new ItemStack(type.item.get()), (int)iconX, (int)iconY);
     }
 
     private void drawChannels(MatrixStack matrixStack, int mouseX, int mouseY, TesseractBlockEntity tile){
@@ -260,7 +258,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         // category
         ScreenUtils.drawString(matrixStack, TextComponents.string("Category:").italic().get(), 117, 80, 0xff666666);
         GlStateManager._pushMatrix();
-        GlStateManager._translated(this.offsetLeft + 115, this.offsetTop + 88, 0);
+        GlStateManager._translated(115, 88, 0);
         GlStateManager._scalef(0.8f, 0.8f, 1);
         ClientUtils.getItemRenderer().renderGuiItem(new ItemStack(type.item.get()), 0, 0);
         GlStateManager._popMatrix();
