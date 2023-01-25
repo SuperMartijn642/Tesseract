@@ -1,6 +1,5 @@
 package com.supermartijn642.tesseract;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.gui.WidgetScreen;
 import com.supermartijn642.core.registry.ClientRegistrationHandler;
@@ -19,13 +18,6 @@ public class TesseractClient {
     }
 
     public static void openScreen(BlockPos pos){
-        ClientUtils.displayScreen(new WidgetScreen<TesseractScreen>(new TesseractScreen(ClientUtils.getWorld(), pos)){
-            @Override
-            public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks){
-                this.widget.offsetLeft = (this.width - this.widget.width()) / 2;
-                this.widget.offsetTop = (this.height - this.widget.height()) / 2;
-                super.render(poseStack, mouseX, mouseY, partialTicks);
-            }
-        });
+        ClientUtils.displayScreen(WidgetScreen.of(new TesseractScreen(ClientUtils.getWorld(), pos)));
     }
 }
