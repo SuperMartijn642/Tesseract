@@ -10,12 +10,14 @@ import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.core.registry.RegistryEntryAcceptor;
 import com.supermartijn642.tesseract.generators.*;
+import com.supermartijn642.tesseract.integration.TesseractTheOneProbePlugin;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import com.supermartijn642.tesseract.packets.*;
 import com.supermartijn642.tesseract.recipe_conditions.TesseractRecipeCondition;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
@@ -66,5 +68,11 @@ public class Tesseract {
         handler.addGenerator(TesseractLootTableGenerator::new);
         handler.addGenerator(TesseractRecipeGenerator::new);
         handler.addGenerator(TesseractTagGenerator::new);
+    }
+
+    @Mod.EventHandler
+    public void preInit(FMLPreInitializationEvent e){
+        if(CommonUtils.isModLoaded("theoneprobe"))
+            TesseractTheOneProbePlugin.interModEnqueue();
     }
 }

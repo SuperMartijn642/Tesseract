@@ -59,7 +59,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     public boolean renderOn(){
-        return this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW);
+        return !this.isBlockedByRedstone();
     }
 
     @Override
@@ -113,13 +113,15 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     public boolean canSend(EnumChannelType type){
-        return this.transferState.get(type).canSend() &&
-            (this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW));
+        return this.transferState.get(type).canSend() && !this.isBlockedByRedstone();
     }
 
     public boolean canReceive(EnumChannelType type){
-        return this.transferState.get(type).canReceive() &&
-            (this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW));
+        return this.transferState.get(type).canReceive() && !this.isBlockedByRedstone();
+    }
+
+    public boolean isBlockedByRedstone(){
+        return this.redstoneState != RedstoneState.DISABLED && this.redstoneState == (this.redstone ? RedstoneState.LOW : RedstoneState.HIGH);
     }
 
     public int getChannelId(EnumChannelType type){
