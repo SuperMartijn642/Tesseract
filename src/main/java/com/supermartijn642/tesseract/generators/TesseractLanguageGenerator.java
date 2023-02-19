@@ -19,6 +19,13 @@ public class TesseractLanguageGenerator extends LanguageGenerator {
         this.block(Tesseract.tesseract, "Tesseract");
         this.translation("tesseract.tesseract.info", "Items, fluids, and energy can be transferred between multiple tesseracts");
 
+        // Highlight info
+        this.translation("tesseract.tesseract.highlight.channels", "Channels:");
+        this.translation("tesseract.tesseract.highlight.channel_info", "  %1$s %2$s %3$s");
+        this.translation("tesseract.tesseract.highlight.channel_info.separator", "-");
+        this.translation("tesseract.tesseract.highlight.channel_info.inactive", "Inactive");
+        this.translation("tesseract.tesseract.highlight.redstone_blocked", "Blocked by redstone signal");
+
         // Screen
         this.translation("gui.tesseract.title", "Tesseract");
         this.translation("gui.tesseract.items", "TESSERACT - ITEMS");
