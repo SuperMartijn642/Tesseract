@@ -1,6 +1,8 @@
 {
   "gui.tesseract.energy": "TESSERACT - ENERGY",
+  "tesseract.tesseract.highlight.channel_info.separator": "-",
   "gui.tesseract.items": "TESSERACT - ITEMS",
+  "tesseract.tesseract.highlight.channel_info.inactive": "Inactive",
   "gui.tesseract.title": "Tesseract",
   "gui.tesseract.unset": "Deactivate",
   "tesseract.block.tesseract": "Tesseract",
@@ -23,6 +25,9 @@
   "gui.tesseract.channel.private": "Private",
   "gui.tesseract.set": "Activate",
   "gui.tesseract.add.cancel": "Cancel",
+  "tesseract.tesseract.highlight.channel_info": "  %1$s %2$s %3$s",
+  "tesseract.tesseract.highlight.redstone_blocked": "Blocked by redstone signal",
+  "tesseract.tesseract.highlight.channels": "Channels:",
   "gui.tesseract.type.energy": "Energy",
   "gui.tesseract.info.narrate_page": "Page %s",
   "gui.tesseract.type.items": "Items",
