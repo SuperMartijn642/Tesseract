@@ -61,7 +61,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     public boolean renderOn(){
-        return this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW);
+        return !this.isBlockedByRedstone();
     }
 
     @Nonnull
@@ -98,9 +98,9 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         ArrayList<T> list = new ArrayList<>();
         for(Direction facing : Direction.values()){
             if(!this.capabilities.get(facing).containsKey(capability)){
-                TileEntity tile = this.level.getBlockEntity(this.worldPosition.relative(facing));
-                if(tile != null && !(tile instanceof TesseractBlockEntity))
-                    tile.getCapability(capability, facing.getOpposite()).ifPresent(
+                TileEntity entity = this.level.getBlockEntity(this.worldPosition.relative(facing));
+                if(entity != null && !(entity instanceof TesseractBlockEntity))
+                    entity.getCapability(capability, facing.getOpposite()).ifPresent(
                         object -> {
                             this.capabilities.get(facing).put(capability, object);
                             list.add(object);
@@ -113,13 +113,15 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     public boolean canSend(EnumChannelType type){
-        return this.transferState.get(type).canSend() &&
-            (this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW));
+        return this.transferState.get(type).canSend() && !this.isBlockedByRedstone();
     }
 
     public boolean canReceive(EnumChannelType type){
-        return this.transferState.get(type).canReceive() &&
-            (this.redstoneState == RedstoneState.DISABLED || this.redstoneState == (this.redstone ? RedstoneState.HIGH : RedstoneState.LOW));
+        return this.transferState.get(type).canReceive() && !this.isBlockedByRedstone();
+    }
+
+    public boolean isBlockedByRedstone(){
+        return this.redstoneState != RedstoneState.DISABLED && this.redstoneState == (this.redstone ? RedstoneState.LOW : RedstoneState.HIGH);
     }
 
     public int getChannelId(EnumChannelType type){
