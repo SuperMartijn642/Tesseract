@@ -9,6 +9,7 @@ import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.core.registry.RegistryEntryAcceptor;
 import com.supermartijn642.tesseract.generators.*;
+import com.supermartijn642.tesseract.integration.TesseractTheOneProbePlugin;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import com.supermartijn642.tesseract.packets.*;
@@ -17,6 +18,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
@@ -34,6 +36,7 @@ public class Tesseract {
     public Tesseract(){
         MinecraftForge.EVENT_BUS.register(TesseractTracker.class);
         MinecraftForge.EVENT_BUS.register(TesseractChannelManager.class);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(TesseractTheOneProbePlugin::interModEnqueue);
 
         TesseractConfig.init();
 
