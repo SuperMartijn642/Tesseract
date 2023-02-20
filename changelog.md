@@ -1,3 +1,7 @@
+### Tesseract 1.0.29
+- Added integration with Jade and The One Probe
+- Updated Russian translations (thanks to Big Energy!)
+
 ### Tesseract 1.0.28a
 - Fix rendering offsets inside the tesseract's gui
 
