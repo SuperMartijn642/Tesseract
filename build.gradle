@@ -39,7 +39,7 @@ dependencies {
 
     // Core library
 //    implementation fg.deobf("curse.maven:supermartijn642s-core-lib-454372:${project.core_library_file}")
-    implementation fg.deobf("com.supermartijn642:supermartijn642corelib:1.1.0-forge-mc1.19")
+    implementation fg.deobf("com.supermartijn642:supermartijn642corelib:1.1.2-forge-mc1.19")
     // Config library
     implementation fg.deobf("curse.maven:supermartijn642s-config-lib-438332:${project.config_library_file}")
 
@@ -49,6 +49,11 @@ dependencies {
     implementation fg.deobf("curse.maven:thermal-foundation-222880:${project.thermal_foundation_file}")
     // CoFH Core
     implementation fg.deobf("curse.maven:cofh-core-69162:${project.cofh_core_file}")
+
+    // Jade
+    implementation fg.deobf("curse.maven:jade-324717:${project.jade_file}")
+    // The One Probe
+    implementation fg.deobf("curse.maven:the-one-probe-245211:${project.the_one_probe_file}")
 
     // Just Enough Items
     runtimeOnly fg.deobf("curse.maven:jei-238222:${project.just_enough_items_file}")
