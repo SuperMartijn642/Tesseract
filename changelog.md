@@ -1,3 +1,10 @@
+### Tesseract 1.0.30
+- Significant performance improvements
+- Added confirmation screen when removing channels
+- Tesseract data will now be saved more frequently
+- Fixed player heads not rendering correct skins
+- Fixed being able to delete other players' channels
+
 ### Tesseract 1.0.29
 - Added integration with Jade and The One Probe
 - Updated Russian translations (thanks to Big Energy!)
