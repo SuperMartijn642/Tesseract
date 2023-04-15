@@ -3,7 +3,10 @@
   "conditions": [
     {
       "condition": {
-        "type": "tesseract:thermal_recipe"
+        "condition": {
+          "type": "tesseract:thermal_recipe"
+        },
+        "type": "supermartijn642corelib:not"
       },
       "type": "supermartijn642corelib:not"
     }
