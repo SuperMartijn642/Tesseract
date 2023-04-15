@@ -1,5 +1,6 @@
 package com.supermartijn642.tesseract.packets;
 
+import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.network.BasePacket;
 import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
@@ -36,6 +37,6 @@ public class PacketRemoveChannel implements BasePacket {
 
     @Override
     public void handle(PacketContext context){
-        TesseractChannelManager.CLIENT.removeChannel(this.type, this.id, context.getSendingPlayer());
+        TesseractChannelManager.CLIENT.removeChannel(this.type, this.id, ClientUtils.getPlayer());
     }
 }
