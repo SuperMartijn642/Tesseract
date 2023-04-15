@@ -1,12 +1,18 @@
 package com.supermartijn642.tesseract.manager;
 
 import com.supermartijn642.tesseract.EnumChannelType;
+import com.supermartijn642.tesseract.Tesseract;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 
-import java.io.File;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Created 4/22/2020 by SuperMartijn642
@@ -84,46 +90,47 @@ public class ChannelList {
         return this.channelsByCreator.getOrDefault(creator, Collections.emptyList());
     }
 
-    public void write(File folder){
+    public void write(Path folder){
         for(Channel channel : this.channels){
-            File file = new File(folder, "channel" + channel.id + ".nbt");
-            try{
-                CompressedStreamTools.write(channel.write(), file);
-            }catch(Exception exception){exception.printStackTrace();}
+            Path file = folder.resolve("channel" + channel.id + ".nbt");
+            try(DataOutputStream output = new DataOutputStream(Files.newOutputStream(file))){
+                CompressedStreamTools.write(channel.write(), output);
+            }catch(Exception e){e.printStackTrace();}
         }
         for(int id : this.removedIds){
-            File file = new File(folder, "channel" + id + ".nbt");
+            Path file = folder.resolve("channel" + id + ".nbt");
             try{
-                file.delete();
-            }catch(Exception exception){exception.printStackTrace();}
+                Files.delete(file);
+            }catch(Exception e){e.printStackTrace();}
         }
         this.removedIds.clear();
     }
 
-    public void read(File folder){
+    public void read(Path folder){
         this.channelId = 0;
 
-        if(!folder.exists())
+        if(!Files.exists(folder))
             return;
 
-        File[] files = folder.listFiles();
-        if(files == null || files.length == 0)
-            return;
-
-        for(File file : files){
-            String name = file.getName();
-            if(name.startsWith("channel") && name.endsWith(".nbt")){
-                try{
-                    int id = Integer.parseInt(name.substring("channel".length(), name.length() - ".nbt".length()));
-                    CompoundNBT compound = CompressedStreamTools.read(file);
-                    if(compound != null){
+        try(Stream<Path> files = Files.list(folder)){
+            files.forEach(file -> {
+                String name = file.getFileName().toString();
+                if(name.startsWith("channel") && name.endsWith(".nbt")){
+                    try{
+                        int id = Integer.parseInt(name.substring("channel".length(), name.length() - ".nbt".length()));
+                        CompoundNBT compound;
+                        try(DataInputStream input = new DataInputStream(Files.newInputStream(file))){
+                            compound = CompressedStreamTools.read(input);
+                        }
                         Channel channel = new Channel(id, this.type, compound);
                         if(channel.id >= this.channelId)
                             this.channelId = channel.id + 1;
                         this.add(channel);
-                    }
-                }catch(Exception exception){exception.printStackTrace();}
-            }
+                    }catch(Exception e){Tesseract.LOGGER.error("Failed to read channel from file '" + file + "'!", e);}
+                }
+            });
+        }catch(IOException e){
+            Tesseract.LOGGER.error("Failed to list files from '" + folder + "'!", e);
         }
     }
 

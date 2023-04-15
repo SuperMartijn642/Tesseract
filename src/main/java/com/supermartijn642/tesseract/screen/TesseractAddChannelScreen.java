@@ -42,7 +42,7 @@ public class TesseractAddChannelScreen extends BlockEntityBaseWidget<TesseractBl
     }
 
     @Override
-    protected void addWidgets(TesseractBlockEntity tile){
+    protected void addWidgets(TesseractBlockEntity entity){
         this.nameField = this.addWidget(new TextFieldWidget(7, 21, 107, 18, "", CHANNEL_MAX_CHARACTERS, this::checkChannelName));
         this.nameField.setSuggestion(ClientUtils.translate("gui.tesseract.add.suggestion"));
         this.addButton = this.addWidget(new TesseractButton(8, 43, 61, 14, TextComponents.translation("gui.tesseract.add.add").get(), this::addChannel));
@@ -53,17 +53,17 @@ public class TesseractAddChannelScreen extends BlockEntityBaseWidget<TesseractBl
         this.lockButton = this.addWidget(new LockButton(117, 20));
         this.lockButton.setLocked(true);
 
-        super.addWidgets(tile);
+        super.addWidgets(entity);
     }
 
     @Override
-    protected void render(int mouseX, int mouseY, TesseractBlockEntity tile){
+    protected void render(int mouseX, int mouseY, TesseractBlockEntity entity){
         ScreenUtils.bindTexture(BACKGROUND);
         ScreenUtils.drawTexture(0, 0, this.width(), this.height());
 
         ScreenUtils.drawCenteredString(TextComponents.translation("gui.tesseract.add.title." + this.type.name().toLowerCase(Locale.ROOT)).get(), 72, 6, 0xffffffff);
 
-        super.render(mouseX, mouseY, tile);
+        super.render(mouseX, mouseY, entity);
     }
 
     private boolean checkChannelName(String name){
