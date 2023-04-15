@@ -32,17 +32,18 @@ public class CombinedEnergyStorage implements IEnergyStorage {
 
         loop:
         for(TesseractReference location : this.channel.receivingTesseracts){
-            if(location.isValid() && location.canReceive(EnumChannelType.ENERGY)){
-                TesseractBlockEntity tile = location.getTesseract();
-                if(tile != this.requester){
-                    for(IEnergyStorage storage : tile.getSurroundingCapabilities(CapabilityEnergy.ENERGY)){
+            if(location.canBeAccessed() && location.canReceive(EnumChannelType.ENERGY)){
+                TesseractBlockEntity entity = location.getTesseract();
+                if(entity != this.requester){
+                    for(IEnergyStorage storage : entity.getSurroundingCapabilities(CapabilityEnergy.ENERGY)){
                         if(!storage.canReceive())
                             continue;
-                        int amount2 = storage.receiveEnergy(amount, simulate);
-                        if(amount2 > 0)
-                            amount -= amount2;
-                        if(amount <= 0)
-                            break loop;
+                        int received = storage.receiveEnergy(amount, simulate);
+                        if(received > 0){
+                            amount -= received;
+                            if(amount <= 0)
+                                break loop;
+                        }
                     }
                 }
             }
@@ -50,7 +51,7 @@ public class CombinedEnergyStorage implements IEnergyStorage {
 
         this.popRecurrentCall();
 
-        return maxReceive - amount;
+        return Math.max(0, maxReceive - amount);
     }
 
     @Override
@@ -65,17 +66,18 @@ public class CombinedEnergyStorage implements IEnergyStorage {
 
         loop:
         for(TesseractReference location : this.channel.sendingTesseracts){
-            if(location.isValid() && location.canSend(EnumChannelType.ENERGY)){
-                TesseractBlockEntity tile = location.getTesseract();
-                if(tile != this.requester){
-                    for(IEnergyStorage storage : tile.getSurroundingCapabilities(CapabilityEnergy.ENERGY)){
+            if(location.canBeAccessed() && location.canSend(EnumChannelType.ENERGY)){
+                TesseractBlockEntity entity = location.getTesseract();
+                if(entity != this.requester){
+                    for(IEnergyStorage storage : entity.getSurroundingCapabilities(CapabilityEnergy.ENERGY)){
                         if(!storage.canExtract())
                             continue;
-                        int amount2 = storage.extractEnergy(amount, simulate);
-                        if(amount2 > 0)
-                            amount -= amount2;
-                        if(amount <= 0)
-                            break loop;
+                        int extracted = storage.extractEnergy(amount, simulate);
+                        if(extracted > 0){
+                            amount -= extracted;
+                            if(amount <= 0)
+                                break loop;
+                        }
                     }
                 }
             }
@@ -83,7 +85,7 @@ public class CombinedEnergyStorage implements IEnergyStorage {
 
         this.popRecurrentCall();
 
-        return maxExtract - amount;
+        return Math.max(0, maxExtract - amount);
     }
 
     @Override
@@ -93,10 +95,10 @@ public class CombinedEnergyStorage implements IEnergyStorage {
 
         int amount = 0;
         for(TesseractReference location : this.channel.tesseracts){
-            if(location.isValid()){
-                TesseractBlockEntity tile = location.getTesseract();
-                if(tile != this.requester){
-                    for(IEnergyStorage storage : tile.getSurroundingCapabilities(CapabilityEnergy.ENERGY))
+            if(location.canBeAccessed()){
+                TesseractBlockEntity entity = location.getTesseract();
+                if(entity != this.requester){
+                    for(IEnergyStorage storage : entity.getSurroundingCapabilities(CapabilityEnergy.ENERGY))
                         amount += storage.getEnergyStored();
                 }
             }
@@ -114,10 +116,10 @@ public class CombinedEnergyStorage implements IEnergyStorage {
 
         int amount = 0;
         for(TesseractReference location : this.channel.tesseracts){
-            if(location.isValid()){
-                TesseractBlockEntity tile = location.getTesseract();
-                if(tile != this.requester){
-                    for(IEnergyStorage storage : tile.getSurroundingCapabilities(CapabilityEnergy.ENERGY))
+            if(location.canBeAccessed()){
+                TesseractBlockEntity entity = location.getTesseract();
+                if(entity != this.requester){
+                    for(IEnergyStorage storage : entity.getSurroundingCapabilities(CapabilityEnergy.ENERGY))
                         amount += storage.getMaxEnergyStored();
                 }
             }

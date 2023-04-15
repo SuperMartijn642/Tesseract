@@ -24,9 +24,9 @@ public class TransferButton extends CycleButton {
         super(x, y, 0);
     }
 
-    public void update(TesseractBlockEntity tile, EnumChannelType type){
-        this.state = tile.getTransferState(type);
-        this.pos = tile.getBlockPos();
+    public void update(TesseractBlockEntity entity, EnumChannelType type){
+        this.state = entity.getTransferState(type);
+        this.pos = entity.getBlockPos();
         this.type = type;
     }
 
