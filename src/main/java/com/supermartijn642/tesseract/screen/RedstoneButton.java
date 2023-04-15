@@ -22,9 +22,9 @@ public class RedstoneButton extends CycleButton {
         super(x, y, 60);
     }
 
-    public void update(TesseractBlockEntity tile){
-        this.state = tile.getRedstoneState();
-        this.pos = tile.getPos();
+    public void update(TesseractBlockEntity entity){
+        this.state = entity.getRedstoneState();
+        this.pos = entity.getPos();
     }
 
     @Override

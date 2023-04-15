@@ -2,7 +2,6 @@ package com.supermartijn642.tesseract;
 
 import com.supermartijn642.core.block.BaseBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
-import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import net.minecraft.nbt.NBTTagCompound;
@@ -23,8 +22,8 @@ import java.util.*;
 public class TesseractBlockEntity extends BaseBlockEntity {
 
     private TesseractReference reference;
-    private final EnumMap<EnumChannelType,Integer> channels = new EnumMap<>(EnumChannelType.class);
     private final EnumMap<EnumChannelType,TransferState> transferState = new EnumMap<>(EnumChannelType.class);
+    private final EnumMap<EnumChannelType,Object> capabilities = new EnumMap<>(EnumChannelType.class);
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
     /**
@@ -32,30 +31,30 @@ public class TesseractBlockEntity extends BaseBlockEntity {
      */
     public int recurrentCalls = 0;
 
-    private final Map<EnumFacing,Map<Capability<?>,Object>> capabilities = new HashMap<>();
+    private final Map<EnumFacing,Map<Capability<?>,Object>> surroundingCapabilities = new HashMap<>();
 
     public TesseractBlockEntity(){
         super(Tesseract.tesseract_tile);
-        for(EnumChannelType type : EnumChannelType.values()){
-            this.channels.put(type, -1);
+        for(EnumChannelType type : EnumChannelType.values())
             this.transferState.put(type, TransferState.BOTH);
-        }
         for(EnumFacing facing : EnumFacing.values())
-            this.capabilities.put(facing, new HashMap<>());
+            this.surroundingCapabilities.put(facing, new HashMap<>());
     }
 
-    public void setChannel(EnumChannelType type, int channel){
-        if(channel == this.channels.get(type))
-            return;
-        Channel oldChannel = this.getChannel(type);
-        this.channels.put(type, channel);
-        if(oldChannel != null)
-            oldChannel.removeTesseract(this.reference);
-        Channel newChannel = this.getChannel(type);
-        if(newChannel != null)
-            newChannel.addTesseract(this.reference);
-        this.updateReference();
-        this.dataChanged();
+    public TesseractReference getReference(){
+        if(this.reference == null)
+            this.reference = TesseractTracker.getInstance(this.world).add(this);
+        return this.reference;
+    }
+
+    public void invalidateReference(){
+        this.reference = null;
+    }
+
+    public void channelChanged(EnumChannelType type){
+        // Clear old capabilities
+        this.capabilities.remove(type);
+        this.notifyNeighbors();
     }
 
     public boolean renderOn(){
@@ -70,25 +69,29 @@ public class TesseractBlockEntity extends BaseBlockEntity {
             super.hasCapability(capability, facing);
     }
 
+    @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing){
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing side){
         if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
-            if(this.getChannel(EnumChannelType.ITEMS) == null)
-                return null;
-            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.getChannel(EnumChannelType.ITEMS).getItemHandler(this));
+            return (T)this.capabilities.computeIfAbsent(EnumChannelType.ITEMS, o -> {
+                Channel channel = this.getChannel(EnumChannelType.ITEMS);
+                return channel == null ? null : channel.getItemHandler(this);
+            });
         }
         if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY){
-            if(this.getChannel(EnumChannelType.FLUID) == null)
-                return null;
-            return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(this.getChannel(EnumChannelType.FLUID).getFluidHandler(this));
+            return (T)this.capabilities.computeIfAbsent(EnumChannelType.FLUID, o -> {
+                Channel channel = this.getChannel(EnumChannelType.FLUID);
+                return channel == null ? null : channel.getFluidHandler(this);
+            });
         }
         if(capability == CapabilityEnergy.ENERGY){
-            if(this.getChannel(EnumChannelType.ENERGY) == null)
-                return null;
-            return CapabilityEnergy.ENERGY.cast(this.getChannel(EnumChannelType.ENERGY).getEnergyStorage(this));
+            return (T)this.capabilities.computeIfAbsent(EnumChannelType.ENERGY, o -> {
+                Channel channel = this.getChannel(EnumChannelType.ENERGY);
+                return channel == null ? null : channel.getEnergyStorage(this);
+            });
         }
-        return super.getCapability(capability, facing);
+        return super.getCapability(capability, side);
     }
 
     public <T> List<T> getSurroundingCapabilities(Capability<T> capability){
@@ -97,17 +100,15 @@ public class TesseractBlockEntity extends BaseBlockEntity {
 
         ArrayList<T> list = new ArrayList<>();
         for(EnumFacing facing : EnumFacing.values()){
-            if(!this.capabilities.get(facing).containsKey(capability)){
+            Object object = this.surroundingCapabilities.get(facing).computeIfAbsent(capability, o -> {
                 TileEntity entity = this.world.getTileEntity(this.pos.offset(facing));
-                if(entity != null && !(entity instanceof TesseractBlockEntity)){
-                    T object = entity.getCapability(capability, facing.getOpposite());
-                    if(object != null){
-                        this.capabilities.get(facing).put(capability, object);
-                        list.add(object);
-                    }
-                }
-            }else
-                list.add((T)this.capabilities.get(facing).get(capability));
+                if(entity != null && !(entity instanceof TesseractBlockEntity))
+                    return entity.getCapability(capability, facing.getOpposite());
+                return null;
+            });
+            if(object != null)
+                //noinspection unchecked
+                list.add((T)object);
         }
         return list;
     }
@@ -125,7 +126,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     public int getChannelId(EnumChannelType type){
-        return this.channels.get(type);
+        return this.getReference().getChannelId(type);
     }
 
     public TransferState getTransferState(EnumChannelType type){
@@ -157,19 +158,30 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         }
     }
 
-    @Override
-    public void onLoad(){
-        if(!this.world.isRemote)
-            this.reference = TesseractTracker.SERVER.add(this);
+    private Channel getChannel(EnumChannelType type){
+        return this.getReference().getChannel(type);
+    }
+
+    public void onNeighborChanged(BlockPos neighbor){
+        EnumFacing facing = EnumFacing.getFacingFromVector(neighbor.getX() - this.pos.getX(), neighbor.getY() - this.pos.getY(), neighbor.getZ() - this.pos.getZ());
+        this.surroundingCapabilities.get(facing).clear();
+    }
+
+    private void notifyNeighbors(){
+        this.world.notifyNeighborsOfStateChange(this.pos, this.getBlockState().getBlock(), false);
+    }
+
+    private void updateReference(){
+        TesseractReference reference = this.getReference();
+        if(reference != null)
+            reference.update(this);
     }
 
     @Override
     protected NBTTagCompound writeData(){
         NBTTagCompound compound = new NBTTagCompound();
-        for(EnumChannelType type : EnumChannelType.values()){
-            compound.setInteger(type.name(), this.channels.get(type));
+        for(EnumChannelType type : EnumChannelType.values())
             compound.setString("transferState" + type.name(), this.transferState.get(type).name());
-        }
         compound.setString("redstoneState", this.redstoneState.name());
         compound.setBoolean("powered", this.redstone);
         return compound;
@@ -177,54 +189,17 @@ public class TesseractBlockEntity extends BaseBlockEntity {
 
     @Override
     protected void readData(NBTTagCompound compound){
-        for(EnumChannelType type : EnumChannelType.values()){
-            this.channels.put(type, compound.getInteger(type.name()));
+        for(EnumChannelType type : EnumChannelType.values())
             if(compound.hasKey("transferState" + type.name()))
                 this.transferState.put(type, TransferState.valueOf(compound.getString("transferState" + type.name())));
-        }
         if(compound.hasKey("redstoneState"))
             this.redstoneState = RedstoneState.valueOf(compound.getString("redstoneState"));
         if(compound.hasKey("powered"))
             this.redstone = compound.getBoolean("powered");
     }
 
-    private Channel getChannel(EnumChannelType type){
-        if(this.channels.get(type) < 0 || this.world == null)
-            return null;
-        Channel channel = TesseractChannelManager.getInstance(this.world).getChannelById(type, this.channels.get(type));
-        if(channel == null && !this.world.isRemote){
-            this.channels.put(type, -1);
-            this.updateReference();
-            this.dataChanged();
-        }
-        return channel;
-    }
-
-    public void onNeighborChanged(BlockPos neighbor){
-        EnumFacing facing = EnumFacing.getFacingFromVector(neighbor.getX() - this.pos.getX(), neighbor.getY() - this.pos.getY(), neighbor.getZ() - this.pos.getZ());
-        this.capabilities.get(facing).clear();
-    }
-
-    @Override
-    public void dataChanged(){
-        super.dataChanged();
-        this.world.notifyNeighborsOfStateChange(this.pos, this.blockType, false);
-    }
-
-    private void updateReference(){
-        // Mekanism seems to interact with the tile entity before #onLoad is called somehow, thus this check is needed
-        if(this.reference != null)
-            this.reference.update(this);
-    }
-
     public void onReplaced(){
-        if(this.world.isRemote){
-            for(EnumChannelType type : EnumChannelType.values()){
-                Channel channel = this.getChannel(type);
-                if(channel != null)
-                    channel.removeTesseract(this.reference);
-            }
+        if(!this.world.isRemote)
             TesseractTracker.SERVER.remove(this.world, this.pos);
-        }
     }
 }

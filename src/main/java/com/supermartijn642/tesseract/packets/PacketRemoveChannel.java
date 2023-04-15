@@ -36,6 +36,6 @@ public class PacketRemoveChannel implements BasePacket {
 
     @Override
     public void handle(PacketContext context){
-        TesseractChannelManager.CLIENT.removeChannel(this.type, this.id);
+        TesseractChannelManager.CLIENT.removeChannel(this.type, this.id, context.getSendingPlayer());
     }
 }

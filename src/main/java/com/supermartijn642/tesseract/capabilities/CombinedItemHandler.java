@@ -30,10 +30,10 @@ public class CombinedItemHandler implements IItemHandler {
 
         int slots = 0;
         for(TesseractReference reference : this.channel.tesseracts){
-            if(reference.isValid()){
-                TesseractBlockEntity tile = reference.getTesseract();
-                if(tile != this.requester){
-                    for(IItemHandler handler : tile.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY))
+            if(reference.canBeAccessed()){
+                TesseractBlockEntity entity = reference.getTesseract();
+                if(entity != this.requester){
+                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY))
                         slots += handler.getSlots();
                 }
             }
@@ -50,47 +50,17 @@ public class CombinedItemHandler implements IItemHandler {
         if(this.pushRecurrentCall())
             return ItemStack.EMPTY;
 
+        ItemStack stack = ItemStack.EMPTY;
         int slots = 0;
+        loop:
         for(TesseractReference reference : this.channel.tesseracts){
-            if(reference.isValid()){
-                TesseractBlockEntity tile = reference.getTesseract();
-                if(tile != this.requester){
-                    for(IItemHandler handler : tile.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+            if(reference.canBeAccessed()){
+                TesseractBlockEntity entity = reference.getTesseract();
+                if(entity != this.requester){
+                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
                         if(slot - slots < handler.getSlots()){
-                            ItemStack stack = handler.getStackInSlot(slot - slots);
-                            this.popRecurrentCall();
-                            return stack;
-                        }else
-                            slots += handler.getSlots();
-                    }
-                }
-            }
-        }
-
-        this.popRecurrentCall();
-
-        return ItemStack.EMPTY;
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate){
-        if(this.pushRecurrentCall())
-            return stack;
-
-        if(!this.requester.canSend(EnumChannelType.ITEMS) || stack.isEmpty())
-            return stack;
-
-        int slots = 0;
-        for(TesseractReference reference : this.channel.tesseracts){
-            if(reference.isValid()){
-                TesseractBlockEntity tile = reference.getTesseract();
-                if(tile != this.requester){
-                    for(IItemHandler handler : tile.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
-                        if(slot - slots < handler.getSlots()){
-                            ItemStack leftOver = reference.canReceive(EnumChannelType.ITEMS) ? handler.insertItem(slot - slots, stack, simulate) : stack;
-                            this.popRecurrentCall();
-                            return leftOver;
+                            stack = handler.getStackInSlot(slot - slots);
+                            break loop;
                         }else
                             slots += handler.getSlots();
                     }
@@ -105,6 +75,38 @@ public class CombinedItemHandler implements IItemHandler {
 
     @Nonnull
     @Override
+    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate){
+        if(this.pushRecurrentCall())
+            return stack;
+
+        if(!this.requester.canSend(EnumChannelType.ITEMS) || stack.isEmpty())
+            return stack;
+
+        ItemStack leftOver = stack;
+        int slots = 0;
+        loop:
+        for(TesseractReference reference : this.channel.tesseracts){
+            if(reference.canBeAccessed()){
+                TesseractBlockEntity entity = reference.getTesseract();
+                if(entity != this.requester){
+                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+                        if(slot - slots < handler.getSlots()){
+                            leftOver = reference.canReceive(EnumChannelType.ITEMS) ? handler.insertItem(slot - slots, stack, simulate) : stack;
+                            break loop;
+                        }else
+                            slots += handler.getSlots();
+                    }
+                }
+            }
+        }
+
+        this.popRecurrentCall();
+
+        return leftOver;
+    }
+
+    @Nonnull
+    @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate){
         if(this.pushRecurrentCall())
             return ItemStack.EMPTY;
@@ -112,16 +114,17 @@ public class CombinedItemHandler implements IItemHandler {
         if(!this.requester.canReceive(EnumChannelType.ITEMS) || amount <= 0)
             return ItemStack.EMPTY;
 
+        ItemStack stack = ItemStack.EMPTY;
         int slots = 0;
+        loop:
         for(TesseractReference reference : this.channel.tesseracts){
-            if(reference.isValid()){
-                TesseractBlockEntity tile = reference.getTesseract();
-                if(tile != this.requester){
-                    for(IItemHandler handler : tile.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+            if(reference.canBeAccessed()){
+                TesseractBlockEntity entity = reference.getTesseract();
+                if(entity != this.requester){
+                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
                         if(slot - slots < handler.getSlots()){
-                            ItemStack stack = reference.canSend(EnumChannelType.ITEMS) ? handler.extractItem(slot - slots, amount, simulate) : ItemStack.EMPTY;
-                            this.popRecurrentCall();
-                            return stack;
+                            stack = reference.canSend(EnumChannelType.ITEMS) ? handler.extractItem(slot - slots, amount, simulate) : ItemStack.EMPTY;
+                            break loop;
                         }else
                             slots += handler.getSlots();
                     }
@@ -131,7 +134,7 @@ public class CombinedItemHandler implements IItemHandler {
 
         this.popRecurrentCall();
 
-        return ItemStack.EMPTY;
+        return stack;
     }
 
     @Override
@@ -139,16 +142,17 @@ public class CombinedItemHandler implements IItemHandler {
         if(this.pushRecurrentCall())
             return 0;
 
+        int limit = 0;
         int slots = 0;
+        loop:
         for(TesseractReference reference : this.channel.tesseracts){
-            if(reference.isValid()){
-                TesseractBlockEntity tile = reference.getTesseract();
-                if(tile != this.requester){
-                    for(IItemHandler handler : tile.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+            if(reference.canBeAccessed()){
+                TesseractBlockEntity entity = reference.getTesseract();
+                if(entity != this.requester){
+                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
                         if(slot - slots < handler.getSlots()){
-                            int limit = handler.getSlotLimit(slot - slots);
-                            this.popRecurrentCall();
-                            return limit;
+                            limit = handler.getSlotLimit(slot - slots);
+                            break loop;
                         }else
                             slots += handler.getSlots();
                     }
@@ -158,7 +162,7 @@ public class CombinedItemHandler implements IItemHandler {
 
         this.popRecurrentCall();
 
-        return 0;
+        return limit;
     }
 
     @Override
@@ -166,16 +170,17 @@ public class CombinedItemHandler implements IItemHandler {
         if(this.pushRecurrentCall())
             return false;
 
+        boolean valid = false;
         int slots = 0;
+        loop:
         for(TesseractReference reference : this.channel.tesseracts){
-            if(reference.isValid()){
-                TesseractBlockEntity tile = reference.getTesseract();
-                if(tile != this.requester){
-                    for(IItemHandler handler : tile.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+            if(reference.canBeAccessed()){
+                TesseractBlockEntity entity = reference.getTesseract();
+                if(entity != this.requester){
+                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
                         if(slot - slots < handler.getSlots()){
-                            boolean valid = handler.isItemValid(slot - slots, stack);
-                            this.popRecurrentCall();
-                            return valid;
+                            valid = handler.isItemValid(slot - slots, stack);
+                            break loop;
                         }else
                             slots += handler.getSlots();
                     }
@@ -185,7 +190,7 @@ public class CombinedItemHandler implements IItemHandler {
 
         this.popRecurrentCall();
 
-        return false;
+        return valid;
     }
 
     /**
