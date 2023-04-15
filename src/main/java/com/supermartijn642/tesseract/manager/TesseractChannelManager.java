@@ -50,7 +50,7 @@ public class TesseractChannelManager {
 
     public void removeChannel(EnumChannelType type, int id, EntityPlayer remover){
         Channel channel = this.getChannelById(type, id);
-        if(channel != null && (channel.creator.equals(remover.getUniqueID()) || remover.canUseCommand(2, ""))){
+        if(channel != null && (this == CLIENT || channel.creator.equals(remover.getUniqueID()) || remover.canUseCommand(2, ""))){
             this.types.putIfAbsent(type, new ChannelList(type));
             this.types.get(type).remove(id);
             this.sendRemoveChannelPacket(type, id);

@@ -100,7 +100,7 @@ public class ChannelList {
         for(int id : this.removedIds){
             Path file = folder.resolve("channel" + id + ".nbt");
             try{
-                Files.delete(file);
+                Files.deleteIfExists(file);
             }catch(Exception e){e.printStackTrace();}
         }
         this.removedIds.clear();
