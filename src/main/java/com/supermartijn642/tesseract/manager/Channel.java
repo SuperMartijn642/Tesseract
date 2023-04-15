@@ -55,7 +55,7 @@ public class Channel {
             if(tesseract.canReceive(this.type))
                 this.receivingTesseracts.add(tesseract);
             if(tesseract.getChannelId(this.type) != this.id)
-                tesseract.getTesseract().setChannel(this.type, this.id);
+                tesseract.setChannel(this.type, this.id);
         }
     }
 
@@ -110,7 +110,7 @@ public class Channel {
                 CompoundNBT compound2 = tesseractCompound.getCompound(key);
                 int dimension = compound2.getInt("dim");
                 BlockPos pos = new BlockPos(compound2.getInt("posx"), compound2.getInt("posy"), compound2.getInt("posz"));
-                TesseractReference reference = TesseractTracker.SERVER.tryAdd(dimension, pos);
+                TesseractReference reference = TesseractTracker.SERVER.getReference(dimension, pos);
                 if(reference != null)
                     this.addTesseract(reference);
             }
@@ -155,7 +155,6 @@ public class Channel {
 
     public void delete(){
         for(TesseractReference location : this.tesseracts)
-            if(location.isValid())
-                location.getTesseract().setChannel(this.type, -1);
+            location.setChannel(this.type, -1);
     }
 }

@@ -1,60 +1,79 @@
 package com.supermartijn642.tesseract.manager;
 
+import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
+import com.supermartijn642.tesseract.packets.PacketAddTesseractReferences;
+import com.supermartijn642.tesseract.packets.PacketRemoveTesseractReferences;
 import io.netty.util.collection.IntObjectHashMap;
 import io.netty.util.collection.IntObjectMap;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import java.io.File;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created 12/16/2020 by SuperMartijn642
  */
 public class TesseractTracker {
 
-    public static MinecraftServer minecraftServer;
-
     public static final TesseractTracker SERVER = new TesseractTracker();
-//    public static final TesseractTracker CLIENT = new TesseractTracker();
+    public static final TesseractTracker CLIENT = new TesseractTracker();
 
-    public static TesseractTracker getInstance(World world){
-        return world.isClientSide ? null /*CLIENT*/ : SERVER;
+    private static long referenceIndexCounter = 0;
+
+    public static TesseractTracker getInstance(World level){
+        return level.isClientSide ? CLIENT : SERVER;
+    }
+
+    public static void registerListeners(){
+        MinecraftForge.EVENT_BUS.addListener(TesseractTracker::onTick);
     }
 
     private final IntObjectMap<HashMap<BlockPos,TesseractReference>> tesseracts = new IntObjectHashMap<>();
-    private final Set<TesseractReference> toBeRemoved = new HashSet<>();
+    private final Set<TesseractReference> dirtyReferences = new HashSet<>();
+    private final Set<TesseractReference> removedReferences = new HashSet<>();
+    private final Set<TesseractReference> referencesToBeSaved = new HashSet<>();
+    private final Set<Long> referencesToBeUnsaved = new HashSet<>();
 
     public TesseractReference add(TesseractBlockEntity self){
-        int dimension = self.getLevel().dimension.getType().getId();
-        this.tesseracts.putIfAbsent(dimension, new HashMap<>());
-        return this.tesseracts.get(dimension).computeIfAbsent(self.getBlockPos(), key -> new TesseractReference(self));
+        int dimension = self.getLevel().getDimension().getType().getId();
+        BlockPos pos = self.getBlockPos();
+        TesseractReference reference = this.getReference(dimension, pos);
+        if(reference != null)
+            return reference;
+        // Create a new reference
+        reference = new TesseractReference(referenceIndexCounter++, self);
+        if(this == SERVER)
+            this.markDirty(reference);
+        this.tesseracts.computeIfAbsent(dimension, o -> new HashMap<>()).put(pos, reference);
+        return reference;
     }
 
-    @Deprecated
-    public TesseractReference tryAdd(int dimension, BlockPos pos){
-        if(minecraftServer == null)
-            return null;
+    public void add(TesseractReference reference){
+        if(this == CLIENT){
+            int dimension = reference.getDimension();
+            BlockPos pos = reference.getPos();
+            TesseractReference oldReference = this.tesseracts.computeIfAbsent(dimension, o -> new HashMap<>()).put(pos, reference);
+            if(oldReference != null && oldReference != reference && oldReference.canBeAccessed())
+                oldReference.getTesseract().invalidateReference();
+        }
+    }
 
-        DimensionType type = DimensionType.getById(dimension);
-        World level = DimensionManager.getWorld(minecraftServer, type, false, true);
-        TileEntity entity = level.getBlockEntity(pos);
-        return entity instanceof TesseractBlockEntity ? this.add((TesseractBlockEntity)entity) : null;
+    public TesseractReference getReference(int dimension, BlockPos pos){
+        return this.tesseracts.containsKey(dimension) ? this.tesseracts.get(dimension).get(pos) : null;
     }
 
     public void remove(World level, BlockPos pos){
@@ -63,21 +82,39 @@ public class TesseractTracker {
     }
 
     public void remove(int dimension, BlockPos pos){
-        this.tesseracts.putIfAbsent(dimension, new HashMap<>());
-        TesseractReference reference = this.tesseracts.get(dimension).get(pos);
-        if(reference != null)
-            this.toBeRemoved.add(reference);
+        if(this == SERVER){
+            TesseractReference reference = this.getReference(dimension, pos);
+            if(reference != null){
+                reference.delete();
+                this.tesseracts.get(dimension).remove(pos);
+                this.removedReferences.add(reference);
+                this.dirtyReferences.remove(reference);
+                this.referencesToBeUnsaved.add(reference.getSaveIndex());
+                this.referencesToBeSaved.remove(reference);
+            }
+        }else if(this.tesseracts.containsKey(dimension))
+            this.tesseracts.get(dimension).remove(pos);
     }
 
-    private void removeAndUpdate(TesseractReference reference){
-        reference.delete();
-        this.tesseracts.putIfAbsent(reference.getDimension(), new HashMap<>());
-        this.tesseracts.get(reference.getDimension()).remove(reference.getPos());
+    void markDirty(TesseractReference reference){
+        this.dirtyReferences.add(reference);
+        this.referencesToBeSaved.add(reference);
     }
 
-    public TesseractReference get(World level, BlockPos pos){
-        int dimension = level.dimension.getType().getId();
-        return this.tesseracts.putIfAbsent(dimension, new HashMap<>()).get(pos);
+    public static void onTick(TickEvent.WorldTickEvent e){
+        if(e.world.isClientSide || e.phase != TickEvent.Phase.END || e.world.getDimension().getType() != DimensionType.OVERWORLD)
+            return;
+
+        // Handle dirty references
+        if(!SERVER.dirtyReferences.isEmpty()){
+            Tesseract.CHANNEL.sendToAllPlayers(new PacketAddTesseractReferences(SERVER.dirtyReferences));
+            SERVER.dirtyReferences.clear();
+        }
+        // Handle removed references
+        if(!SERVER.removedReferences.isEmpty()){
+            Tesseract.CHANNEL.sendToAllPlayers(new PacketRemoveTesseractReferences(SERVER.removedReferences));
+            SERVER.removedReferences.clear();
+        }
     }
 
     public CompoundNBT writeKey(TesseractReference reference){
@@ -92,64 +129,73 @@ public class TesseractTracker {
     public TesseractReference fromKey(CompoundNBT key){
         int dimension = key.getInt("dimension");
         BlockPos pos = new BlockPos(key.getInt("posx"), key.getInt("posy"), key.getInt("posz"));
-        return this.tesseracts.containsKey(dimension) ?
-            this.tesseracts.get(dimension).get(pos) : null;
+        return this.getReference(dimension, pos);
     }
 
-    @SubscribeEvent
-    public static void onSave(WorldEvent.Save e){
-        if(e.getWorld().isClientSide() || e.getWorld().getDimension().getType() != DimensionType.OVERWORLD)
+    public static void saveReferences(Path saveDirectory){
+        Path directory = saveDirectory.resolve("tesseract/tracking");
+        try{
+            Files.createDirectories(directory);
+        }catch(IOException e){
+            Tesseract.LOGGER.error("Failed to create tesseract reference save directory!", e);
             return;
+        }
 
-        File directory = new File(((ServerWorld)e.getWorld()).getLevelStorage().getFolder(), "tesseract/tracking");
-        int index = 0;
-        for(Map.Entry<Integer,HashMap<BlockPos,TesseractReference>> dimensionEntry : SERVER.tesseracts.entrySet()){
-            for(Map.Entry<BlockPos,TesseractReference> entry : dimensionEntry.getValue().entrySet()){
-                File file = new File(directory, "tesseract" + index++ + ".nbt");
-                try{
-                    file.getParentFile().mkdirs();
-                    file.createNewFile();
-                    CompressedStreamTools.write(entry.getValue().write(), file);
-                }catch(IOException ioException){
-                    ioException.printStackTrace();
-                }
+        for(TesseractReference reference : SERVER.referencesToBeSaved){
+            Path file = directory.resolve("tesseract" + reference.getSaveIndex() + ".nbt");
+            try(DataOutputStream output = new DataOutputStream(Files.newOutputStream(file))){
+                CompressedStreamTools.write(reference.write(), output);
+            }catch(IOException e){
+                Tesseract.LOGGER.error("Failed to save tesseract reference file '" + file + "'!", e);
             }
         }
+        for(Long index : SERVER.referencesToBeUnsaved){
+            Path file = directory.resolve("tesseract" + index + ".nbt");
+            try{
+                Files.deleteIfExists(file);
+            }catch(IOException e){
+                Tesseract.LOGGER.error("Failed to remove tesseract reference file '" + file + "'!", e);
+            }
+        }
+        SERVER.referencesToBeSaved.clear();
+        SERVER.referencesToBeUnsaved.clear();
     }
 
-    @SubscribeEvent
-    public static void onLoad(WorldEvent.Load e){
-        if(e.getWorld().isClientSide() || e.getWorld().getDimension().getType() != DimensionType.OVERWORLD)
-            return;
-
-        minecraftServer = ((ServerWorld)e.getWorld()).getServer();
-
+    public static void loadReferences(Path saveDirectory){
         SERVER.tesseracts.clear();
+        SERVER.dirtyReferences.clear();
+        SERVER.removedReferences.clear();
+        SERVER.referencesToBeSaved.clear();
+        SERVER.referencesToBeUnsaved.clear();
+        referenceIndexCounter = 0;
 
-        File directory = new File(((ServerWorld)e.getWorld()).getLevelStorage().getFolder(), "tesseract/tracking");
-        File[] files = directory.listFiles();
-        if(files != null){
-            for(File file : directory.listFiles()){
-                if(file.isFile() && file.getName().endsWith(".nbt")){
+        Path directory = saveDirectory.resolve("tesseract/tracking");
+        try(Stream<Path> files = Files.list(directory)){
+            files.forEach(file -> {
+                if(Files.isRegularFile(file) && file.getFileName().startsWith("tesseract") && file.getFileName().endsWith(".nbt")){
                     try{
-                        CompoundNBT tag = CompressedStreamTools.read(file);
-                        TesseractReference location = new TesseractReference(tag);
-                        SERVER.tesseracts.putIfAbsent(location.getDimension(), new HashMap<>());
-                        SERVER.tesseracts.get(location.getDimension()).put(location.getPos(), location);
-                    }catch(IOException ioException){
-                        ioException.printStackTrace();
+                        long index = Long.parseLong(file.getFileName().toString().substring("tesseract".length(), file.getFileName().toString().length() - ".nbt".length()));
+                        if(index > referenceIndexCounter)
+                            referenceIndexCounter = index + 1;
+                        CompoundNBT tag;
+                        try(DataInputStream input = new DataInputStream(Files.newInputStream(file))){
+                            tag = CompressedStreamTools.read(input);
+                        }
+                        TesseractReference reference = new TesseractReference(index, tag, false);
+                        SERVER.tesseracts.putIfAbsent(reference.getDimension(), new HashMap<>());
+                        SERVER.tesseracts.get(reference.getDimension()).put(reference.getPos(), reference);
+                    }catch(IOException exception){
+                        Tesseract.LOGGER.error("Failed to read tesseract data from file '~/tesseract/tracking/" + file.getFileName() + "':", exception);
                     }
                 }
-            }
+            });
+        }catch(IOException e){
+            Tesseract.LOGGER.error("Failed to load tesseract references!", e);
         }
     }
 
-    @SubscribeEvent
-    public static void onTick(TickEvent.WorldTickEvent e){
-        if(e.world.isClientSide || e.phase != TickEvent.Phase.END || e.world.getDimension().getType() != DimensionType.OVERWORLD)
-            return;
-
-        SERVER.toBeRemoved.forEach(SERVER::removeAndUpdate);
-        SERVER.toBeRemoved.clear();
+    public static void sendReferences(PlayerEntity player){
+        Collection<TesseractReference> references = SERVER.tesseracts.values().stream().map(Map::values).flatMap(Collection::stream).collect(Collectors.toList());
+        Tesseract.CHANNEL.sendToPlayer(player, new PacketAddTesseractReferences(references));
     }
 }

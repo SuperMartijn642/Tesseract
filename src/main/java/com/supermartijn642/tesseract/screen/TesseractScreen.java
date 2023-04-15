@@ -12,9 +12,9 @@ import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import com.supermartijn642.tesseract.packets.PacketScreenRemoveChannel;
 import com.supermartijn642.tesseract.packets.PacketScreenSetChannel;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -41,8 +41,8 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
     private static final ResourceLocation ENERGY_ICON = new ResourceLocation("tesseract", "textures/gui/energy_tab_icon.png");
     private static final ResourceLocation FLUID_ICON = new ResourceLocation("tesseract", "textures/gui/fluid_tab_icon.png");
     private static final ResourceLocation SCROLL_BUTTONS = new ResourceLocation("minecraft", "textures/gui/server_selection.png");
-    private static final ResourceLocation LOCK_ON = new ResourceLocation("tesseract", "textures/gui/lock_on.png");
-    private static final ResourceLocation LOCK_OFF = new ResourceLocation("tesseract", "textures/gui/lock_off.png");
+    public static final ResourceLocation LOCK_ON = new ResourceLocation("tesseract", "textures/gui/lock_on.png");
+    public static final ResourceLocation LOCK_OFF = new ResourceLocation("tesseract", "textures/gui/lock_off.png");
     private static final ResourceLocation REDSTONE_TAB = new ResourceLocation("tesseract", "textures/gui/redstone_tab.png");
     private static final ResourceLocation SIDE_TAB = new ResourceLocation("tesseract", "textures/gui/side_tab_new.png");
     private static final ResourceLocation CHECKMARK = new ResourceLocation("tesseract", "textures/gui/checkmark_icon.png");
@@ -79,13 +79,13 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         this.setButton.active = false;
 
         // remove button
-        this.removeButton = this.addWidget(new TesseractButton(180, 185, 61, 18, TextComponents.translation("gui.tesseract.remove").get(), () -> {
-            Tesseract.CHANNEL.sendToServer(new PacketScreenRemoveChannel(type, this.selectedChannel));
-            this.selectedChannel = -1;
-            this.setButton.active = false;
-            this.setButton.setText(TextComponents.translation("gui.tesseract.set").get());
-            this.removeButton.active = false;
-        }));
+        this.removeButton = this.addWidget(new TesseractButton(180, 185, 61, 18, TextComponents.translation("gui.tesseract.remove").get(),
+            () -> {
+                Channel channel = TesseractChannelManager.CLIENT.getChannelById(type, this.selectedChannel);
+                if(channel != null && (channel.creator.equals(ClientUtils.getPlayer().getUUID()) || (ClientUtils.getPlayer().hasPermissions(2)) && Screen.hasShiftDown()))
+                    ClientUtils.displayScreen(WidgetScreen.of(new TesseractRemoveChannelScreen(this.blockEntityLevel, this.blockEntityPos, type, this.selectedChannel)));
+            }
+        ));
         this.removeButton.setRedBackground();
         this.removeButton.active = false;
 
@@ -189,7 +189,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         ClientUtils.getItemRenderer().renderGuiItem(new ItemStack(type.item.get()), (int)iconX, (int)iconY);
     }
 
-    private void drawChannels(MatrixStack matrixStack, int mouseX, int mouseY, TesseractBlockEntity tile){
+    private void drawChannels(MatrixStack matrixStack, int mouseX, int mouseY, TesseractBlockEntity entity){
         ScreenUtils.bindTexture(CHANNEL_BACKGROUND);
         GlStateManager._enableAlphaTest();
         ScreenUtils.drawTexture(matrixStack, 3, 31, 102, 156, 0, 0, 102 / 256f, 157 / 256f);
@@ -203,7 +203,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
             Channel channel = channels.get(i + this.scrollOffset);
 
             // background
-            if(tile.getChannelId(type) == channel.id)
+            if(entity.getChannelId(type) == channel.id)
                 ScreenUtils.fillRect(matrixStack, x, y, 102, channelHeight, 0x69007050);
             if(this.selectedChannel == channel.id){
                 ScreenUtils.fillRect(matrixStack, x, y, 102, 1, 0xffffffff);
@@ -219,7 +219,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
 
             // channel name and icons
             x += 2;
-            if(tile.getChannelId(type) == channel.id){
+            if(entity.getChannelId(type) == channel.id){
                 ScreenUtils.bindTexture(CHECKMARK);
                 ScreenUtils.drawTexture(matrixStack, x, y + 2, 9, 9);
                 x += 12;
