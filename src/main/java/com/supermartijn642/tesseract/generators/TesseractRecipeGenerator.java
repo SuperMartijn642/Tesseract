@@ -24,7 +24,7 @@ public class TesseractRecipeGenerator extends RecipeGenerator {
             .input('A', Tags.Items.OBSIDIAN)
             .input('B', Tags.Items.ENDER_PEARLS)
             .input('C', Tags.Items.STORAGE_BLOCKS_DIAMOND);
-//            .notCondition(new TesseractRecipeCondition());
+//            .notCondition(new TesseractRecipeCondition().negate());
 
         // Thermal Expansion recipe // TODO re-enable this once thermal expansion is updated
 //        this.shaped("thermal", Tesseract.tesseract)
