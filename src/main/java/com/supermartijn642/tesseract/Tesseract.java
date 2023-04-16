@@ -56,7 +56,7 @@ public class Tesseract implements ModInitializer {
         RegistrationHandler handler = RegistrationHandler.get("tesseract");
         handler.registerBlock("tesseract", TesseractBlock::new);
         handler.registerBlockEntityType("tesseract_tile", () -> BaseBlockEntityType.create(TesseractBlockEntity::new, tesseract));
-        handler.registerItem("tesseract", () -> new BaseBlockItem(tesseract, ItemProperties.create().group(CreativeItemGroup.getDecoration())));
+        handler.registerItem("tesseract", () -> new BaseBlockItem(tesseract, ItemProperties.create().group(CreativeItemGroup.getFunctionalBlocks())));
         // Api providers
         handler.registerBlockEntityTypeCallback(helper -> TesseractBlockApiProviders.register());
     }

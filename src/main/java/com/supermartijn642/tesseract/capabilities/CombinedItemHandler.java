@@ -98,7 +98,7 @@ public class CombinedItemHandler implements Storage<ItemVariant> {
     }
 
     @Override
-    public Iterator<? extends StorageView<ItemVariant>> iterator(TransactionContext transaction){
+    public Iterator<StorageView<ItemVariant>> iterator(){
         Iterator<TesseractReference> tesseracts = this.channel.tesseracts.iterator();
         return new FlatMapIterator<>(new FlatMapIterator<>(tesseracts, reference -> {
             if(reference.canBeAccessed()){
@@ -107,7 +107,7 @@ public class CombinedItemHandler implements Storage<ItemVariant> {
                     return entity.getSurroundingCapabilities(ItemStorage.SIDED).iterator();
             }
             return Collections.emptyIterator();
-        }), storage -> storage.iterator(transaction));
+        }), Storage::iterator);
     }
 
     /**
