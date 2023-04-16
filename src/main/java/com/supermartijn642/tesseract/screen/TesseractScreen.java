@@ -186,7 +186,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         float width = 16, height = 16;
         float iconX = x + (28 - width) / 2f, iconY = (TesseractScreen.type == type ? 0 : 2) + (29 - height) / 2f;
 
-        ClientUtils.getItemRenderer().renderGuiItem(new ItemStack(type.item.get()), (int)iconX, (int)iconY);
+        ClientUtils.getItemRenderer().renderGuiItem(matrixStack, new ItemStack(type.item.get()), (int)iconX, (int)iconY);
     }
 
     private void drawChannels(PoseStack matrixStack, int mouseX, int mouseY, TesseractBlockEntity entity){
@@ -258,7 +258,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         RenderSystem.getModelViewStack().pushPose();
         RenderSystem.getModelViewStack().translate(115, 88, 0);
         RenderSystem.getModelViewStack().scale(0.8f, 0.8f, 1);
-        ClientUtils.getItemRenderer().renderGuiItem(new ItemStack(type.item.get()), 0, 0);
+        ClientUtils.getItemRenderer().renderGuiItem(matrixStack, new ItemStack(type.item.get()), 0, 0);
         RenderSystem.getModelViewStack().popPose();
         RenderSystem.applyModelViewMatrix();
         ScreenUtils.drawString(matrixStack, channel.type.getTranslation(), 129, 91, ScreenUtils.ACTIVE_TEXT_COLOR);
