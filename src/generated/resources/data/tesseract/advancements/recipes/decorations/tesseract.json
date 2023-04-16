@@ -1,15 +1,4 @@
 {
-  "conditions": [
-    {
-      "condition": {
-        "condition": {
-          "type": "tesseract:thermal_recipe"
-        },
-        "type": "supermartijn642corelib:not"
-      },
-      "type": "supermartijn642corelib:not"
-    }
-  ],
   "parent": "minecraft:recipes/root",
   "display": {
     "icon": {

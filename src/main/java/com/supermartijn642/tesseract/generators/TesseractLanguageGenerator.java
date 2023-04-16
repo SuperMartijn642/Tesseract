@@ -68,5 +68,8 @@ public class TesseractLanguageGenerator extends LanguageGenerator {
         this.translation("gui.tesseract.info.tab.items", "Item Transport");
         this.translation("gui.tesseract.info.tab.fluid", "Fluid Transport");
         this.translation("gui.tesseract.info.tab.energy", "Energy Transport");
+
+        // Jade
+        this.translation("config.jade.plugin_tesseract.tesseract_component", "Tesseract info");
     }
 }

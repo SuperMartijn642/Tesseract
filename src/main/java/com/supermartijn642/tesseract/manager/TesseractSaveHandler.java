@@ -2,12 +2,13 @@ package com.supermartijn642.tesseract.manager;
 
 import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.tesseract.TesseractConfig;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.world.WorldEvent;
 
 import java.nio.file.Path;
 
@@ -19,24 +20,20 @@ public class TesseractSaveHandler {
     private static long lastSaveTime = 0;
 
     public static void registerListeners(){
-        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::onJoin);
-        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::tick);
-        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::save);
-        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::load);
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> onJoin(handler.getPlayer()));
+        ServerTickEvents.END_SERVER_TICK.register(TesseractSaveHandler::tick);
+        ServerWorldEvents.LOAD.register(TesseractSaveHandler::load);
     }
 
-    private static void onJoin(PlayerEvent.PlayerLoggedInEvent e){
-        if(e.getEntity().getCommandSenderWorld().isClientSide)
+    private static void onJoin(Player player){
+        if(player.getCommandSenderWorld().isClientSide)
             return;
 
-        TesseractTracker.sendReferences(e.getPlayer());
-        TesseractChannelManager.sendChannels(e.getPlayer());
+        TesseractTracker.sendReferences(player);
+        TesseractChannelManager.sendChannels(player);
     }
 
-    private static void tick(TickEvent.WorldTickEvent e){
-        if(e.world.isClientSide || e.phase != TickEvent.Phase.END || e.world.dimension() != Level.OVERWORLD)
-            return;
-
+    private static void tick(MinecraftServer server){
         if(System.currentTimeMillis() - lastSaveTime >= TesseractConfig.saveInterval.get() * 60000){
             Path saveDirectory = CommonUtils.getServer().getWorldPath(LevelResource.ROOT);
             TesseractTracker.saveReferences(saveDirectory);
@@ -45,8 +42,8 @@ public class TesseractSaveHandler {
         }
     }
 
-    private static void save(WorldEvent.Save e){
-        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof Level) || ((Level)e.getWorld()).dimension() != Level.OVERWORLD)
+    public static void save(Level level){
+        if(level.isClientSide() || level.dimension() != Level.OVERWORLD)
             return;
 
         Path saveDirectory = CommonUtils.getServer().getWorldPath(LevelResource.ROOT);
@@ -55,8 +52,8 @@ public class TesseractSaveHandler {
         lastSaveTime = System.currentTimeMillis();
     }
 
-    private static void load(WorldEvent.Load e){
-        if(e.getWorld().isClientSide() || !(e.getWorld() instanceof Level) || ((Level)e.getWorld()).dimension() != Level.OVERWORLD)
+    private static void load(MinecraftServer server, Level level){
+        if(level.isClientSide() || level.dimension() != Level.OVERWORLD)
             return;
 
         Path saveDirectory = CommonUtils.getServer().getWorldPath(LevelResource.ROOT);

@@ -4,13 +4,13 @@ import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.packets.PacketAddTesseractReferences;
 import com.supermartijn642.tesseract.packets.PacketRemoveTesseractReferences;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -36,7 +36,7 @@ public class TesseractTracker {
     }
 
     public static void registerListeners(){
-        MinecraftForge.EVENT_BUS.addListener(TesseractTracker::onTick);
+        ServerTickEvents.END_SERVER_TICK.register(TesseractTracker::onTick);
     }
 
     private final HashMap<String,HashMap<BlockPos,TesseractReference>> tesseracts = new HashMap<>();
@@ -98,10 +98,7 @@ public class TesseractTracker {
         this.referencesToBeSaved.add(reference);
     }
 
-    public static void onTick(TickEvent.WorldTickEvent e){
-        if(e.world.isClientSide || e.phase != TickEvent.Phase.END || e.world.dimension() != Level.OVERWORLD)
-            return;
-
+    public static void onTick(MinecraftServer server){
         // Handle dirty references
         if(!SERVER.dirtyReferences.isEmpty()){
             Tesseract.CHANNEL.sendToAllPlayers(new PacketAddTesseractReferences(SERVER.dirtyReferences));

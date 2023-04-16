@@ -1,36 +1,22 @@
 {
-  "type": "supermartijn642corelib:conditional",
-  "conditions": [
-    {
-      "condition": {
-        "condition": {
-          "type": "tesseract:thermal_recipe"
-        },
-        "type": "supermartijn642corelib:not"
-      },
-      "type": "supermartijn642corelib:not"
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ABA",
+    "BCB",
+    "ABA"
   ],
-  "recipe": {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-      "ABA",
-      "BCB",
-      "ABA"
-    ],
-    "key": {
-      "A": {
-        "tag": "forge:obsidian"
-      },
-      "B": {
-        "tag": "forge:ender_pearls"
-      },
-      "C": {
-        "tag": "forge:storage_blocks/diamond"
-      }
+  "key": {
+    "A": {
+      "item": "minecraft:obsidian"
     },
-    "result": {
-      "item": "tesseract:tesseract"
+    "B": {
+      "item": "minecraft:ender_pearl"
+    },
+    "C": {
+      "item": "minecraft:diamond_block"
     }
+  },
+  "result": {
+    "item": "tesseract:tesseract"
   }
 }

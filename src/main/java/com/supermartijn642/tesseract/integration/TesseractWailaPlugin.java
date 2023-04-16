@@ -6,27 +6,27 @@ import com.supermartijn642.tesseract.TesseractBlock;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import mcp.mobius.waila.api.*;
-import mcp.mobius.waila.api.config.IPluginConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import snownee.jade.api.*;
+import snownee.jade.api.config.IPluginConfig;
 
 /**
  * Created 1/26/2021 by SuperMartijn642
  */
 @WailaPlugin("tesseract")
-public class TesseractWailaPlugin implements IComponentProvider, IWailaPlugin {
+public class TesseractWailaPlugin implements IBlockComponentProvider, IWailaPlugin {
+
+    @Override
+    public ResourceLocation getUid(){
+        return new ResourceLocation("tesseract", "tesseract_component");
+    }
 
     @Override
     public void registerClient(IWailaClientRegistration registration){
-        registration.registerComponentProvider(this, TooltipPosition.BODY, TesseractBlock.class);
-        registration.registerComponentProvider((tooltip, accessor, pluginConfig) -> {
-            // Prevent Jade from showing the energy and fluid capability data
-            tooltip.remove(new ResourceLocation("fe"));
-            tooltip.remove(new ResourceLocation("fluid"));
-        }, TooltipPosition.TAIL, TesseractBlock.class);
+        registration.registerBlockComponent(this, TesseractBlock.class);
     }
 
     @Override

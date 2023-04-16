@@ -4,16 +4,20 @@ import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
-import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.Iterator;
 
 /**
- * Created 3/20/2020 by SuperMartijn642
+ * Created 16/04/2023 by SuperMartijn642
  */
-public class CombinedFluidHandler implements IFluidHandler {
+@SuppressWarnings("UnstableApiUsage")
+public class CombinedFluidHandler implements Storage<FluidVariant> {
 
     private final Channel channel;
     private final TesseractBlockEntity requester;
@@ -24,212 +28,28 @@ public class CombinedFluidHandler implements IFluidHandler {
     }
 
     @Override
-    public int getTanks(){
+    public boolean supportsInsertion(){
+        return this.requester.canSend(EnumChannelType.ITEMS);
+    }
+
+    @Override
+    public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction){
         if(this.pushRecurrentCall())
             return 0;
 
-        int tanks = 0;
-        for(TesseractReference location : this.channel.tesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY))
-                        tanks += Math.max(handler.getTanks(), 0);
-                }
-            }
-        }
-
-        this.popRecurrentCall();
-
-        return tanks;
-    }
-
-    @Nonnull
-    @Override
-    public FluidStack getFluidInTank(int tank){
-        if(this.pushRecurrentCall())
-            return FluidStack.EMPTY;
-
-        FluidStack stack = FluidStack.EMPTY;
-        int tanks = 0;
-        loop:
-        for(TesseractReference location : this.channel.tesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
-                        if(tank - tanks < handler.getTanks()){
-                            stack = handler.getFluidInTank(tank - tanks);
-                            break loop;
-                        }else
-                            tanks += Math.max(handler.getTanks(), 0);
-                    }
-                }
-            }
-        }
-
-        this.popRecurrentCall();
-
-        return stack;
-    }
-
-    @Override
-    public int getTankCapacity(int tank){
-        if(this.pushRecurrentCall())
+        if(!this.requester.canSend(EnumChannelType.ITEMS) || resource.isBlank())
             return 0;
 
-        int capacity = 0;
-        int tanks = 0;
+        long leftOver = maxAmount;
         loop:
-        for(TesseractReference location : this.channel.tesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
+        for(TesseractReference reference : this.channel.receivingTesseracts){
+            if(reference.canBeAccessed()){
+                TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
-                        if(tank - tanks < handler.getTanks()){
-                            capacity = handler.getTankCapacity(tank - tanks);
-                            break loop;
-                        }else
-                            tanks += Math.max(handler.getTanks(), 0);
-                    }
-                }
-            }
-        }
-
-        this.popRecurrentCall();
-
-        return 0;
-    }
-
-    @Override
-    public boolean isFluidValid(int tank, @Nonnull FluidStack stack){
-        if(this.pushRecurrentCall())
-            return false;
-
-        boolean valid = false;
-        int tanks = 0;
-        loop:
-        for(TesseractReference location : this.channel.tesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
-                        if(tank - tanks < handler.getTanks()){
-                            valid = handler.isFluidValid(tank - tanks, stack);
-                            break loop;
-                        }else
-                            tanks += Math.max(handler.getTanks(), 0);
-                    }
-                }
-            }
-        }
-
-        this.popRecurrentCall();
-
-        return false;
-    }
-
-    @Override
-    public int fill(FluidStack resource, FluidAction action){
-        if(this.pushRecurrentCall())
-            return 0;
-
-        if(!this.requester.canSend(EnumChannelType.FLUID) || resource.isEmpty())
-            return 0;
-
-        FluidStack fluid = resource.copy();
-        int amount = 0;
-
-        loop:
-        for(TesseractReference location : this.channel.receivingTesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
-                        amount += handler.fill(fluid, action);
-                        if(amount >= resource.getAmount())
-                            break loop;
-                        fluid.setAmount(resource.getAmount() - amount);
-                    }
-                }
-            }
-        }
-
-        this.popRecurrentCall();
-
-        return amount;
-    }
-
-    @Nonnull
-    @Override
-    public FluidStack drain(FluidStack resource, FluidAction action){
-        if(this.pushRecurrentCall())
-            return FluidStack.EMPTY;
-
-        if(!this.requester.canReceive(EnumChannelType.FLUID) || resource == null || resource.isEmpty())
-            return FluidStack.EMPTY;
-
-        FluidStack fluid = resource.copy();
-
-        loop:
-        for(TesseractReference location : this.channel.sendingTesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
-                        FluidStack stack = handler.drain(fluid.copy(), FluidAction.SIMULATE);
-                        if(!stack.isEmpty() && resource.isFluidEqual(stack)){
-                            if(action.execute())
-                                handler.drain(fluid.copy(), FluidAction.EXECUTE);
-                            fluid.setAmount(fluid.getAmount() - stack.getAmount());
-                        }
-                        if(fluid.isEmpty())
-                            break loop;
-                    }
-                }
-            }
-        }
-
-        this.popRecurrentCall();
-
-        if(fluid.getAmount() == resource.getAmount())
-            return FluidStack.EMPTY;
-
-        fluid.setAmount(resource.getAmount() - fluid.getAmount());
-        return fluid;
-    }
-
-    @Nonnull
-    @Override
-    public FluidStack drain(int maxDrain, FluidAction action){
-        if(this.pushRecurrentCall())
-            return FluidStack.EMPTY;
-
-        if(!this.requester.canReceive(EnumChannelType.FLUID) || maxDrain <= 0)
-            return FluidStack.EMPTY;
-
-        FluidStack fluid = null;
-
-        loop:
-        for(TesseractReference location : this.channel.sendingTesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
-                        if(fluid == null){
-                            fluid = handler.drain(maxDrain, action);
-                            if(fluid.isEmpty())
-                                fluid = null;
-                            else
-                                fluid.setAmount(maxDrain - fluid.getAmount());
-                        }else{
-                            FluidStack stack = handler.drain(fluid.copy(), FluidAction.SIMULATE);
-                            if(!stack.isEmpty() && fluid.isFluidEqual(stack)){
-                                if(action.execute())
-                                    handler.drain(fluid.copy(), FluidAction.EXECUTE);
-                                fluid.setAmount(fluid.getAmount() - stack.getAmount());
-                            }
-                            if(fluid.isEmpty())
+                    for(Storage<FluidVariant> handler : entity.getSurroundingCapabilities(FluidStorage.SIDED)){
+                        if(handler.supportsInsertion()){
+                            leftOver -= handler.insert(resource, leftOver, transaction);
+                            if(leftOver <= 0)
                                 break loop;
                         }
                     }
@@ -239,11 +59,55 @@ public class CombinedFluidHandler implements IFluidHandler {
 
         this.popRecurrentCall();
 
-        if(fluid == null)
-            return FluidStack.EMPTY;
+        return maxAmount - leftOver;
+    }
 
-        fluid.setAmount(maxDrain - fluid.getAmount());
-        return fluid;
+    @Override
+    public boolean supportsExtraction(){
+        return this.requester.canReceive(EnumChannelType.ITEMS);
+    }
+
+    @Override
+    public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction){
+        if(this.pushRecurrentCall())
+            return 0;
+
+        if(!this.requester.canReceive(EnumChannelType.ITEMS) || resource.isBlank())
+            return 0;
+
+        long leftOver = maxAmount;
+        loop:
+        for(TesseractReference reference : this.channel.sendingTesseracts){
+            if(reference.canBeAccessed()){
+                TesseractBlockEntity entity = reference.getTesseract();
+                if(entity != this.requester){
+                    for(Storage<FluidVariant> handler : entity.getSurroundingCapabilities(FluidStorage.SIDED)){
+                        if(handler.supportsExtraction()){
+                            leftOver -= handler.extract(resource, leftOver, transaction);
+                            if(leftOver <= 0)
+                                break loop;
+                        }
+                    }
+                }
+            }
+        }
+
+        this.popRecurrentCall();
+
+        return maxAmount - leftOver;
+    }
+
+    @Override
+    public Iterator<? extends StorageView<FluidVariant>> iterator(TransactionContext transaction){
+        Iterator<TesseractReference> tesseracts = this.channel.tesseracts.iterator();
+        return new FlatMapIterator<>(new FlatMapIterator<>(tesseracts, reference -> {
+            if(reference.canBeAccessed()){
+                TesseractBlockEntity entity = reference.getTesseract();
+                if(entity != this.requester)
+                    return entity.getSurroundingCapabilities(FluidStorage.SIDED).iterator();
+            }
+            return Collections.emptyIterator();
+        }), storage -> storage.iterator(transaction));
     }
 
     /**

@@ -4,16 +4,20 @@ import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
-import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.Iterator;
 
 /**
- * Created 3/20/2020 by SuperMartijn642
+ * Created 16/04/2023 by SuperMartijn642
  */
-public class CombinedItemHandler implements IItemHandler {
+@SuppressWarnings("UnstableApiUsage")
+public class CombinedItemHandler implements Storage<ItemVariant> {
 
     private final Channel channel;
     private final TesseractBlockEntity requester;
@@ -24,45 +28,30 @@ public class CombinedItemHandler implements IItemHandler {
     }
 
     @Override
-    public int getSlots(){
+    public boolean supportsInsertion(){
+        return this.requester.canSend(EnumChannelType.ITEMS);
+    }
+
+    @Override
+    public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction){
         if(this.pushRecurrentCall())
             return 0;
 
-        int slots = 0;
-        for(TesseractReference reference : this.channel.tesseracts){
-            if(reference.canBeAccessed()){
-                TesseractBlockEntity entity = reference.getTesseract();
-                if(entity != this.requester){
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY))
-                        slots += handler.getSlots();
-                }
-            }
-        }
+        if(!this.requester.canSend(EnumChannelType.ITEMS) || resource.isBlank())
+            return 0;
 
-        this.popRecurrentCall();
-
-        return slots;
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack getStackInSlot(int slot){
-        if(this.pushRecurrentCall())
-            return ItemStack.EMPTY;
-
-        ItemStack stack = ItemStack.EMPTY;
-        int slots = 0;
+        long leftOver = maxAmount;
         loop:
-        for(TesseractReference reference : this.channel.tesseracts){
+        for(TesseractReference reference : this.channel.receivingTesseracts){
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
-                        if(slot - slots < handler.getSlots()){
-                            stack = handler.getStackInSlot(slot - slots);
-                            break loop;
-                        }else
-                            slots += handler.getSlots();
+                    for(Storage<ItemVariant> handler : entity.getSurroundingCapabilities(ItemStorage.SIDED)){
+                        if(handler.supportsInsertion()){
+                            leftOver -= handler.insert(resource, leftOver, transaction);
+                            if(leftOver <= 0)
+                                break loop;
+                        }
                     }
                 }
             }
@@ -70,91 +59,34 @@ public class CombinedItemHandler implements IItemHandler {
 
         this.popRecurrentCall();
 
-        return stack;
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate){
-        if(this.pushRecurrentCall())
-            return stack;
-
-        if(!this.requester.canSend(EnumChannelType.ITEMS) || stack.isEmpty())
-            return stack;
-
-        ItemStack leftOver = stack;
-        int slots = 0;
-        loop:
-        for(TesseractReference reference : this.channel.tesseracts){
-            if(reference.canBeAccessed()){
-                TesseractBlockEntity entity = reference.getTesseract();
-                if(entity != this.requester){
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
-                        if(slot - slots < handler.getSlots()){
-                            leftOver = reference.canReceive(EnumChannelType.ITEMS) ? handler.insertItem(slot - slots, stack, simulate) : stack;
-                            break loop;
-                        }else
-                            slots += handler.getSlots();
-                    }
-                }
-            }
-        }
-
-        this.popRecurrentCall();
-
-        return leftOver;
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate){
-        if(this.pushRecurrentCall())
-            return ItemStack.EMPTY;
-
-        if(!this.requester.canReceive(EnumChannelType.ITEMS) || amount <= 0)
-            return ItemStack.EMPTY;
-
-        ItemStack stack = ItemStack.EMPTY;
-        int slots = 0;
-        loop:
-        for(TesseractReference reference : this.channel.tesseracts){
-            if(reference.canBeAccessed()){
-                TesseractBlockEntity entity = reference.getTesseract();
-                if(entity != this.requester){
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
-                        if(slot - slots < handler.getSlots()){
-                            stack = reference.canSend(EnumChannelType.ITEMS) ? handler.extractItem(slot - slots, amount, simulate) : ItemStack.EMPTY;
-                            break loop;
-                        }else
-                            slots += handler.getSlots();
-                    }
-                }
-            }
-        }
-
-        this.popRecurrentCall();
-
-        return stack;
+        return maxAmount - leftOver;
     }
 
     @Override
-    public int getSlotLimit(int slot){
+    public boolean supportsExtraction(){
+        return this.requester.canReceive(EnumChannelType.ITEMS);
+    }
+
+    @Override
+    public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction){
         if(this.pushRecurrentCall())
             return 0;
 
-        int limit = 0;
-        int slots = 0;
+        if(!this.requester.canReceive(EnumChannelType.ITEMS) || resource.isBlank())
+            return 0;
+
+        long leftOver = maxAmount;
         loop:
-        for(TesseractReference reference : this.channel.tesseracts){
+        for(TesseractReference reference : this.channel.sendingTesseracts){
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
-                        if(slot - slots < handler.getSlots()){
-                            limit = handler.getSlotLimit(slot - slots);
-                            break loop;
-                        }else
-                            slots += handler.getSlots();
+                    for(Storage<ItemVariant> handler : entity.getSurroundingCapabilities(ItemStorage.SIDED)){
+                        if(handler.supportsExtraction()){
+                            leftOver -= handler.extract(resource, leftOver, transaction);
+                            if(leftOver <= 0)
+                                break loop;
+                        }
                     }
                 }
             }
@@ -162,35 +94,20 @@ public class CombinedItemHandler implements IItemHandler {
 
         this.popRecurrentCall();
 
-        return limit;
+        return maxAmount - leftOver;
     }
 
     @Override
-    public boolean isItemValid(int slot, @Nonnull ItemStack stack){
-        if(this.pushRecurrentCall())
-            return false;
-
-        boolean valid = false;
-        int slots = 0;
-        loop:
-        for(TesseractReference reference : this.channel.tesseracts){
+    public Iterator<? extends StorageView<ItemVariant>> iterator(TransactionContext transaction){
+        Iterator<TesseractReference> tesseracts = this.channel.tesseracts.iterator();
+        return new FlatMapIterator<>(new FlatMapIterator<>(tesseracts, reference -> {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
-                if(entity != this.requester){
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
-                        if(slot - slots < handler.getSlots()){
-                            valid = handler.isItemValid(slot - slots, stack);
-                            break loop;
-                        }else
-                            slots += handler.getSlots();
-                    }
-                }
+                if(entity != this.requester)
+                    return entity.getSurroundingCapabilities(ItemStorage.SIDED).iterator();
             }
-        }
-
-        this.popRecurrentCall();
-
-        return valid;
+            return Collections.emptyIterator();
+        }), storage -> storage.iterator(transaction));
     }
 
     /**
