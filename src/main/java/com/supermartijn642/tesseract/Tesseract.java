@@ -18,8 +18,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
@@ -34,7 +34,7 @@ public class Tesseract {
     @RegistryEntryAcceptor(namespace = "tesseract", identifier = "tesseract_tile", registry = RegistryEntryAcceptor.Registry.BLOCK_ENTITY_TYPES)
     public static BaseBlockEntityType<TesseractBlockEntity> tesseract_tile;
 
-    public static final Logger LOGGER = LoggerFactory.getLogger("tesseract");
+    public static final Logger LOGGER = LogManager.getLogger("tesseract");
 
     public Tesseract(){
         TesseractTracker.registerListeners();
