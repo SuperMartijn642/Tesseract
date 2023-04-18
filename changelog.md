@@ -1,3 +1,6 @@
+### Tesseract 1.0.30a
+- Fixed crash on startup
+
 ### Tesseract 1.0.30
 - Significant performance improvements
 - Added confirmation screen when removing channels
