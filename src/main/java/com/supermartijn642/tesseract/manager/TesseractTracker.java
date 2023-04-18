@@ -172,26 +172,30 @@ public class TesseractTracker {
         Path directory = saveDirectory.resolve("tesseract/tracking");
         try(Stream<Path> files = Files.list(directory)){
             files.forEach(file -> {
-                if(Files.isRegularFile(file) && file.getFileName().startsWith("tesseract") && file.getFileName().endsWith(".nbt")){
-                    try{
-                        long index = Long.parseLong(file.getFileName().toString().substring("tesseract".length(), file.getFileName().toString().length() - ".nbt".length()));
-                        if(index > referenceIndexCounter)
-                            referenceIndexCounter = index + 1;
-                        CompoundNBT tag;
-                        try(DataInputStream input = new DataInputStream(Files.newInputStream(file))){
-                            tag = CompressedStreamTools.read(input);
+                if(Files.isRegularFile(file)){
+                    String fileName = file.getFileName().toString();
+                    if(fileName.startsWith("tesseract") && fileName.endsWith(".nbt")){
+                        try{
+                            long index = Long.parseLong(file.getFileName().toString().substring("tesseract".length(), file.getFileName().toString().length() - ".nbt".length()));
+                            if(index > referenceIndexCounter)
+                                referenceIndexCounter = index + 1;
+                            CompoundNBT tag;
+                            try(DataInputStream input = new DataInputStream(Files.newInputStream(file))){
+                                tag = CompressedStreamTools.read(input);
+                            }
+                            TesseractReference reference = new TesseractReference(index, tag, false);
+                            SERVER.tesseracts.putIfAbsent(reference.getDimension(), new HashMap<>());
+                            SERVER.tesseracts.get(reference.getDimension()).put(reference.getPos(), reference);
+                        }catch(IOException exception){
+                            Tesseract.LOGGER.error("Failed to read tesseract data from file '~/tesseract/tracking/" + file.getFileName() + "':", exception);
                         }
-                        TesseractReference reference = new TesseractReference(index, tag, false);
-                        SERVER.tesseracts.putIfAbsent(reference.getDimension(), new HashMap<>());
-                        SERVER.tesseracts.get(reference.getDimension()).put(reference.getPos(), reference);
-                    }catch(IOException exception){
-                        Tesseract.LOGGER.error("Failed to read tesseract data from file '~/tesseract/tracking/" + file.getFileName() + "':", exception);
                     }
                 }
             });
         }catch(IOException e){
             Tesseract.LOGGER.error("Failed to load tesseract references!", e);
         }
+        System.out.println("Loaded " + SERVER.tesseracts.values().stream().map(Map::values).mapToLong(Collection::size).sum() + " tesseract references!");
     }
 
     public static void sendReferences(PlayerEntity player){
