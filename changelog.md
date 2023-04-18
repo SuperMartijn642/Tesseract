@@ -1,3 +1,6 @@
+### Tesseract 1.0.31
+- Fixed tesseract save data loading
+
 ### Tesseract 1.0.30a
 - Fixed tesseract recipe conditions
 
