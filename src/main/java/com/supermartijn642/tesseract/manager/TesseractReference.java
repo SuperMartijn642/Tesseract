@@ -126,8 +126,12 @@ public class TesseractReference {
         if(this.channels.get(type) < 0)
             return null;
         Channel channel = TesseractChannelManager.getInstance(this.isClientSide).getChannelById(type, this.channels.get(type));
-        if(channel == null && !this.isClientSide)
-            this.setChannel(type, -1);
+        if(channel == null && !this.isClientSide){
+            this.channels.put(type, -1);
+            this.markDirty();
+            if(this.canBeAccessed())
+                this.getTesseract().channelChanged(type);
+        }
         return channel;
     }
 
