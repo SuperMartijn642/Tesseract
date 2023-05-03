@@ -44,7 +44,7 @@ public class TesseractTracker {
 
     private final IntObjectMap<HashMap<BlockPos,TesseractReference>> tesseracts = new IntObjectHashMap<>();
     private final Set<TesseractReference> dirtyReferences = new HashSet<>();
-    private final Set<TesseractReference> removedReferences = new HashSet<>();
+    private final Set<TesseractReference> referencesToBeRemoved = new HashSet<>();
     private final Set<TesseractReference> referencesToBeSaved = new HashSet<>();
     private final Set<Long> referencesToBeUnsaved = new HashSet<>();
 
@@ -84,14 +84,8 @@ public class TesseractTracker {
     public void remove(int dimension, BlockPos pos){
         if(this == SERVER){
             TesseractReference reference = this.getReference(dimension, pos);
-            if(reference != null){
-                reference.delete();
-                this.tesseracts.get(dimension).remove(pos);
-                this.removedReferences.add(reference);
-                this.dirtyReferences.remove(reference);
-                this.referencesToBeUnsaved.add(reference.getSaveIndex());
-                this.referencesToBeSaved.remove(reference);
-            }
+            if(reference != null)
+                this.referencesToBeRemoved.add(reference);
         }else if(this.tesseracts.containsKey(dimension))
             this.tesseracts.get(dimension).remove(pos);
     }
@@ -106,15 +100,22 @@ public class TesseractTracker {
         if(e.world.isRemote || e.phase != TickEvent.Phase.END || e.world.provider.getDimension() != 0)
             return;
 
+        // Handle removed references
+        if(!SERVER.referencesToBeRemoved.isEmpty()){
+            for(TesseractReference reference : SERVER.referencesToBeRemoved){
+                reference.delete();
+                SERVER.tesseracts.get(reference.getDimension()).remove(reference.getPos());
+                SERVER.dirtyReferences.remove(reference);
+                SERVER.referencesToBeUnsaved.add(reference.getSaveIndex());
+                SERVER.referencesToBeSaved.remove(reference);
+            }
+            Tesseract.CHANNEL.sendToAllPlayers(new PacketRemoveTesseractReferences(SERVER.referencesToBeRemoved));
+            SERVER.referencesToBeRemoved.clear();
+        }
         // Handle dirty references
         if(!SERVER.dirtyReferences.isEmpty()){
             Tesseract.CHANNEL.sendToAllPlayers(new PacketAddTesseractReferences(SERVER.dirtyReferences));
             SERVER.dirtyReferences.clear();
-        }
-        // Handle removed references
-        if(!SERVER.removedReferences.isEmpty()){
-            Tesseract.CHANNEL.sendToAllPlayers(new PacketRemoveTesseractReferences(SERVER.removedReferences));
-            SERVER.removedReferences.clear();
         }
     }
 
@@ -165,7 +166,7 @@ public class TesseractTracker {
     public static void loadReferences(Path saveDirectory){
         SERVER.tesseracts.clear();
         SERVER.dirtyReferences.clear();
-        SERVER.removedReferences.clear();
+        SERVER.referencesToBeRemoved.clear();
         SERVER.referencesToBeSaved.clear();
         SERVER.referencesToBeUnsaved.clear();
         referenceIndexCounter = 0;
