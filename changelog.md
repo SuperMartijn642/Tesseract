@@ -1,3 +1,6 @@
+### Tesseract 1.0.33
+- Fixed rare crash when invalid tesseract references are removed
+
 ### Tesseract 1.0.32a
 - Fixed missing atlas entries for the tesseract's textures
 
