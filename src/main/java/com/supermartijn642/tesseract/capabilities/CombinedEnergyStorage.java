@@ -25,8 +25,10 @@ public class CombinedEnergyStorage implements IEnergyStorage {
         if(this.pushRecurrentCall())
             return 0;
 
-        if(!this.requester.canSend(EnumChannelType.ENERGY) || maxReceive <= 0)
+        if(!this.requester.canSend(EnumChannelType.ENERGY) || maxReceive <= 0){
+            this.popRecurrentCall();
             return 0;
+        }
 
         int amount = maxReceive;
 
@@ -59,8 +61,10 @@ public class CombinedEnergyStorage implements IEnergyStorage {
         if(this.pushRecurrentCall())
             return 0;
 
-        if(!this.requester.canReceive(EnumChannelType.ENERGY) || maxExtract <= 0)
+        if(!this.requester.canReceive(EnumChannelType.ENERGY) || maxExtract <= 0){
+            this.popRecurrentCall();
             return 0;
+        }
 
         int amount = maxExtract;
 
