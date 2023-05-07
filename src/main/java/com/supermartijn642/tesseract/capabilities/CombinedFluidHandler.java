@@ -62,8 +62,10 @@ public class CombinedFluidHandler implements IFluidHandler {
         if(this.pushRecurrentCall())
             return 0;
 
-        if(!this.requester.canSend(EnumChannelType.FLUID) || resource == null || resource.amount <= 0)
+        if(!this.requester.canSend(EnumChannelType.FLUID) || resource == null || resource.amount <= 0){
+            this.popRecurrentCall();
             return 0;
+        }
 
         FluidStack fluid = resource.copy();
         int amount = 0;
@@ -93,8 +95,10 @@ public class CombinedFluidHandler implements IFluidHandler {
         if(this.pushRecurrentCall())
             return null;
 
-        if(!this.requester.canReceive(EnumChannelType.FLUID) || resource == null || resource.amount <= 0)
+        if(!this.requester.canReceive(EnumChannelType.FLUID) || resource == null || resource.amount <= 0){
+            this.popRecurrentCall();
             return null;
+        }
 
         FluidStack fluid = resource.copy();
 
@@ -131,8 +135,10 @@ public class CombinedFluidHandler implements IFluidHandler {
         if(this.pushRecurrentCall())
             return null;
 
-        if(!this.requester.canReceive(EnumChannelType.FLUID) || maxDrain <= 0)
+        if(!this.requester.canReceive(EnumChannelType.FLUID) || maxDrain <= 0){
+            this.popRecurrentCall();
             return null;
+        }
 
         FluidStack fluid = null;
 
