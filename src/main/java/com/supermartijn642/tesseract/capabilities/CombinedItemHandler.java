@@ -79,8 +79,10 @@ public class CombinedItemHandler implements IItemHandler {
         if(this.pushRecurrentCall())
             return stack;
 
-        if(!this.requester.canSend(EnumChannelType.ITEMS) || stack.isEmpty())
+        if(!this.requester.canSend(EnumChannelType.ITEMS) || stack.isEmpty()){
+            this.popRecurrentCall();
             return stack;
+        }
 
         ItemStack leftOver = stack;
         int slots = 0;
@@ -111,8 +113,10 @@ public class CombinedItemHandler implements IItemHandler {
         if(this.pushRecurrentCall())
             return ItemStack.EMPTY;
 
-        if(!this.requester.canReceive(EnumChannelType.ITEMS) || amount <= 0)
+        if(!this.requester.canReceive(EnumChannelType.ITEMS) || amount <= 0){
+            this.popRecurrentCall();
             return ItemStack.EMPTY;
+        }
 
         ItemStack stack = ItemStack.EMPTY;
         int slots = 0;
