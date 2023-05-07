@@ -98,7 +98,7 @@ public class CombinedFluidHandler implements IFluidHandler {
 
         this.popRecurrentCall();
 
-        return 0;
+        return capacity;
     }
 
     @Override
@@ -126,7 +126,7 @@ public class CombinedFluidHandler implements IFluidHandler {
 
         this.popRecurrentCall();
 
-        return false;
+        return valid;
     }
 
     @Override
@@ -134,8 +134,10 @@ public class CombinedFluidHandler implements IFluidHandler {
         if(this.pushRecurrentCall())
             return 0;
 
-        if(!this.requester.canSend(EnumChannelType.FLUID) || resource.isEmpty())
+        if(!this.requester.canSend(EnumChannelType.FLUID) || resource.isEmpty()){
+            this.popRecurrentCall();
             return 0;
+        }
 
         FluidStack fluid = resource.copy();
         int amount = 0;
@@ -166,8 +168,10 @@ public class CombinedFluidHandler implements IFluidHandler {
         if(this.pushRecurrentCall())
             return FluidStack.EMPTY;
 
-        if(!this.requester.canReceive(EnumChannelType.FLUID) || resource == null || resource.isEmpty())
+        if(!this.requester.canReceive(EnumChannelType.FLUID) || resource == null || resource.isEmpty()){
+            this.popRecurrentCall();
             return FluidStack.EMPTY;
+        }
 
         FluidStack fluid = resource.copy();
 
@@ -205,8 +209,10 @@ public class CombinedFluidHandler implements IFluidHandler {
         if(this.pushRecurrentCall())
             return FluidStack.EMPTY;
 
-        if(!this.requester.canReceive(EnumChannelType.FLUID) || maxDrain <= 0)
+        if(!this.requester.canReceive(EnumChannelType.FLUID) || maxDrain <= 0){
+            this.popRecurrentCall();
             return FluidStack.EMPTY;
+        }
 
         FluidStack fluid = null;
 
