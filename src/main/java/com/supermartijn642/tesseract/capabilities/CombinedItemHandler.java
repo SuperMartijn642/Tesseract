@@ -37,8 +37,10 @@ public class CombinedItemHandler implements Storage<ItemVariant> {
         if(this.pushRecurrentCall())
             return 0;
 
-        if(!this.requester.canSend(EnumChannelType.ITEMS) || resource.isBlank())
+        if(!this.requester.canSend(EnumChannelType.ITEMS) || resource.isBlank()){
+            this.popRecurrentCall();
             return 0;
+        }
 
         long leftOver = maxAmount;
         loop:
@@ -72,8 +74,10 @@ public class CombinedItemHandler implements Storage<ItemVariant> {
         if(this.pushRecurrentCall())
             return 0;
 
-        if(!this.requester.canReceive(EnumChannelType.ITEMS) || resource.isBlank())
+        if(!this.requester.canReceive(EnumChannelType.ITEMS) || resource.isBlank()){
+            this.popRecurrentCall();
             return 0;
+        }
 
         long leftOver = maxAmount;
         loop:

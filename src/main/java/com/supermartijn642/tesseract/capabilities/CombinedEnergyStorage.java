@@ -31,8 +31,10 @@ public class CombinedEnergyStorage implements EnergyStorage {
         if(this.pushRecurrentCall())
             return 0;
 
-        if(!this.requester.canSend(EnumChannelType.ENERGY) || maxAmount <= 0)
+        if(!this.requester.canSend(EnumChannelType.ENERGY) || maxAmount <= 0){
+            this.popRecurrentCall();
             return 0;
+        }
 
         long leftOver = maxAmount;
         loop:
@@ -66,8 +68,10 @@ public class CombinedEnergyStorage implements EnergyStorage {
         if(this.pushRecurrentCall())
             return 0;
 
-        if(!this.requester.canReceive(EnumChannelType.ENERGY) || maxAmount <= 0)
+        if(!this.requester.canReceive(EnumChannelType.ENERGY) || maxAmount <= 0){
+            this.popRecurrentCall();
             return 0;
+        }
 
         long leftOver = maxAmount;
         loop:

@@ -37,8 +37,10 @@ public class CombinedFluidHandler implements Storage<FluidVariant> {
         if(this.pushRecurrentCall())
             return 0;
 
-        if(!this.requester.canSend(EnumChannelType.FLUID) || resource.isBlank())
+        if(!this.requester.canSend(EnumChannelType.FLUID) || resource.isBlank()){
+            this.popRecurrentCall();
             return 0;
+        }
 
         long leftOver = maxAmount;
         loop:
@@ -72,8 +74,10 @@ public class CombinedFluidHandler implements Storage<FluidVariant> {
         if(this.pushRecurrentCall())
             return 0;
 
-        if(!this.requester.canReceive(EnumChannelType.FLUID) || resource.isBlank())
+        if(!this.requester.canReceive(EnumChannelType.FLUID) || resource.isBlank()){
+            this.popRecurrentCall();
             return 0;
+        }
 
         long leftOver = maxAmount;
         loop:
