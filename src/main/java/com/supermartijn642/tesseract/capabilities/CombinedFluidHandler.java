@@ -29,7 +29,7 @@ public class CombinedFluidHandler implements Storage<FluidVariant> {
 
     @Override
     public boolean supportsInsertion(){
-        return this.requester.canSend(EnumChannelType.ITEMS);
+        return this.requester.canSend(EnumChannelType.FLUID);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class CombinedFluidHandler implements Storage<FluidVariant> {
         if(this.pushRecurrentCall())
             return 0;
 
-        if(!this.requester.canSend(EnumChannelType.ITEMS) || resource.isBlank())
+        if(!this.requester.canSend(EnumChannelType.FLUID) || resource.isBlank())
             return 0;
 
         long leftOver = maxAmount;
@@ -64,7 +64,7 @@ public class CombinedFluidHandler implements Storage<FluidVariant> {
 
     @Override
     public boolean supportsExtraction(){
-        return this.requester.canReceive(EnumChannelType.ITEMS);
+        return this.requester.canReceive(EnumChannelType.FLUID);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class CombinedFluidHandler implements Storage<FluidVariant> {
         if(this.pushRecurrentCall())
             return 0;
 
-        if(!this.requester.canReceive(EnumChannelType.ITEMS) || resource.isBlank())
+        if(!this.requester.canReceive(EnumChannelType.FLUID) || resource.isBlank())
             return 0;
 
         long leftOver = maxAmount;
