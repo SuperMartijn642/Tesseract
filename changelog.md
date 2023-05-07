@@ -1,3 +1,8 @@
+### Tesseract 1.0.34
+- Added Ukrainian translations (thanks to SKZGx!)
+- Fixed tesseracts getting stuck not transferring
+- Fixed error message when loading a world without previous tesseract data
+
 ### Tesseract 1.0.33
 - Fixed rare crash when invalid tesseract references are removed
 
