@@ -1,3 +1,6 @@
+### Tesseract 1.0.34a
+- Fixed tesseract recipe not working
+
 ### Tesseract 1.0.34
 - Added Ukrainian translations (thanks to SKZGx!)
 - Fixed tesseracts getting stuck not transferring
