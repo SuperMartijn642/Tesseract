@@ -1,0 +1,8 @@
+// 1.19.4	2023-05-25T01:06:46.5985037	Core Lib Generators
+9f7d6db5f401e867311f07daa6546da802b92280 assets/minecraft/atlases/blocks.json
+f535424e8cc785231d304390e944ca5483d607c4 assets/tesseract/blockstates/tesseract.json
+41851c8c6f9c86cc9d8bda169c25d5f9e58bd426 assets/tesseract/lang/en_us.json
+ffbe68af05b77979e5a2343cd18eb79f71ae72c7 data/minecraft/tags/blocks/mineable/pickaxe.json
+889a398f938f61d3e180ee9751fe2d4dd9478316 data/tesseract/advancements/recipes/misc/tesseract.json
+3bcff11f96c49099d8680ebd52c8fa64805d74dc data/tesseract/loot_tables/blocks/tesseract.json
+3b7a5de5724bbfc6bc69129e446b0355fdf79ba0 data/tesseract/recipes/tesseract.json
