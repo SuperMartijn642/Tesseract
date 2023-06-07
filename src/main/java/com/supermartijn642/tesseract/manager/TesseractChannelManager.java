@@ -58,7 +58,7 @@ public class TesseractChannelManager {
     }
 
     public void sortChannels(Player player, EnumChannelType type){
-        if(player == null || player.level == null || !player.level.isClientSide)
+        if(player == null || player.level() == null || !player.level().isClientSide)
             return;
         this.types.putIfAbsent(type, new ChannelList(type));
         this.types.get(type).sortForPlayer(player);

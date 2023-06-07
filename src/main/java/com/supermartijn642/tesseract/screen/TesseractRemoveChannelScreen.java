@@ -1,10 +1,10 @@
 package com.supermartijn642.tesseract.screen;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.core.gui.widget.BlockEntityBaseWidget;
+import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
@@ -50,27 +50,27 @@ public class TesseractRemoveChannelScreen extends BlockEntityBaseWidget<Tesserac
     }
 
     @Override
-    protected void render(PoseStack matrixStack, int mouseX, int mouseY, TesseractBlockEntity entity){
+    protected void render(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity entity){
         ScreenUtils.bindTexture(BACKGROUND);
-        ScreenUtils.drawTexture(matrixStack, 0, 0, this.width(), this.height());
+        ScreenUtils.drawTexture(context.poseStack(), 0, 0, this.width(), this.height());
 
         Channel channel = TesseractChannelManager.CLIENT.getChannelById(this.type, this.channelId);
         if(channel == null){
             ClientUtils.closeScreen();
             return;
         }
-        ScreenUtils.drawCenteredString(matrixStack, TextComponents.translation("gui.tesseract.remove.title." + this.type.name().toLowerCase(Locale.ROOT)).get(), 72, 6, 0xffffffff);
+        ScreenUtils.drawCenteredString(context.poseStack(), TextComponents.translation("gui.tesseract.remove.title." + this.type.name().toLowerCase(Locale.ROOT)).get(), 72, 6, 0xffffffff);
         // Render player head and channel name
         int nameWidth = ClientUtils.getFontRenderer().width(channel.name);
         int x = 72 - (9 + 3 + nameWidth + 3 + 9) / 2;
-        PlayerRenderer.renderPlayerHead(channel.creator, matrixStack, x, 24, 9, 9);
-        ScreenUtils.drawString(matrixStack, channel.name, x + 12, 25, 0xffffffff);
+        PlayerRenderer.renderPlayerHead(channel.creator, context.poseStack(), x, 24, 9, 9);
+        ScreenUtils.drawString(context.poseStack(), channel.name, x + 12, 25, 0xffffffff);
         if(channel.creator.equals(ClientUtils.getPlayer().getUUID())){
             ScreenUtils.bindTexture(channel.isPrivate ? TesseractScreen.LOCK_ON : TesseractScreen.LOCK_OFF);
-            ScreenUtils.drawTexture(matrixStack, x + 12 + nameWidth + 3, 24, 9, 9);
+            ScreenUtils.drawTexture(context.poseStack(), x + 12 + nameWidth + 3, 24, 9, 9);
         }
 
-        super.render(matrixStack, mouseX, mouseY, entity);
+        super.render(context, mouseX, mouseY, entity);
     }
 
     @Override

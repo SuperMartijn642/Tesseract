@@ -1,10 +1,10 @@
 package com.supermartijn642.tesseract.screen;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.core.gui.widget.BlockEntityBaseWidget;
+import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.core.gui.widget.premade.TextFieldWidget;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
@@ -58,13 +58,13 @@ public class TesseractAddChannelScreen extends BlockEntityBaseWidget<TesseractBl
     }
 
     @Override
-    protected void render(PoseStack matrixStack, int mouseX, int mouseY, TesseractBlockEntity entity){
+    protected void render(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity entity){
         ScreenUtils.bindTexture(BACKGROUND);
-        ScreenUtils.drawTexture(matrixStack, 0, 0, this.width(), this.height());
+        ScreenUtils.drawTexture(context.poseStack(), 0, 0, this.width(), this.height());
 
-        ScreenUtils.drawCenteredString(matrixStack, TextComponents.translation("gui.tesseract.add.title." + this.type.name().toLowerCase(Locale.ROOT)).get(), 72, 6, 0xffffffff);
+        ScreenUtils.drawCenteredString(context.poseStack(), TextComponents.translation("gui.tesseract.add.title." + this.type.name().toLowerCase(Locale.ROOT)).get(), 72, 6, 0xffffffff);
 
-        super.render(matrixStack, mouseX, mouseY, entity);
+        super.render(context, mouseX, mouseY, entity);
     }
 
     private boolean checkChannelName(String name){
