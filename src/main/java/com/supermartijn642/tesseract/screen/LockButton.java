@@ -1,8 +1,8 @@
 package com.supermartijn642.tesseract.screen;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.gui.ScreenUtils;
+import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.core.gui.widget.premade.AbstractButtonWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
@@ -35,7 +35,7 @@ public class LockButton extends AbstractButtonWidget {
     }
 
     @Override
-    public void render(PoseStack matrixStack, int x, int y){
+    public void render(WidgetRenderContext context, int x, int y){
         ScreenUtils.bindTexture(Button.WIDGETS_LOCATION);
 
         Icon icon;
@@ -46,7 +46,7 @@ public class LockButton extends AbstractButtonWidget {
         else
             icon = this.locked ? Icon.LOCKED : Icon.UNLOCKED;
 
-        ScreenUtils.drawTexture(matrixStack, this.x, this.y, this.width, this.height, icon.getX() / 256f, icon.getY() / 256f, 20 / 256f, 20 / 256f);
+        ScreenUtils.drawTexture(context.poseStack(), this.x, this.y, this.width, this.height, icon.getX() / 256f, icon.getY() / 256f, 20 / 256f, 20 / 256f);
     }
 
     public boolean isLocked(){

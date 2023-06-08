@@ -1,13 +1,13 @@
 package com.supermartijn642.tesseract.screen;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.core.gui.WidgetScreen;
 import com.supermartijn642.core.gui.widget.BlockEntityBaseWidget;
+import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
@@ -113,32 +113,32 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
     }
 
     @Override
-    protected void renderBackground(PoseStack poseStack, int mouseX, int mouseY, TesseractBlockEntity object){
+    protected void renderBackground(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity object){
         this.setFocused(true);
-        super.renderBackground(poseStack, mouseX, mouseY, object);
+        super.renderBackground(context, mouseX, mouseY, object);
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, TesseractBlockEntity entity){
+    public void render(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity entity){
         GlStateManager._enableBlend();
         ScreenUtils.bindTexture(BACKGROUND);
-        ScreenUtils.drawTexture(poseStack, 0, 0, this.width(), this.height());
+        ScreenUtils.drawTexture(context.poseStack(), 0, 0, this.width(), this.height());
 
         Component s = TextComponents.translation("gui.tesseract." + type.name().toLowerCase(Locale.ROOT)).get();
-        ScreenUtils.drawCenteredString(poseStack, s, 177, 14, 0xffffffff);
+        ScreenUtils.drawCenteredString(context.poseStack(), s, 177, 14, 0xffffffff);
 
-        this.drawTabs(poseStack);
-        this.drawChannels(poseStack, mouseX, mouseY, entity);
+        this.drawTabs(context);
+        this.drawChannels(context.poseStack(), mouseX, mouseY, entity);
 
         Channel channel = TesseractChannelManager.CLIENT.getChannelById(type, this.selectedChannel);
         if(channel != null)
-            this.drawSelectedChannelInfo(poseStack, channel);
+            this.drawSelectedChannelInfo(context.poseStack(), channel);
 
-        super.render(poseStack, mouseX, mouseY, entity);
+        super.render(context, mouseX, mouseY, entity);
     }
 
     @Override
-    protected void renderTooltips(PoseStack poseStack, int mouseX, int mouseY, TesseractBlockEntity entity){
+    protected void renderTooltips(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity entity){
         List<Channel> channels = TesseractChannelManager.CLIENT.getChannels(TesseractScreen.type);
         for(int i = 0; i < MAX_DISPLAYED_CHANNELS && i + this.scrollOffset < channels.size(); i++){
             Channel channel = channels.get(i + this.scrollOffset);
@@ -146,47 +146,47 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
             if(mouseX >= x && mouseX < x + 9 && mouseY >= y + 2 && mouseY < y + 11){
                 String creatorName = PlayerRenderer.getPlayerUsername(channel.creator);
                 if(creatorName != null)
-                    ScreenUtils.drawTooltip(poseStack, creatorName, mouseX, mouseY);
+                    ScreenUtils.drawTooltip(context.poseStack(), creatorName, mouseX, mouseY);
             }
         }
 
         if(mouseX >= 9 && mouseX < 31 && mouseY >= (type == EnumChannelType.ITEMS ? 2 : 4) && mouseY < 28)
-            ScreenUtils.drawTooltip(poseStack, EnumChannelType.ITEMS.getTranslation(), mouseX, mouseY);
+            ScreenUtils.drawTooltip(context.poseStack(), EnumChannelType.ITEMS.getTranslation(), mouseX, mouseY);
         else if(mouseX >= 38 && mouseX < 60 && mouseY >= (type == EnumChannelType.ENERGY ? 2 : 4) && mouseY < 28)
-            ScreenUtils.drawTooltip(poseStack, EnumChannelType.ENERGY.getTranslation(), mouseX, mouseY);
+            ScreenUtils.drawTooltip(context.poseStack(), EnumChannelType.ENERGY.getTranslation(), mouseX, mouseY);
         else if(mouseX >= 67 && mouseX < 89 && mouseY >= (type == EnumChannelType.FLUID ? 2 : 4) && mouseY < 28)
-            ScreenUtils.drawTooltip(poseStack, EnumChannelType.FLUID.getTranslation(), mouseX, mouseY);
+            ScreenUtils.drawTooltip(context.poseStack(), EnumChannelType.FLUID.getTranslation(), mouseX, mouseY);
 
-        super.renderTooltips(poseStack, mouseX, mouseY, entity);
+        super.renderTooltips(context, mouseX, mouseY, entity);
     }
 
-    private void drawTabs(PoseStack matrixStack){
+    private void drawTabs(WidgetRenderContext context){
         // items
-        this.drawTab(matrixStack, EnumChannelType.ITEMS, 6, ITEM_ICON);
+        this.drawTab(context, EnumChannelType.ITEMS, 6, ITEM_ICON);
 
         // energy
-        this.drawTab(matrixStack, EnumChannelType.ENERGY, 35, ENERGY_ICON);
+        this.drawTab(context, EnumChannelType.ENERGY, 35, ENERGY_ICON);
 
         // fluid
-        this.drawTab(matrixStack, EnumChannelType.FLUID, 64, FLUID_ICON);
+        this.drawTab(context, EnumChannelType.FLUID, 64, FLUID_ICON);
 
         // transfer
         ScreenUtils.bindTexture(SIDE_TAB);
-        ScreenUtils.drawTexture(matrixStack, -27, 150, 30, 32);
+        ScreenUtils.drawTexture(context.poseStack(), -27, 150, 30, 32);
 
         // info and redstone
         ScreenUtils.bindTexture(REDSTONE_TAB);
-        ScreenUtils.drawTexture(matrixStack, -30, 32, 30, 30);
+        ScreenUtils.drawTexture(context.poseStack(), -30, 32, 30, 30);
     }
 
-    private void drawTab(PoseStack matrixStack, EnumChannelType type, int x, ResourceLocation icon){
+    private void drawTab(WidgetRenderContext context, EnumChannelType type, int x, ResourceLocation icon){
         ScreenUtils.bindTexture(type == TesseractScreen.type ? TAB_ON : TAB_OFF);
-        ScreenUtils.drawTexture(matrixStack, x, type == TesseractScreen.type ? 0 : 2, 28, type == TesseractScreen.type ? 31 : 26);
+        ScreenUtils.drawTexture(context.poseStack(), x, type == TesseractScreen.type ? 0 : 2, 28, type == TesseractScreen.type ? 31 : 26);
 
         float width = 16, height = 16;
         float iconX = x + (28 - width) / 2f, iconY = (TesseractScreen.type == type ? 0 : 2) + (29 - height) / 2f;
 
-        ClientUtils.getItemRenderer().renderGuiItem(matrixStack, new ItemStack(type.item.get()), (int)iconX, (int)iconY);
+        ScreenUtils.drawItem(context.poseStack(), new ItemStack(type.item.get()), null, (int)iconX, (int)iconY);
     }
 
     private void drawChannels(PoseStack matrixStack, int mouseX, int mouseY, TesseractBlockEntity entity){
@@ -255,12 +255,11 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
             ScreenUtils.drawString(matrixStack, creatorName, 129, 66, ScreenUtils.ACTIVE_TEXT_COLOR);
         // category
         ScreenUtils.drawString(matrixStack, TextComponents.string("Category:").italic().get(), 117, 80, 0xff666666);
-        RenderSystem.getModelViewStack().pushPose();
-        RenderSystem.getModelViewStack().translate(115, 88, 0);
-        RenderSystem.getModelViewStack().scale(0.8f, 0.8f, 1);
-        ClientUtils.getItemRenderer().renderGuiItem(matrixStack, new ItemStack(type.item.get()), 0, 0);
-        RenderSystem.getModelViewStack().popPose();
-        RenderSystem.applyModelViewMatrix();
+        matrixStack.pushPose();
+        matrixStack.translate(115, 88, 0);
+        matrixStack.scale(0.8f, 0.8f, 1);
+        ScreenUtils.drawItem(matrixStack, new ItemStack(type.item.get()), null, 0, 0);
+        matrixStack.popPose();
         ScreenUtils.drawString(matrixStack, channel.type.getTranslation(), 129, 91, ScreenUtils.ACTIVE_TEXT_COLOR);
         // accessibility
         ScreenUtils.drawString(matrixStack, TextComponents.string("Accessibility:").italic().get(), 117, 105, 0xff666666);

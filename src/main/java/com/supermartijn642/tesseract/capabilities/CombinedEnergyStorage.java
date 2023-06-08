@@ -4,7 +4,7 @@ import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
-import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.energy.IEnergyStorage;
 
 /**
@@ -37,7 +37,7 @@ public class CombinedEnergyStorage implements IEnergyStorage {
             if(location.canBeAccessed() && location.canReceive(EnumChannelType.ENERGY)){
                 TesseractBlockEntity entity = location.getTesseract();
                 if(entity != this.requester){
-                    for(IEnergyStorage storage : entity.getSurroundingCapabilities(CapabilityEnergy.ENERGY)){
+                    for(IEnergyStorage storage : entity.getSurroundingCapabilities(ForgeCapabilities.ENERGY)){
                         if(!storage.canReceive())
                             continue;
                         int received = storage.receiveEnergy(amount, simulate);
@@ -73,7 +73,7 @@ public class CombinedEnergyStorage implements IEnergyStorage {
             if(location.canBeAccessed() && location.canSend(EnumChannelType.ENERGY)){
                 TesseractBlockEntity entity = location.getTesseract();
                 if(entity != this.requester){
-                    for(IEnergyStorage storage : entity.getSurroundingCapabilities(CapabilityEnergy.ENERGY)){
+                    for(IEnergyStorage storage : entity.getSurroundingCapabilities(ForgeCapabilities.ENERGY)){
                         if(!storage.canExtract())
                             continue;
                         int extracted = storage.extractEnergy(amount, simulate);
@@ -102,7 +102,7 @@ public class CombinedEnergyStorage implements IEnergyStorage {
             if(location.canBeAccessed()){
                 TesseractBlockEntity entity = location.getTesseract();
                 if(entity != this.requester){
-                    for(IEnergyStorage storage : entity.getSurroundingCapabilities(CapabilityEnergy.ENERGY))
+                    for(IEnergyStorage storage : entity.getSurroundingCapabilities(ForgeCapabilities.ENERGY))
                         amount += storage.getEnergyStored();
                 }
             }
@@ -123,7 +123,7 @@ public class CombinedEnergyStorage implements IEnergyStorage {
             if(location.canBeAccessed()){
                 TesseractBlockEntity entity = location.getTesseract();
                 if(entity != this.requester){
-                    for(IEnergyStorage storage : entity.getSurroundingCapabilities(CapabilityEnergy.ENERGY))
+                    for(IEnergyStorage storage : entity.getSurroundingCapabilities(ForgeCapabilities.ENERGY))
                         amount += storage.getMaxEnergyStored();
                 }
             }

@@ -10,10 +10,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -69,19 +67,19 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction side){
-        if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
+        if(capability == ForgeCapabilities.ITEM_HANDLER){
             return this.capabilities.computeIfAbsent(EnumChannelType.ITEMS, o -> {
                 Channel channel = this.getChannel(EnumChannelType.ITEMS);
                 return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getItemHandler(this));
             }).cast();
         }
-        if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY){
+        if(capability == ForgeCapabilities.FLUID_HANDLER){
             return this.capabilities.computeIfAbsent(EnumChannelType.FLUID, o -> {
                 Channel channel = this.getChannel(EnumChannelType.FLUID);
                 return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getFluidHandler(this));
             }).cast();
         }
-        if(capability == CapabilityEnergy.ENERGY){
+        if(capability == ForgeCapabilities.ENERGY){
             return this.capabilities.computeIfAbsent(EnumChannelType.ENERGY, o -> {
                 Channel channel = this.getChannel(EnumChannelType.ENERGY);
                 return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getEnergyStorage(this));

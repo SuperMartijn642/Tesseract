@@ -19,8 +19,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +31,7 @@ import java.util.function.Consumer;
 public class TesseractBlock extends BaseBlock implements EntityHoldingBlock {
 
     public TesseractBlock(){
-        super(false, BlockProperties.create(Material.HEAVY_METAL, MaterialColor.COLOR_GREEN).sound(SoundType.METAL).destroyTime(1.5f).explosionResistance(6).noOcclusion());
+        super(false, BlockProperties.create().mapColor(MapColor.COLOR_GREEN).sound(SoundType.METAL).destroyTime(1.5f).explosionResistance(6).noOcclusion());
     }
 
     @Override

@@ -5,7 +5,7 @@ import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
@@ -33,7 +33,7 @@ public class CombinedItemHandler implements IItemHandler {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY))
+                    for(IItemHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.ITEM_HANDLER))
                         slots += handler.getSlots();
                 }
             }
@@ -57,7 +57,7 @@ public class CombinedItemHandler implements IItemHandler {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+                    for(IItemHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.ITEM_HANDLER)){
                         if(slot - slots < handler.getSlots()){
                             stack = handler.getStackInSlot(slot - slots);
                             break loop;
@@ -91,7 +91,7 @@ public class CombinedItemHandler implements IItemHandler {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+                    for(IItemHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.ITEM_HANDLER)){
                         if(slot - slots < handler.getSlots()){
                             leftOver = reference.canReceive(EnumChannelType.ITEMS) ? handler.insertItem(slot - slots, stack, simulate) : stack;
                             break loop;
@@ -125,7 +125,7 @@ public class CombinedItemHandler implements IItemHandler {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+                    for(IItemHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.ITEM_HANDLER)){
                         if(slot - slots < handler.getSlots()){
                             stack = reference.canSend(EnumChannelType.ITEMS) ? handler.extractItem(slot - slots, amount, simulate) : ItemStack.EMPTY;
                             break loop;
@@ -153,7 +153,7 @@ public class CombinedItemHandler implements IItemHandler {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+                    for(IItemHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.ITEM_HANDLER)){
                         if(slot - slots < handler.getSlots()){
                             limit = handler.getSlotLimit(slot - slots);
                             break loop;
@@ -181,7 +181,7 @@ public class CombinedItemHandler implements IItemHandler {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+                    for(IItemHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.ITEM_HANDLER)){
                         if(slot - slots < handler.getSlots()){
                             valid = handler.isItemValid(slot - slots, stack);
                             break loop;

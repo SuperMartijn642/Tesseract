@@ -1,7 +1,7 @@
 package com.supermartijn642.tesseract.screen;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.gui.ScreenUtils;
+import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.core.gui.widget.premade.AbstractButtonWidget;
 import net.minecraft.resources.ResourceLocation;
 
@@ -23,8 +23,8 @@ public abstract class CycleButton extends AbstractButtonWidget {
     protected abstract int getCycleIndex();
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY){
+    public void render(WidgetRenderContext context, int mouseX, int mouseY){
         ScreenUtils.bindTexture(TEXTURE);
-        ScreenUtils.drawTexture(poseStack, this.x, this.y, this.width, this.height, (this.textureX + this.getCycleIndex() * 20) / 120f, (this.active ? this.isFocused() ? 1 : 0 : 2) / 3f, 1 / 6f, 1 / 3f);
+        ScreenUtils.drawTexture(context.poseStack(), this.x, this.y, this.width, this.height, (this.textureX + this.getCycleIndex() * 20) / 120f, (this.active ? this.isFocused() ? 1 : 0 : 2) / 3f, 1 / 6f, 1 / 3f);
     }
 }
