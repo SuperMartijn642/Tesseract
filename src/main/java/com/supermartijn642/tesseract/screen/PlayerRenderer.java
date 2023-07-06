@@ -1,19 +1,17 @@
 package com.supermartijn642.tesseract.screen;
 
-import com.google.common.collect.Iterables;
 import com.google.gson.JsonObject;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonReader;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
-import com.mojang.authlib.properties.Property;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.gui.ScreenUtils;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.client.resources.SkinManager;
-import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.UsernameCache;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
@@ -31,7 +29,7 @@ import java.util.UUID;
  */
 public class PlayerRenderer {
 
-    // TODO: this should probably be cleared after a certain time
+    // TODO this should probably be cleared after a certain time
     private static final Map<UUID,GameProfile> PLAYER_PROFILE_MAP = new HashMap<>();
     private static final HashSet<UUID> FETCH_QUEUE = new HashSet<>();
 
@@ -42,7 +40,7 @@ public class PlayerRenderer {
 
     public static String getPlayerUsername(UUID player){
         GameProfile profile = fetchPlayerProfile(player);
-        return profile == null ? null : profile.getName();
+        return profile == null ? UsernameCache.getLastKnownUsername(player) : profile.getName();
     }
 
     public static ResourceLocation getPlayerSkin(UUID player){
@@ -64,8 +62,7 @@ public class PlayerRenderer {
         }
 
         synchronized(FETCH_QUEUE){
-            if(!FETCH_QUEUE.contains(player)){
-                FETCH_QUEUE.add(player);
+            if(FETCH_QUEUE.add(player)){
                 new Thread(() -> {
                     boolean success = false;
                     String name = fetchPlayerName(player);
@@ -88,7 +85,7 @@ public class PlayerRenderer {
                     synchronized(FETCH_QUEUE){
                         FETCH_QUEUE.remove(player);
                     }
-                }, "Tesseract - UUID to username").start();
+                }, "Tesseract - Game profile fetching").start();
             }
         }
 
@@ -97,20 +94,9 @@ public class PlayerRenderer {
 
     @Nullable
     private static GameProfile updateGameProfile(@Nullable GameProfile input){
-        if(input != null && input.getName() != null && !input.getName().isEmpty()){
-            if(!input.isComplete() || !input.getProperties().containsKey("textures")){
-                PlayerProfileCache profileCache = getProfileCache();
-                MinecraftSessionService sessionService = getSessionService();
-                if(profileCache != null && sessionService != null){
-                    GameProfile gameprofile = profileCache.getGameProfileForUsername(input.getName());
-                    if(gameprofile != null){
-                        Property property = Iterables.getFirst(gameprofile.getProperties().get("textures"), null);
-                        if(property == null)
-                            gameprofile = sessionService.fillProfileProperties(gameprofile, true);
-                        return gameprofile;
-                    }
-                }
-            }
+        if(input != null && input.getId() != null){
+            MinecraftSessionService sessionService = getSessionService();
+            return sessionService.fillProfileProperties(input, true);
         }
         return null;
     }
@@ -131,10 +117,6 @@ public class PlayerRenderer {
             }
         }catch(Exception ignore){}
         return null;
-    }
-
-    private static PlayerProfileCache getProfileCache(){
-        return ClientUtils.getMinecraft().getIntegratedServer().getPlayerProfileCache();
     }
 
     private static MinecraftSessionService getSessionService(){
