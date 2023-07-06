@@ -1,3 +1,6 @@
+### Tesseract 1.0.35
+- Fixed player skins inside the tesseract screen not rendering sometimes
+
 ### Tesseract 1.0.34a
 - Fixed tesseract recipe not working
 
