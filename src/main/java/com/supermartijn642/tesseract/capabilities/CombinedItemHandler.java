@@ -111,7 +111,7 @@ public class CombinedItemHandler implements Storage<ItemVariant> {
                     return entity.getSurroundingCapabilities(ItemStorage.SIDED).iterator();
             }
             return Collections.emptyIterator();
-        }), Storage::iterator);
+        }, this::pushRecurrentCall, this::popRecurrentCall), Storage::iterator);
     }
 
     /**

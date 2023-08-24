@@ -111,7 +111,7 @@ public class CombinedFluidHandler implements Storage<FluidVariant> {
                     return entity.getSurroundingCapabilities(FluidStorage.SIDED).iterator();
             }
             return Collections.emptyIterator();
-        }), Storage::iterator);
+        }, this::pushRecurrentCall, this::popRecurrentCall), Storage::iterator);
     }
 
     /**
