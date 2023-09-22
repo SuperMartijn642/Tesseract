@@ -4,8 +4,8 @@ import com.supermartijn642.core.TextComponents;
 import com.supermartijn642.core.gui.ScreenUtils;
 import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.core.gui.widget.premade.AbstractButtonWidget;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
 
@@ -34,8 +34,6 @@ public class LockButton extends AbstractButtonWidget {
 
     @Override
     public void render(WidgetRenderContext context, int x, int y){
-        ScreenUtils.bindTexture(Button.WIDGETS_LOCATION);
-
         Icon icon;
         if(!this.active)
             icon = this.locked ? Icon.LOCKED_DISABLED : Icon.UNLOCKED_DISABLED;
@@ -44,7 +42,8 @@ public class LockButton extends AbstractButtonWidget {
         else
             icon = this.locked ? Icon.LOCKED : Icon.UNLOCKED;
 
-        ScreenUtils.drawTexture(context.poseStack(), this.x, this.y, this.width, this.height, icon.getX() / 256f, icon.getY() / 256f, 20 / 256f, 20 / 256f);
+        ScreenUtils.bindTexture(icon.location);
+        ScreenUtils.drawTexture(context.poseStack(), this.x, this.y, this.width, this.height, 0, 0, 1, 1);
     }
 
     public boolean isLocked(){
@@ -61,27 +60,21 @@ public class LockButton extends AbstractButtonWidget {
     }
 
     enum Icon {
-        LOCKED(0, 146),
-        LOCKED_HOVER(0, 166),
-        LOCKED_DISABLED(0, 186),
-        UNLOCKED(20, 146),
-        UNLOCKED_HOVER(20, 166),
-        UNLOCKED_DISABLED(20, 186);
+        LOCKED(new ResourceLocation("textures/gui/sprites/widget/locked_button.png")),
+        LOCKED_HOVER(new ResourceLocation("textures/gui/sprites/widget/locked_button_highlighted.png")),
+        LOCKED_DISABLED(new ResourceLocation("textures/gui/sprites/widget/locked_button_disabled.png")),
+        UNLOCKED(new ResourceLocation("textures/gui/sprites/widget/unlocked_button.png")),
+        UNLOCKED_HOVER(new ResourceLocation("textures/gui/sprites/widget/unlocked_button_highlighted.png")),
+        UNLOCKED_DISABLED(new ResourceLocation("textures/gui/sprites/widget/unlocked_button_disabled.png"));
 
-        private final int x;
-        private final int y;
+        private final ResourceLocation location;
 
-        Icon(int xIn, int yIn){
-            this.x = xIn;
-            this.y = yIn;
+        Icon(ResourceLocation location){
+            this.location = location;
         }
 
-        public int getX(){
-            return this.x;
-        }
-
-        public int getY(){
-            return this.y;
+        public ResourceLocation location(){
+            return this.location;
         }
     }
 }
