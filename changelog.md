@@ -1,3 +1,6 @@
+### Tesseract 1.0.35a
+- Fixed tesseract resource transferring with neighboring blocks sometimes breaking
+
 ### Tesseract 1.0.35
 - Fixed player skins inside the tesseract screen not rendering sometimes
 
