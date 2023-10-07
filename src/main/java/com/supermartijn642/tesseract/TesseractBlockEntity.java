@@ -208,23 +208,22 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     /**
-     *   A replacement wrapper for {@link Map#computeIfAbsent(Object, Function)}
+     * A replacement wrapper for {@link Map#computeIfAbsent(Object, Function)}
      * that can handle a {@link LazyOptional} being invalidated.
-     *
-     * @param map A mapping between a generic key and a value wrapped in a
-     *          LazyOptional.
-     * @param key The key to test for.
+     * @param map             A mapping between a generic key and a value wrapped in a
+     *                        LazyOptional.
+     * @param key             The key to test for.
      * @param mappingFunction The mapping function to execute if the value
-     *           is missing or invalidated. This function should probably
-     *           not return null, instead it should probably return
-     *           {@link LazyOptional#empty}.
-     * @param <K> The generic key type.
+     *                        is missing or invalidated. This function should probably
+     *                        not return null, instead it should probably return
+     *                        {@link LazyOptional#empty}.
+     * @param <K>             The generic key type.
      * @return The value associated with the key (either pre-existing, or
-     *      newly created if the value was previously missing or
-     *      invalidated) wrapped in a LazyOptional. This can be null, if
-     *      the mapping function returns a null, though it shouldn't.
+     * newly created if the value was previously missing or
+     * invalidated) wrapped in a LazyOptional. This can be null, if
+     * the mapping function returns a null, though it shouldn't.
      */
-    private static <K> LazyOptional<?> computeIfLazyAbsent(Map<K, LazyOptional<?>> map, K key, Function<? super K, ? extends LazyOptional<?>> mappingFunction){
+    private static <K> LazyOptional<?> computeIfLazyAbsent(Map<K,LazyOptional<?>> map, K key, Function<? super K,? extends LazyOptional<?>> mappingFunction){
         // If the value is fully missing, defer to the original functionality of Map.
         if(!map.containsKey(key)){
             return map.computeIfAbsent(key, mappingFunction);
