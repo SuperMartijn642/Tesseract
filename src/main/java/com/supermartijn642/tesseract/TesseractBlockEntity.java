@@ -71,30 +71,18 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction side){
         if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
-//            return this.capabilities.computeIfAbsent(EnumChannelType.ITEMS, o -> {
-//                Channel channel = this.getChannel(EnumChannelType.ITEMS);
-//                return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getItemHandler(this));
-//            }).cast();
             return computeIfLazyAbsent(this.capabilities, EnumChannelType.ITEMS, o -> {
                 Channel channel = this.getChannel(EnumChannelType.ITEMS);
                 return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getItemHandler(this));
             }).cast();
         }
         if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY){
-//            return this.capabilities.computeIfAbsent(EnumChannelType.FLUID, o -> {
-//                Channel channel = this.getChannel(EnumChannelType.FLUID);
-//                return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getFluidHandler(this));
-//            }).cast();
             return computeIfLazyAbsent(this.capabilities, EnumChannelType.FLUID, o -> {
                 Channel channel = this.getChannel(EnumChannelType.FLUID);
                 return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getFluidHandler(this));
             }).cast();
         }
         if(capability == CapabilityEnergy.ENERGY){
-//            return this.capabilities.computeIfAbsent(EnumChannelType.ENERGY, o -> {
-//                Channel channel = this.getChannel(EnumChannelType.ENERGY);
-//                return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getEnergyStorage(this));
-//            }).cast();
             return computeIfLazyAbsent(this.capabilities, EnumChannelType.ENERGY, o -> {
                 Channel channel = this.getChannel(EnumChannelType.ENERGY);
                 return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getEnergyStorage(this));
@@ -109,12 +97,6 @@ public class TesseractBlockEntity extends BaseBlockEntity {
 
         ArrayList<T> list = new ArrayList<>();
         for(Direction facing : Direction.values()){
-//            LazyOptional<?> optional = this.surroundingCapabilities.get(facing).computeIfAbsent(capability, o -> {
-//                BlockEntity entity = this.level.getBlockEntity(this.worldPosition.relative(facing));
-//                if(entity != null && !(entity instanceof TesseractBlockEntity))
-//                    return entity.getCapability(capability, facing.getOpposite());
-//                return LazyOptional.empty();
-//            });
             LazyOptional<?> optional = computeIfLazyAbsent(this.surroundingCapabilities.get(facing), capability, o -> {
                 BlockEntity entity = this.level.getBlockEntity(this.worldPosition.relative(facing));
                 if(entity != null && !(entity instanceof TesseractBlockEntity))
