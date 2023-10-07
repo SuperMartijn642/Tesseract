@@ -17,6 +17,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
@@ -69,19 +70,19 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction side){
         if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
-            return this.capabilities.computeIfAbsent(EnumChannelType.ITEMS, o -> {
+            return computeIfLazyAbsent(this.capabilities, EnumChannelType.ITEMS, o -> {
                 Channel channel = this.getChannel(EnumChannelType.ITEMS);
                 return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getItemHandler(this));
             }).cast();
         }
         if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY){
-            return this.capabilities.computeIfAbsent(EnumChannelType.FLUID, o -> {
+            return computeIfLazyAbsent(this.capabilities, EnumChannelType.FLUID, o -> {
                 Channel channel = this.getChannel(EnumChannelType.FLUID);
                 return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getFluidHandler(this));
             }).cast();
         }
         if(capability == CapabilityEnergy.ENERGY){
-            return this.capabilities.computeIfAbsent(EnumChannelType.ENERGY, o -> {
+            return computeIfLazyAbsent(this.capabilities, EnumChannelType.ENERGY, o -> {
                 Channel channel = this.getChannel(EnumChannelType.ENERGY);
                 return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getEnergyStorage(this));
             }).cast();
@@ -95,7 +96,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
 
         ArrayList<T> list = new ArrayList<>();
         for(Direction facing : Direction.values()){
-            LazyOptional<?> optional = this.surroundingCapabilities.get(facing).computeIfAbsent(capability, o -> {
+            LazyOptional<?> optional = computeIfLazyAbsent(this.surroundingCapabilities.get(facing), capability, o -> {
                 TileEntity entity = this.level.getBlockEntity(this.worldPosition.relative(facing));
                 if(entity != null && !(entity instanceof TesseractBlockEntity))
                     return entity.getCapability(capability, facing.getOpposite());
@@ -203,5 +204,51 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         super.onChunkUnloaded();
         // Invalidate capabilities
         this.capabilities.values().forEach(LazyOptional::invalidate);
+    }
+
+    /**
+     *   A replacement wrapper for {@link Map#computeIfAbsent(Object, Function)}
+     * that can handle a {@link LazyOptional} being invalidated.
+     *
+     * @param map A mapping between a generic key and a value wrapped in a
+     *          LazyOptional.
+     * @param key The key to test for.
+     * @param mappingFunction The mapping function to execute if the value
+     *           is missing or invalidated. This function should probably
+     *           not return null, instead it should probably return
+     *           {@link LazyOptional#empty}.
+     * @param <K> The generic key type.
+     * @return The value associated with the key (either pre-existing, or
+     *      newly created if the value was previously missing or
+     *      invalidated) wrapped in a LazyOptional. This can be null, if
+     *      the mapping function returns a null, though it shouldn't.
+     */
+    private static <K> LazyOptional<?> computeIfLazyAbsent(Map<K, LazyOptional<?>> map, K key, Function<? super K, ? extends LazyOptional<?>> mappingFunction){
+        // If the value is fully missing, defer to the original functionality of Map.
+        if(!map.containsKey(key)){
+            return map.computeIfAbsent(key, mappingFunction);
+        }
+
+        LazyOptional<?> value = map.get(key);
+
+        // If the value is null, defer to the original functionality of Map.
+        if(value == null){
+            return map.computeIfAbsent(key, mappingFunction);
+        }
+
+        // If the value is present, there is no need to perform the mapping.
+        if(value.isPresent()){
+            return value;
+        }
+
+        // Create the new value.
+        value = mappingFunction.apply(key);
+
+        // If the value is not null (which should always be true), store it into the map.
+        if(value != null){
+            map.put(key, value);
+        }
+
+        return value;
     }
 }
