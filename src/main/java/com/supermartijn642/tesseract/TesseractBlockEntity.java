@@ -34,7 +34,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
      */
     public int recurrentCalls = 0;
 
-    private final Map<Direction,Map<Capability<?>,LazyOptional<?>>> surroundingCapabilities = new HashMap<>();
+    private final Map<Direction,Map<Capability<?>,LazyOptional<?>>> surroundingCapabilities = new EnumMap<>(Direction.class);
 
     public TesseractBlockEntity(){
         super(Tesseract.tesseract_tile);
