@@ -11,7 +11,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 
@@ -23,7 +22,7 @@ import java.util.function.Function;
 public class TesseractTheOneProbePlugin {
 
     public static void interModEnqueue(){
-        FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "com.supermartijn642.tesseract.integration.TheOneProbePlugin$ProbeInfoProvider");
+        FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "com.supermartijn642.tesseract.integration.TesseractTheOneProbePlugin$ProbeInfoProvider");
     }
 
     public static class ProbeInfoProvider implements IProbeInfoProvider, IProbeConfigProvider, Function<ITheOneProbe,Void> {
@@ -51,15 +50,15 @@ public class TesseractTheOneProbePlugin {
                 probeInfo.text(formatChannelInfo(EnumChannelType.ENERGY, tesseract.getChannelId(EnumChannelType.ENERGY)));
                 probeInfo.text(formatChannelInfo(EnumChannelType.FLUID, tesseract.getChannelId(EnumChannelType.FLUID)));
                 if(tesseract.isBlockedByRedstone())
-                    probeInfo.text(TextComponents.string(TextStyleClass.ERROR.toString()).translation("tesseract.tesseract.highlight.redstone_blocked").format());
+                    probeInfo.text(TextStyleClass.ERROR + TextComponents.translation("tesseract.tesseract.highlight.redstone_blocked").format());
             }
         }
 
         private static String formatChannelInfo(EnumChannelType type, int channelId){
             Channel channel = TesseractChannelManager.CLIENT.getChannelById(type, channelId);
-            ITextComponent channelType = TextComponents.string(TextStyleClass.WARNING.toString()).get().appendSibling(type.getTranslation());
-            ITextComponent separator = TextComponents.string(TextStyleClass.INFO.toString()).translation("tesseract.tesseract.highlight.channel_info.separator").get();
-            ITextComponent channelName = channel == null ? TextComponents.string(TextStyleClass.LABEL.toString()).translation("tesseract.tesseract.highlight.channel_info.inactive").get() : TextComponents.string(TextStyleClass.INFO.toString()).string(channel.name).get();
+            String channelType = TextStyleClass.WARNING + TextComponents.fromTextComponent(type.getTranslation()).format();
+            String separator = TextStyleClass.INFO + TextComponents.translation("tesseract.tesseract.highlight.channel_info.separator").format();
+            String channelName = channel == null ? TextStyleClass.LABEL + TextComponents.translation("tesseract.tesseract.highlight.channel_info.inactive").format() : TextStyleClass.INFO + channel.name;
             return TextComponents.translation("tesseract.tesseract.highlight.channel_info", channelType, separator, channelName).format();
         }
 
