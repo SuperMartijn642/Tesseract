@@ -1,3 +1,6 @@
+### Tesseract 1.0.35b
+- Fixed integration with The One Probe
+
 ### Tesseract 1.0.35a
 - Fixed tesseract resource transferring with neighboring blocks sometimes breaking
 
