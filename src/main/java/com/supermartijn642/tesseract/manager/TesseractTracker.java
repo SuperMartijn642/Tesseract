@@ -9,8 +9,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.TickEvent;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -36,7 +36,7 @@ public class TesseractTracker {
     }
 
     public static void registerListeners(){
-        MinecraftForge.EVENT_BUS.addListener(TesseractTracker::onTick);
+        NeoForge.EVENT_BUS.addListener(TesseractTracker::onTick);
     }
 
     private final HashMap<String,HashMap<BlockPos,TesseractReference>> tesseracts = new HashMap<>();

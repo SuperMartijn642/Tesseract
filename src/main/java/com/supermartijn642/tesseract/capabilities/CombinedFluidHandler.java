@@ -4,9 +4,8 @@ import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 
@@ -33,7 +32,7 @@ public class CombinedFluidHandler implements IFluidHandler {
             if(location.canBeAccessed()){
                 TesseractBlockEntity entity = location.getTesseract();
                 if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER))
+                    for(IFluidHandler handler : entity.getSurroundingFluidCapabilities())
                         tanks += Math.max(handler.getTanks(), 0);
                 }
             }
@@ -57,7 +56,7 @@ public class CombinedFluidHandler implements IFluidHandler {
             if(location.canBeAccessed()){
                 TesseractBlockEntity entity = location.getTesseract();
                 if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
+                    for(IFluidHandler handler : entity.getSurroundingFluidCapabilities()){
                         if(tank - tanks < handler.getTanks()){
                             stack = handler.getFluidInTank(tank - tanks);
                             break loop;
@@ -85,7 +84,7 @@ public class CombinedFluidHandler implements IFluidHandler {
             if(location.canBeAccessed()){
                 TesseractBlockEntity entity = location.getTesseract();
                 if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
+                    for(IFluidHandler handler : entity.getSurroundingFluidCapabilities()){
                         if(tank - tanks < handler.getTanks()){
                             capacity = handler.getTankCapacity(tank - tanks);
                             break loop;
@@ -113,7 +112,7 @@ public class CombinedFluidHandler implements IFluidHandler {
             if(location.canBeAccessed()){
                 TesseractBlockEntity entity = location.getTesseract();
                 if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
+                    for(IFluidHandler handler : entity.getSurroundingFluidCapabilities()){
                         if(tank - tanks < handler.getTanks()){
                             valid = handler.isFluidValid(tank - tanks, stack);
                             break loop;
@@ -147,7 +146,7 @@ public class CombinedFluidHandler implements IFluidHandler {
             if(location.canBeAccessed()){
                 TesseractBlockEntity entity = location.getTesseract();
                 if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
+                    for(IFluidHandler handler : entity.getSurroundingFluidCapabilities()){
                         amount += handler.fill(fluid, action);
                         if(amount >= resource.getAmount())
                             break loop;
@@ -180,7 +179,7 @@ public class CombinedFluidHandler implements IFluidHandler {
             if(location.canBeAccessed()){
                 TesseractBlockEntity entity = location.getTesseract();
                 if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
+                    for(IFluidHandler handler : entity.getSurroundingFluidCapabilities()){
                         FluidStack stack = handler.drain(fluid.copy(), FluidAction.SIMULATE);
                         if(!stack.isEmpty() && resource.isFluidEqual(stack)){
                             if(action.execute())
@@ -221,7 +220,7 @@ public class CombinedFluidHandler implements IFluidHandler {
             if(location.canBeAccessed()){
                 TesseractBlockEntity entity = location.getTesseract();
                 if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
+                    for(IFluidHandler handler : entity.getSurroundingFluidCapabilities()){
                         if(fluid == null){
                             fluid = handler.drain(maxDrain, action);
                             if(fluid.isEmpty())

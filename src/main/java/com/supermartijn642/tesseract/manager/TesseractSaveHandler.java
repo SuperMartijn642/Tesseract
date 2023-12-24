@@ -4,10 +4,10 @@ import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.tesseract.TesseractConfig;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.level.LevelEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
 import java.nio.file.Path;
 
@@ -19,10 +19,10 @@ public class TesseractSaveHandler {
     private static long lastSaveTime = 0;
 
     public static void registerListeners(){
-        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::onJoin);
-        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::tick);
-        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::save);
-        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::load);
+        NeoForge.EVENT_BUS.addListener(TesseractSaveHandler::onJoin);
+        NeoForge.EVENT_BUS.addListener(TesseractSaveHandler::tick);
+        NeoForge.EVENT_BUS.addListener(TesseractSaveHandler::save);
+        NeoForge.EVENT_BUS.addListener(TesseractSaveHandler::load);
     }
 
     private static void onJoin(PlayerEvent.PlayerLoggedInEvent e){

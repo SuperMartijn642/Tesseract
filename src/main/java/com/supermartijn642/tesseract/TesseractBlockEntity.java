@@ -7,16 +7,17 @@ import com.supermartijn642.tesseract.manager.TesseractTracker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
@@ -25,7 +26,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
 
     private TesseractReference reference;
     private final EnumMap<EnumChannelType,TransferState> transferState = new EnumMap<>(EnumChannelType.class);
-    private final EnumMap<EnumChannelType,LazyOptional<?>> capabilities = new EnumMap<>(EnumChannelType.class);
+    private final EnumMap<EnumChannelType,Object> capabilities = new EnumMap<>(EnumChannelType.class);
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
     /**
@@ -33,14 +34,14 @@ public class TesseractBlockEntity extends BaseBlockEntity {
      */
     public int recurrentCalls = 0;
 
-    private final Map<Direction,Map<Capability<?>,LazyOptional<?>>> surroundingCapabilities = new EnumMap<>(Direction.class);
+    private final Map<Direction,Map<EnumChannelType,BlockCapabilityCache<?,Direction>>> surroundingCapabilities = new HashMap<>();
 
     public TesseractBlockEntity(BlockPos pos, BlockState state){
         super(Tesseract.tesseract_tile, pos, state);
         for(EnumChannelType type : EnumChannelType.values())
             this.transferState.put(type, TransferState.BOTH);
         for(Direction facing : Direction.values())
-            this.surroundingCapabilities.put(facing, new HashMap<>());
+            this.surroundingCapabilities.put(facing, new EnumMap<>(EnumChannelType.class));
     }
 
     public TesseractReference getReference(){
@@ -55,9 +56,8 @@ public class TesseractBlockEntity extends BaseBlockEntity {
 
     public void channelChanged(EnumChannelType type){
         // Clear old capabilities
-        LazyOptional<?> optional = this.capabilities.remove(type);
-        if(optional != null)
-            optional.invalidate();
+        this.capabilities.remove(type);
+        this.invalidateCapabilities();
         this.notifyNeighbors();
     }
 
@@ -65,47 +65,55 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         return !this.isBlockedByRedstone();
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction side){
-        if(capability == ForgeCapabilities.ITEM_HANDLER){
-            return computeIfLazyAbsent(this.capabilities, EnumChannelType.ITEMS, o -> {
-                Channel channel = this.getChannel(EnumChannelType.ITEMS);
-                return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getItemHandler(this));
-            }).cast();
-        }
-        if(capability == ForgeCapabilities.FLUID_HANDLER){
-            return computeIfLazyAbsent(this.capabilities, EnumChannelType.FLUID, o -> {
-                Channel channel = this.getChannel(EnumChannelType.FLUID);
-                return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getFluidHandler(this));
-            }).cast();
-        }
-        if(capability == ForgeCapabilities.ENERGY){
-            return computeIfLazyAbsent(this.capabilities, EnumChannelType.ENERGY, o -> {
-                Channel channel = this.getChannel(EnumChannelType.ENERGY);
-                return channel == null ? LazyOptional.empty() : LazyOptional.of(() -> channel.getEnergyStorage(this));
-            }).cast();
-        }
-        return super.getCapability(capability, side);
+    public IItemHandler getItemCapability(){
+        return (IItemHandler)this.capabilities.computeIfAbsent(EnumChannelType.ITEMS, o -> {
+            Channel channel = this.getChannel(EnumChannelType.ITEMS);
+            return channel == null ? null : channel.getItemHandler(this);
+        });
     }
 
-    public <T> List<T> getSurroundingCapabilities(Capability<T> capability){
+    public IFluidHandler getFluidCapability(){
+        return (IFluidHandler)this.capabilities.computeIfAbsent(EnumChannelType.FLUID, o -> {
+            Channel channel = this.getChannel(EnumChannelType.FLUID);
+            return channel == null ? null : channel.getFluidHandler(this);
+        });
+    }
+
+    public IEnergyStorage getEnergyCapability(){
+        return (IEnergyStorage)this.capabilities.computeIfAbsent(EnumChannelType.ENERGY, o -> {
+            Channel channel = this.getChannel(EnumChannelType.ENERGY);
+            return channel == null ? null : channel.getEnergyStorage(this);
+        });
+    }
+
+    public List<IItemHandler> getSurroundingItemCapabilities(){
+        return this.getSurroundingCapabilities(EnumChannelType.ITEMS);
+    }
+
+    public List<IFluidHandler> getSurroundingFluidCapabilities(){
+        return this.getSurroundingCapabilities(EnumChannelType.FLUID);
+    }
+
+    public List<IEnergyStorage> getSurroundingEnergyCapabilities(){
+        return this.getSurroundingCapabilities(EnumChannelType.ENERGY);
+    }
+
+    private <T> List<T> getSurroundingCapabilities(EnumChannelType type){
         if(this.level == null)
             return Collections.emptyList();
 
-        ArrayList<T> list = new ArrayList<>();
-        for(Direction facing : Direction.values()){
-            LazyOptional<?> optional = computeIfLazyAbsent(this.surroundingCapabilities.get(facing), capability, o -> {
-                BlockEntity entity = this.level.getBlockEntity(this.worldPosition.relative(facing));
-                if(entity != null && !(entity instanceof TesseractBlockEntity))
-                    return entity.getCapability(capability, facing.getOpposite());
-                return LazyOptional.empty();
-            });
-            if(optional.isPresent())
-                //noinspection unchecked,DataFlowIssue
-                list.add((T)optional.orElseGet(() -> null));
-        }
-        return list;
+        BlockCapability<?,Direction> capability = switch(type){
+            case ITEMS -> Capabilities.ItemHandler.BLOCK;
+            case FLUID -> Capabilities.FluidHandler.BLOCK;
+            case ENERGY -> Capabilities.EnergyStorage.BLOCK;
+        };
+
+        //noinspection unchecked
+        return (List<T>)Arrays.stream(Direction.values())
+            .map(side -> this.surroundingCapabilities.get(side).computeIfAbsent(type, t -> BlockCapabilityCache.create(capability, (ServerLevel)this.level, this.worldPosition.relative(side), side.getOpposite(), () -> !this.remove, () -> {})))
+            .map(BlockCapabilityCache::getCapability)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     public boolean canSend(EnumChannelType type){
@@ -196,57 +204,5 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     public void onReplaced(){
         if(!this.level.isClientSide)
             TesseractTracker.SERVER.remove(this.level, this.worldPosition);
-    }
-
-    @Override
-    public void onChunkUnloaded(){
-        super.onChunkUnloaded();
-        // Invalidate capabilities
-        this.capabilities.values().forEach(LazyOptional::invalidate);
-    }
-
-    /**
-     * A replacement wrapper for {@link Map#computeIfAbsent(Object, Function)}
-     * that can handle a {@link LazyOptional} being invalidated.
-     * @param map             A mapping between a generic key and a value wrapped in a
-     *                        LazyOptional.
-     * @param key             The key to test for.
-     * @param mappingFunction The mapping function to execute if the value
-     *                        is missing or invalidated. This function should probably
-     *                        not return null, instead it should probably return
-     *                        {@link LazyOptional#empty}.
-     * @param <K>             The generic key type.
-     * @return The value associated with the key (either pre-existing, or
-     * newly created if the value was previously missing or
-     * invalidated) wrapped in a LazyOptional. This can be null, if
-     * the mapping function returns a null, though it shouldn't.
-     */
-    private static <K> LazyOptional<?> computeIfLazyAbsent(Map<K,LazyOptional<?>> map, K key, Function<? super K,? extends LazyOptional<?>> mappingFunction){
-        // If the value is fully missing, defer to the original functionality of Map.
-        if(!map.containsKey(key)){
-            return map.computeIfAbsent(key, mappingFunction);
-        }
-
-        LazyOptional<?> value = map.get(key);
-
-        // If the value is null, defer to the original functionality of Map.
-        if(value == null){
-            return map.computeIfAbsent(key, mappingFunction);
-        }
-
-        // If the value is present, there is no need to perform the mapping.
-        if(value.isPresent()){
-            return value;
-        }
-
-        // Create the new value.
-        value = mappingFunction.apply(key);
-
-        // If the value is not null (which should always be true), store it into the map.
-        if(value != null){
-            map.put(key, value);
-        }
-
-        return value;
     }
 }

@@ -1,5 +1,6 @@
 package com.supermartijn642.tesseract;
 
+import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.core.block.BaseBlockEntityType;
 import com.supermartijn642.core.item.BaseBlockItem;
 import com.supermartijn642.core.item.CreativeItemGroup;
@@ -13,11 +14,8 @@ import com.supermartijn642.tesseract.integration.TesseractTheOneProbePlugin;
 import com.supermartijn642.tesseract.manager.TesseractSaveHandler;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import com.supermartijn642.tesseract.packets.*;
-import com.supermartijn642.tesseract.recipe_conditions.TesseractRecipeCondition;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,10 +34,10 @@ public class Tesseract {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("tesseract");
 
-    public Tesseract(){
+    public Tesseract(IEventBus eventBus){
         TesseractTracker.registerListeners();
         TesseractSaveHandler.registerListeners();
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(TesseractTheOneProbePlugin::interModEnqueue);
+        eventBus.addListener(TesseractTheOneProbePlugin::interModEnqueue);
 
         TesseractConfig.init();
 
@@ -55,7 +53,8 @@ public class Tesseract {
         CHANNEL.registerMessage(PacketRemoveTesseractReferences.class, PacketRemoveTesseractReferences::new, true);
 
         register();
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> TesseractClient::register);
+        if(CommonUtils.getEnvironmentSide().isClient())
+            TesseractClient.register();
         registerGenerators();
     }
 
@@ -64,7 +63,8 @@ public class Tesseract {
         handler.registerBlock("tesseract", TesseractBlock::new);
         handler.registerBlockEntityType("tesseract_tile", () -> BaseBlockEntityType.create(TesseractBlockEntity::new, tesseract));
         handler.registerItem("tesseract", () -> new BaseBlockItem(tesseract, ItemProperties.create().group(CreativeItemGroup.getFunctionalBlocks())));
-        handler.registerResourceConditionSerializer("thermal_recipe", TesseractRecipeCondition.SERIALIZER);
+        // Api providers
+        handler.registerBlockEntityTypeCallback(helper -> TesseractBlockApiProviders.register());
     }
 
     private static void registerGenerators(){

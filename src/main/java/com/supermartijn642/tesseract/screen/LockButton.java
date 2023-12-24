@@ -6,8 +6,6 @@ import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.core.gui.widget.premade.AbstractButtonWidget;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.function.Consumer;
 
@@ -61,7 +59,6 @@ public class LockButton extends AbstractButtonWidget {
         tooltips.accept(TextComponents.translation("gui.tesseract.channel." + (this.locked ? "private" : "public")).get());
     }
 
-    @OnlyIn(Dist.CLIENT)
     enum Icon {
         LOCKED(new ResourceLocation("textures/gui/sprites/widget/locked_button.png")),
         LOCKED_HOVER(new ResourceLocation("textures/gui/sprites/widget/locked_button_highlighted.png")),
