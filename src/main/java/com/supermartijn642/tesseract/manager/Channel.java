@@ -5,8 +5,10 @@ import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.capabilities.CombinedEnergyStorage;
 import com.supermartijn642.tesseract.capabilities.CombinedFluidHandler;
 import com.supermartijn642.tesseract.capabilities.CombinedItemHandler;
+import com.supermartijn642.tesseract.screen.TesseractAddChannelScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -117,22 +119,20 @@ public class Channel {
         }
     }
 
-    public CompoundTag writeClientChannel(){
-        CompoundTag tag = new CompoundTag();
-        tag.putInt("id", this.id);
-        tag.putInt("type", this.type.getIndex());
-        tag.putUUID("creator", this.creator);
-        tag.putBoolean("private", this.isPrivate);
-        tag.putString("name", this.name);
-        return tag;
+    public void writeClientChannel(FriendlyByteBuf buffer){
+        buffer.writeInt(this.id);
+        buffer.writeEnum(this.type);
+        buffer.writeUUID(this.creator);
+        buffer.writeBoolean(this.isPrivate);
+        buffer.writeUtf(this.name, TesseractAddChannelScreen.CHANNEL_MAX_CHARACTERS);
     }
 
-    public static Channel readClientChannel(CompoundTag tag){
-        int id = tag.getInt("id");
-        EnumChannelType type = EnumChannelType.byIndex(tag.getInt("type"));
-        UUID creator = tag.getUUID("creator");
-        boolean isPrivate = tag.getBoolean("private");
-        String name = tag.getString("name");
+    public static Channel readClientChannel(FriendlyByteBuf buffer){
+        int id = buffer.readInt();
+        EnumChannelType type = buffer.readEnum(EnumChannelType.class);
+        UUID creator = buffer.readUUID();
+        boolean isPrivate = buffer.readBoolean();
+        String name = buffer.readUtf(TesseractAddChannelScreen.CHANNEL_MAX_CHARACTERS);
         return new Channel(id, type, creator, isPrivate, name);
     }
 
@@ -146,6 +146,17 @@ public class Channel {
 
     public CombinedEnergyStorage getEnergyStorage(TesseractBlockEntity self){
         return new CombinedEnergyStorage(this, self);
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(this == o) return true;
+        if(o == null || this.getClass() != o.getClass()) return false;
+
+        Channel channel = (Channel)o;
+
+        if(this.id != channel.id) return false;
+        return this.type == channel.type;
     }
 
     @Override

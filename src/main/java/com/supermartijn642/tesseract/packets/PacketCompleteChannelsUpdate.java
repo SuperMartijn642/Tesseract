@@ -6,10 +6,13 @@ import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
@@ -18,21 +21,17 @@ public class PacketCompleteChannelsUpdate implements BasePacket {
 
     private List<Channel> channels;
 
-    public PacketCompleteChannelsUpdate(boolean server){
-        if(!server)
-            throw new IllegalStateException();
-
-        List<Channel>[] lists = new List[EnumChannelType.values().length];
-        int index = 0;
+    public PacketCompleteChannelsUpdate(Player target){
+        Set<Channel>[] channels = new Set[EnumChannelType.values().length];
         int size = 0;
         for(EnumChannelType type : EnumChannelType.values()){
-            lists[index] = TesseractChannelManager.SERVER.getChannels(type);
-            size += lists[index].size();
-            index++;
+            channels[type.ordinal()] = new HashSet<>(TesseractChannelManager.SERVER.getPublicChannels(type));
+            channels[type.ordinal()].addAll(TesseractChannelManager.SERVER.getChannelsCreatedBy(type, target.getGameProfile().getId()));
+            size += channels[type.ordinal()].size();
         }
         this.channels = new ArrayList<>(size);
-        for(List<Channel> list : lists)
-            this.channels.addAll(list);
+        for(Set<Channel> set : channels)
+            this.channels.addAll(set);
     }
 
     public PacketCompleteChannelsUpdate(){
@@ -40,32 +39,26 @@ public class PacketCompleteChannelsUpdate implements BasePacket {
 
     @Override
     public void write(FriendlyByteBuf buffer){
-        CompoundTag compound = new CompoundTag();
-
-        Iterator<Channel> iterator = this.channels.iterator();
-        for(int index = 0; iterator.hasNext(); index++)
-            compound.put(Integer.toString(index), iterator.next().writeClientChannel());
-
-        buffer.writeNbt(compound);
+        buffer.writeInt(this.channels.size());
+        for(Channel channel : this.channels)
+            channel.writeClientChannel(buffer);
     }
 
     @Override
     public void read(FriendlyByteBuf buffer){
-        CompoundTag compound = buffer.readNbt();
-
-        this.channels = new ArrayList<>();
-        for(String key : compound.getAllKeys())
-            this.channels.add(Channel.readClientChannel(compound.getCompound(key)));
+        int channels = buffer.readInt();
+        if(channels > 500)
+            throw new IllegalStateException("Too many channels!");
+        this.channels = new ArrayList<>(channels);
+        for(int i = 0; i < channels; i++)
+            this.channels.add(Channel.readClientChannel(buffer));
     }
 
     @Override
     public void handle(PacketContext buffer){
         TesseractChannelManager.CLIENT.clear();
-        Set<EnumChannelType> types = new HashSet<>(3);
-        this.channels.forEach(channel -> {
-            TesseractChannelManager.CLIENT.addChannel(channel);
-            types.add(channel.type);
-        });
-        types.forEach(type -> TesseractChannelManager.CLIENT.sortChannels(ClientUtils.getPlayer(), type));
+        this.channels.forEach(TesseractChannelManager.CLIENT::addChannel);
+        for(EnumChannelType type : EnumChannelType.values())
+            TesseractChannelManager.CLIENT.sortChannels(ClientUtils.getPlayer(), type);
     }
 }

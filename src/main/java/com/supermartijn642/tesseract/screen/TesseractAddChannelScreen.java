@@ -27,7 +27,7 @@ import java.util.Locale;
 public class TesseractAddChannelScreen extends BlockEntityBaseWidget<TesseractBlockEntity> {
 
     private static final int CHANNEL_MIN_CHARACTERS = 3;
-    private static final int CHANNEL_MAX_CHARACTERS = 19;
+    public static final int CHANNEL_MAX_CHARACTERS = 19;
 
     private static final ResourceLocation BACKGROUND = new ResourceLocation("tesseract", "textures/gui/add_screen_background.png");
 

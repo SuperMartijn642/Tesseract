@@ -22,10 +22,10 @@ public class ChannelList {
     private int channelId = 0;
 
     public final EnumChannelType type;
-    private final ArrayList<Channel> channels = new ArrayList<>();
-    private final ArrayList<Channel> publicChannels = new ArrayList<>();
-    private final HashMap<Integer,Channel> channelsById = new HashMap<>();
-    private final HashMap<UUID,List<Channel>> channelsByCreator = new HashMap<>();
+    private final List<Channel> channels = new ArrayList<>();
+    private final List<Channel> publicChannels = new ArrayList<>();
+    private final Map<Integer,Channel> channelsById = new HashMap<>();
+    private final Map<UUID,List<Channel>> channelsByCreator = new HashMap<>();
     private final List<Integer> removedIds = new ArrayList<>();
 
     public ChannelList(EnumChannelType type){
@@ -65,9 +65,6 @@ public class ChannelList {
 
     public List<Channel> sortForPlayer(Player player){
         final UUID uuid = player.getUUID();
-
-        this.channels.removeIf(channel -> channel.isPrivate && !channel.creator.equals(uuid));
-
         this.channels.sort((a, b) -> {
             boolean aUuid = a.creator.equals(uuid);
             boolean bUuid = b.creator.equals(uuid);
@@ -86,6 +83,10 @@ public class ChannelList {
         return Collections.unmodifiableList(this.channels);
     }
 
+    public List<Channel> getPublicChannels(){
+        return Collections.unmodifiableList(this.publicChannels);
+    }
+
     public List<Channel> getChannelsCreatedBy(UUID creator){
         return this.channelsByCreator.getOrDefault(creator, Collections.emptyList());
     }
@@ -95,13 +96,17 @@ public class ChannelList {
             Path file = folder.resolve("channel" + channel.id + ".nbt");
             try(DataOutputStream output = new DataOutputStream(Files.newOutputStream(file))){
                 NbtIo.write(channel.write(), output);
-            }catch(Exception e){e.printStackTrace();}
+            }catch(Exception e){
+                e.printStackTrace();
+            }
         }
         for(int id : this.removedIds){
             Path file = folder.resolve("channel" + id + ".nbt");
             try{
                 Files.deleteIfExists(file);
-            }catch(Exception e){e.printStackTrace();}
+            }catch(Exception e){
+                e.printStackTrace();
+            }
         }
         this.removedIds.clear();
     }
@@ -126,7 +131,9 @@ public class ChannelList {
                         if(channel.id >= this.channelId)
                             this.channelId = channel.id + 1;
                         this.add(channel);
-                    }catch(Exception e){Tesseract.LOGGER.error("Failed to read channel from file '" + file + "'!", e);}
+                    }catch(Exception e){
+                        Tesseract.LOGGER.error("Failed to read channel from file '" + file + "'!", e);
+                    }
                 }
             });
         }catch(IOException e){
