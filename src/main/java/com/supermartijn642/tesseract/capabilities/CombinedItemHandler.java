@@ -4,7 +4,6 @@ import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
@@ -48,7 +47,7 @@ public class CombinedItemHandler implements Storage<ItemVariant> {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(Storage<ItemVariant> handler : entity.getSurroundingCapabilities(ItemStorage.SIDED)){
+                    for(Storage<ItemVariant> handler : entity.getSurroundingItemCapabilities()){
                         if(handler.supportsInsertion()){
                             leftOver -= handler.insert(resource, leftOver, transaction);
                             if(leftOver <= 0)
@@ -85,7 +84,7 @@ public class CombinedItemHandler implements Storage<ItemVariant> {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(Storage<ItemVariant> handler : entity.getSurroundingCapabilities(ItemStorage.SIDED)){
+                    for(Storage<ItemVariant> handler : entity.getSurroundingItemCapabilities()){
                         if(handler.supportsExtraction()){
                             leftOver -= handler.extract(resource, leftOver, transaction);
                             if(leftOver <= 0)
@@ -108,7 +107,7 @@ public class CombinedItemHandler implements Storage<ItemVariant> {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester)
-                    return entity.getSurroundingCapabilities(ItemStorage.SIDED).iterator();
+                    return entity.getSurroundingItemCapabilities().iterator();
             }
             return Collections.emptyIterator();
         }, this::pushRecurrentCall, this::popRecurrentCall), Storage::iterator);

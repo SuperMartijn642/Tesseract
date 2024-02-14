@@ -4,16 +4,22 @@ import com.supermartijn642.core.block.BaseBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
+import team.reborn.energy.api.EnergyStorage;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
@@ -21,8 +27,8 @@ import java.util.*;
 public class TesseractBlockEntity extends BaseBlockEntity {
 
     private TesseractReference reference;
-    private final EnumMap<EnumChannelType,TransferState> transferState = new EnumMap<>(EnumChannelType.class);
-    private final EnumMap<EnumChannelType,Object> capabilities = new EnumMap<>(EnumChannelType.class);
+    private final Map<EnumChannelType,TransferState> transferState = new EnumMap<>(EnumChannelType.class);
+    private final Map<EnumChannelType,Object> capabilities = new EnumMap<>(EnumChannelType.class);
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
     /**
@@ -30,14 +36,15 @@ public class TesseractBlockEntity extends BaseBlockEntity {
      */
     public int recurrentCalls = 0;
 
-    private final Map<Direction,Map<EnumChannelType,Boolean>> surroundingCapabilities = new HashMap<>();
+    private final Map<Direction,Map<EnumChannelType,BlockApiCache<?,Direction>>> surroundingCapabilities = new HashMap<>();
+    private final boolean[] surroundingTesseracts = new boolean[Direction.values().length];
 
     public TesseractBlockEntity(BlockPos pos, BlockState state){
         super(Tesseract.tesseract_tile, pos, state);
         for(EnumChannelType type : EnumChannelType.values())
             this.transferState.put(type, TransferState.BOTH);
         for(Direction facing : Direction.values())
-            this.surroundingCapabilities.put(facing, new HashMap<>());
+            this.surroundingCapabilities.put(facing, new EnumMap<>(EnumChannelType.class));
     }
 
     public TesseractReference getReference(){
@@ -76,52 +83,35 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         });
     }
 
-    public Object getEnergyCapability(){
-        return this.capabilities.computeIfAbsent(EnumChannelType.ENERGY, o -> {
+    public EnergyStorage getEnergyCapability(){
+        return (EnergyStorage)this.capabilities.computeIfAbsent(EnumChannelType.ENERGY, o -> {
             Channel channel = this.getChannel(EnumChannelType.ENERGY);
             return channel == null ? null : channel.getEnergyStorage(this);
         });
     }
 
-    public <T> Iterable<T> getSurroundingCapabilities(BlockApiLookup<T,Direction> apiLookup){
+    public List<Storage<ItemVariant>> getSurroundingItemCapabilities(){
+        return this.getSurroundingCapabilities(EnumChannelType.ITEMS, ItemStorage.SIDED);
+    }
+
+    public List<Storage<FluidVariant>> getSurroundingFluidCapabilities(){
+        return this.getSurroundingCapabilities(EnumChannelType.FLUID, FluidStorage.SIDED);
+    }
+
+    public List<EnergyStorage> getSurroundingEnergyCapabilities(){
+        return this.getSurroundingCapabilities(EnumChannelType.ENERGY, EnergyStorage.SIDED);
+    }
+
+    private <T> List<T> getSurroundingCapabilities(EnumChannelType type, BlockApiLookup<T,Direction> api){
         if(this.level == null)
-            return Collections::emptyIterator;
+            return Collections.emptyList();
 
-        BlockPos pos = this.getBlockPos();
-        return () -> new Iterator<>() {
-            private int index;
-            private T next;
-
-            private void findNext(){
-                while(this.next == null && this.index < 6){
-                    Direction facing = Direction.values()[this.index++];
-                    BlockPos facingPos = pos.relative(facing);
-                    BlockState state = TesseractBlockEntity.this.level.getBlockState(facingPos);
-                    if(state.is(Tesseract.tesseract))
-                        continue;
-                    this.next = apiLookup.find(TesseractBlockEntity.this.level, pos.relative(facing), state, TesseractBlockEntity.this.level.getBlockEntity(facingPos), facing.getOpposite());
-                }
-            }
-
-            @Override
-            public boolean hasNext(){
-                if(this.next == null)
-                    this.findNext();
-                return this.next != null;
-            }
-
-            @Override
-            public T next(){
-                if(this.next == null){
-                    this.findNext();
-                    if(this.next == null)
-                        throw new NoSuchElementException();
-                }
-                T next = this.next;
-                this.next = null;
-                return next;
-            }
-        };
+        //noinspection unchecked
+        return (List<T>)Arrays.stream(Direction.values())
+            .filter(side -> !this.surroundingTesseracts[side.ordinal()])
+            .map(side -> this.surroundingCapabilities.get(side).computeIfAbsent(type, t -> BlockApiCache.create(api, (ServerLevel)this.level, this.worldPosition.relative(side))).find(side))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     public boolean canSend(EnumChannelType type){
@@ -174,8 +164,9 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     public void onNeighborChanged(BlockPos neighbor){
-        Direction facing = Direction.getNearest(neighbor.getX() - this.worldPosition.getX(), neighbor.getY() - this.worldPosition.getY(), neighbor.getZ() - this.worldPosition.getZ());
-        this.surroundingCapabilities.get(facing).clear();
+        Direction side = Direction.fromDelta(neighbor.getX() - this.worldPosition.getX(), neighbor.getY() - this.worldPosition.getY(), neighbor.getZ() - this.worldPosition.getZ());
+        BlockState state = this.level.getBlockState(neighbor);
+        this.surroundingTesseracts[side.ordinal()] = state.getBlock() == Tesseract.tesseract;
     }
 
     private void notifyNeighbors(){

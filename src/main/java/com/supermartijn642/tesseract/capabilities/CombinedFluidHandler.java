@@ -4,7 +4,6 @@ import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
@@ -48,7 +47,7 @@ public class CombinedFluidHandler implements Storage<FluidVariant> {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(Storage<FluidVariant> handler : entity.getSurroundingCapabilities(FluidStorage.SIDED)){
+                    for(Storage<FluidVariant> handler : entity.getSurroundingFluidCapabilities()){
                         if(handler.supportsInsertion()){
                             leftOver -= handler.insert(resource, leftOver, transaction);
                             if(leftOver <= 0)
@@ -85,7 +84,7 @@ public class CombinedFluidHandler implements Storage<FluidVariant> {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(Storage<FluidVariant> handler : entity.getSurroundingCapabilities(FluidStorage.SIDED)){
+                    for(Storage<FluidVariant> handler : entity.getSurroundingFluidCapabilities()){
                         if(handler.supportsExtraction()){
                             leftOver -= handler.extract(resource, leftOver, transaction);
                             if(leftOver <= 0)
@@ -108,7 +107,7 @@ public class CombinedFluidHandler implements Storage<FluidVariant> {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester)
-                    return entity.getSurroundingCapabilities(FluidStorage.SIDED).iterator();
+                    return entity.getSurroundingFluidCapabilities().iterator();
             }
             return Collections.emptyIterator();
         }, this::pushRecurrentCall, this::popRecurrentCall), Storage::iterator);

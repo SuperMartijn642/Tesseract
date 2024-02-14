@@ -42,7 +42,7 @@ public class CombinedEnergyStorage implements EnergyStorage {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(EnergyStorage handler : entity.getSurroundingCapabilities(EnergyStorage.SIDED)){
+                    for(EnergyStorage handler : entity.getSurroundingEnergyCapabilities()){
                         if(handler.supportsInsertion()){
                             leftOver -= handler.insert(leftOver, transaction);
                             if(leftOver <= 0)
@@ -79,7 +79,7 @@ public class CombinedEnergyStorage implements EnergyStorage {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(EnergyStorage handler : entity.getSurroundingCapabilities(EnergyStorage.SIDED)){
+                    for(EnergyStorage handler : entity.getSurroundingEnergyCapabilities()){
                         if(handler.supportsExtraction()){
                             leftOver -= handler.extract(leftOver, transaction);
                             if(leftOver <= 0)
@@ -105,7 +105,7 @@ public class CombinedEnergyStorage implements EnergyStorage {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(EnergyStorage handler : entity.getSurroundingCapabilities(EnergyStorage.SIDED))
+                    for(EnergyStorage handler : entity.getSurroundingEnergyCapabilities())
                         energy += handler.getAmount();
                 }
             }
@@ -126,7 +126,7 @@ public class CombinedEnergyStorage implements EnergyStorage {
             if(reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
                 if(entity != this.requester){
-                    for(EnergyStorage handler : entity.getSurroundingCapabilities(EnergyStorage.SIDED))
+                    for(EnergyStorage handler : entity.getSurroundingEnergyCapabilities())
                         capacity += handler.getCapacity();
                 }
             }
