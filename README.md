@@ -4,6 +4,11 @@
 Use multiple channels to have **different groups** of Tesseracts!
 
 ---
+### Prerequisites
+- [Config Library](https://www.curseforge.com/minecraft/mc-mods/supermartijn642s-config-lib)
+- [Core Library](https://www.curseforge.com/minecraft/mc-mods/supermartijn642s-core-lib)
+
+---
 
 ### CurseForge
 For more info and downloads, check out the project on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/tesseract)
