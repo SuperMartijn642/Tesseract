@@ -24,7 +24,7 @@ import java.util.Locale;
  */
 public class TesseractRemoveChannelScreen extends BlockEntityBaseWidget<TesseractBlockEntity> {
 
-    private static final ResourceLocation BACKGROUND = new ResourceLocation("tesseract", "textures/gui/add_screen_background.png");
+    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/add_screen_background.png");
 
     private final EnumChannelType type;
     private final int channelId;

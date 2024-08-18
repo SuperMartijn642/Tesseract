@@ -1,8 +1,8 @@
-// 1.20.6	2024-08-18T15:10:54.9606749	Core Lib Generators
+// 1.21.1	2024-08-18T22:44:13.0993947	Core Lib Generators
 9f7d6db5f401e867311f07daa6546da802b92280 assets/minecraft/atlases/blocks.json
 f535424e8cc785231d304390e944ca5483d607c4 assets/tesseract/blockstates/tesseract.json
 41851c8c6f9c86cc9d8bda169c25d5f9e58bd426 assets/tesseract/lang/en_us.json
-ffbe68af05b77979e5a2343cd18eb79f71ae72c7 data/minecraft/tags/blocks/mineable/pickaxe.json
-6e1bf8cfad3b239d66ff219695656a7b276a6679 data/tesseract/advancements/recipes/misc/tesseract.json
-977e287a3e72c69f906f746e595fa5bd0d5385ab data/tesseract/loot_tables/blocks/tesseract.json
-e34b6aae1682f48d3ddd991c06b9e28cfd5cf64c data/tesseract/recipes/tesseract.json
+ffbe68af05b77979e5a2343cd18eb79f71ae72c7 data/minecraft/tags/block/mineable/pickaxe.json
+6e1bf8cfad3b239d66ff219695656a7b276a6679 data/tesseract/advancement/recipes/misc/tesseract.json
+977e287a3e72c69f906f746e595fa5bd0d5385ab data/tesseract/loot_table/blocks/tesseract.json
+e34b6aae1682f48d3ddd991c06b9e28cfd5cf64c data/tesseract/recipe/tesseract.json

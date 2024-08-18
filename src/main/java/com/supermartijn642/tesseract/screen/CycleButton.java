@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
  */
 public abstract class CycleButton extends AbstractButtonWidget {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation("tesseract", "textures/gui/buttons.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/buttons.png");
 
     private final int textureX;
     private boolean active = true;

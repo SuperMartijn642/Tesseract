@@ -31,9 +31,9 @@ public class TesseractRecipeGenerator extends RecipeGenerator {
 //            .pattern("ABA")
 //            .pattern("BCB")
 //            .pattern("ABA")
-//            .input('A', TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation("forge", "ingots/enderium")))
-//            .input('B', Registries.ITEMS.getValue(new ResourceLocation("thermal", "obsidian_glass")))
-//            .input('C', Registries.ITEMS.getValue(new ResourceLocation("thermal", "machine_frame")))
+//            .input('A', TagKey.create(Registry.ITEM_REGISTRY, ResourceLocation.fromNamespaceAndPath("forge", "ingots/enderium")))
+//            .input('B', Registries.ITEMS.getValue(ResourceLocation.fromNamespaceAndPath("thermal", "obsidian_glass")))
+//            .input('C', Registries.ITEMS.getValue(ResourceLocation.fromNamespaceAndPath("thermal", "machine_frame")))
 //            .condition(new TesseractRecipeCondition());
     }
 }
