@@ -2,7 +2,7 @@
   "parent": "minecraft:recipes/root",
   "display": {
     "icon": {
-      "item": "tesseract:tesseract"
+      "id": "tesseract:tesseract"
     },
     "title": {
       "translate": "tesseract.advancement.recipes/misc/tesseract.title"

@@ -7,16 +7,16 @@
   ],
   "key": {
     "A": {
-      "tag": "forge:obsidian"
+      "tag": "c:obsidians"
     },
     "B": {
-      "tag": "forge:ender_pearls"
+      "tag": "c:ender_pearls"
     },
     "C": {
-      "tag": "forge:storage_blocks/diamond"
+      "tag": "c:storage_blocks/diamond"
     }
   },
   "result": {
-    "item": "tesseract:tesseract"
+    "id": "tesseract:tesseract"
   }
 }

@@ -21,7 +21,7 @@ public class TesseractRecipeGenerator extends RecipeGenerator {
             .pattern("ABA")
             .pattern("BCB")
             .pattern("ABA")
-            .input('A', Tags.Items.OBSIDIAN)
+            .input('A', Tags.Items.OBSIDIANS)
             .input('B', Tags.Items.ENDER_PEARLS)
             .input('C', Tags.Items.STORAGE_BLOCKS_DIAMOND);
     }

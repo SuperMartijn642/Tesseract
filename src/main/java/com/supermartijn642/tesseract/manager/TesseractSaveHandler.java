@@ -5,9 +5,9 @@ import com.supermartijn642.tesseract.TesseractConfig;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 import java.nio.file.Path;
 
@@ -33,8 +33,8 @@ public class TesseractSaveHandler {
         TesseractChannelManager.sendChannels(e.getEntity());
     }
 
-    private static void tick(TickEvent.LevelTickEvent e){
-        if(e.level.isClientSide || e.phase != TickEvent.Phase.END || e.level.dimension() != Level.OVERWORLD)
+    private static void tick(LevelTickEvent.Post e){
+        if(e.getLevel().isClientSide || e.getLevel().dimension() != Level.OVERWORLD)
             return;
 
         if(System.currentTimeMillis() - lastSaveTime >= TesseractConfig.saveInterval.get() * 60000){

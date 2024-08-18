@@ -10,7 +10,7 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -92,8 +92,8 @@ public class TesseractTracker {
         this.referencesToBeSaved.add(reference);
     }
 
-    public static void onTick(TickEvent.LevelTickEvent e){
-        if(e.level.isClientSide || e.phase != TickEvent.Phase.END || e.level.dimension() != Level.OVERWORLD)
+    public static void onTick(LevelTickEvent.Post e){
+        if(e.getLevel().isClientSide || e.getLevel().dimension() != Level.OVERWORLD)
             return;
 
         // Handle removed references
