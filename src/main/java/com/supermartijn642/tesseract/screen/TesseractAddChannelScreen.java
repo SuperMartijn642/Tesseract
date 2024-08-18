@@ -29,7 +29,7 @@ public class TesseractAddChannelScreen extends BlockEntityBaseWidget<TesseractBl
     private static final int CHANNEL_MIN_CHARACTERS = 3;
     public static final int CHANNEL_MAX_CHARACTERS = 19;
 
-    private static final ResourceLocation BACKGROUND = new ResourceLocation("tesseract", "textures/gui/add_screen_background.png");
+    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/add_screen_background.png");
 
     private final EnumChannelType type;
 

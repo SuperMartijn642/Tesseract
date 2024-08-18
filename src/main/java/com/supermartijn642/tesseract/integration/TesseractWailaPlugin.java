@@ -21,7 +21,7 @@ public class TesseractWailaPlugin implements IBlockComponentProvider, IWailaPlug
 
     @Override
     public ResourceLocation getUid(){
-        return new ResourceLocation("tesseract", "tesseract_component");
+        return ResourceLocation.fromNamespaceAndPath("tesseract", "tesseract_component");
     }
 
     @Override

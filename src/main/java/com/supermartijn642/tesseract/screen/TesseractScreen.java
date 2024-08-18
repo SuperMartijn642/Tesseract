@@ -34,20 +34,20 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
     private static final int MAX_DISPLAYED_CHANNELS = 12;
     private static final int CHANNEL_CUTOFF_LENGTH = 100;
 
-    private static final ResourceLocation BACKGROUND = new ResourceLocation("tesseract", "textures/gui/new_gui.png");
+    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/new_gui.png");
     private static final int BACKGROUND_WIDTH = 249, BACKGROUND_HEIGHT = 211;
-    private static final ResourceLocation CHANNEL_BACKGROUND = new ResourceLocation("tesseract", "textures/gui/background.png");
-    private static final ResourceLocation TAB_ON = new ResourceLocation("tesseract", "textures/gui/tab_new.png");
-    private static final ResourceLocation TAB_OFF = new ResourceLocation("tesseract", "textures/gui/tab_off_new.png");
-    private static final ResourceLocation ITEM_ICON = new ResourceLocation("tesseract", "textures/gui/item_tab_icon.png");
-    private static final ResourceLocation ENERGY_ICON = new ResourceLocation("tesseract", "textures/gui/energy_tab_icon.png");
-    private static final ResourceLocation FLUID_ICON = new ResourceLocation("tesseract", "textures/gui/fluid_tab_icon.png");
-    private static final ResourceLocation SCROLL_BUTTONS = new ResourceLocation("minecraft", "textures/gui/server_selection.png");
-    public static final ResourceLocation LOCK_ON = new ResourceLocation("tesseract", "textures/gui/lock_on.png");
-    public static final ResourceLocation LOCK_OFF = new ResourceLocation("tesseract", "textures/gui/lock_off.png");
-    private static final ResourceLocation REDSTONE_TAB = new ResourceLocation("tesseract", "textures/gui/redstone_tab.png");
-    private static final ResourceLocation SIDE_TAB = new ResourceLocation("tesseract", "textures/gui/side_tab_new.png");
-    private static final ResourceLocation CHECKMARK = new ResourceLocation("tesseract", "textures/gui/checkmark_icon.png");
+    private static final ResourceLocation CHANNEL_BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/background.png");
+    private static final ResourceLocation TAB_ON = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/tab_new.png");
+    private static final ResourceLocation TAB_OFF = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/tab_off_new.png");
+    private static final ResourceLocation ITEM_ICON = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/item_tab_icon.png");
+    private static final ResourceLocation ENERGY_ICON = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/energy_tab_icon.png");
+    private static final ResourceLocation FLUID_ICON = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/fluid_tab_icon.png");
+    private static final ResourceLocation SCROLL_BUTTONS = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/server_selection.png");
+    public static final ResourceLocation LOCK_ON = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/lock_on.png");
+    public static final ResourceLocation LOCK_OFF = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/lock_off.png");
+    private static final ResourceLocation REDSTONE_TAB = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/redstone_tab.png");
+    private static final ResourceLocation SIDE_TAB = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/side_tab_new.png");
+    private static final ResourceLocation CHECKMARK = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/checkmark_icon.png");
 
     private static EnumChannelType type = EnumChannelType.ITEMS;
 

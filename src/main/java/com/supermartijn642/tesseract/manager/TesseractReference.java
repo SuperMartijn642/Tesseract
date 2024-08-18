@@ -65,7 +65,7 @@ public class TesseractReference {
     public Level getLevel(){
         if(this.isClientSide)
             return ClientUtils.getWorld().dimension().location().toString().equals(this.dimension) ? ClientUtils.getWorld() : null;
-        ResourceKey<Level> key = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(this.dimension));
+        ResourceKey<Level> key = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(this.dimension));
         return CommonUtils.getLevel(key);
     }
 
