@@ -4,8 +4,8 @@ import com.supermartijn642.core.network.BasePacket;
 import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import net.minecraft.SharedConstants;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.StringUtil;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
@@ -41,7 +41,7 @@ public class PacketScreenAddChannel implements BasePacket {
 
     @Override
     public boolean verify(PacketContext context){
-        return this.type != null && !this.name.trim().isEmpty() && this.name.trim().equals(SharedConstants.filterText(this.name.trim()));
+        return this.type != null && !this.name.trim().isEmpty() && this.name.trim().equals(StringUtil.filterText(this.name.trim()));
     }
 
     @Override
