@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.lang.ref.WeakReference;
 import java.util.EnumMap;
@@ -64,7 +65,7 @@ public class TesseractReference {
     public Level getLevel(){
         if(this.isClientSide)
             return ClientUtils.getWorld().dimension().location().toString().equals(this.dimension) ? ClientUtils.getWorld() : null;
-        ResourceKey<Level> key = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(this.dimension));
+        ResourceKey<Level> key = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(this.dimension));
         return CommonUtils.getLevel(key);
     }
 
@@ -91,8 +92,13 @@ public class TesseractReference {
     }
 
     public TesseractBlockEntity getTesseract(){
-        if(this.entity == null || this.entity.get() == null || this.entity.get().isRemoved() || !this.entity.get().getBlockPos().equals(this.pos))
-            this.entity = new WeakReference<>((TesseractBlockEntity)this.getLevel().getBlockEntity(this.pos));
+        if(this.entity == null || this.entity.get() == null || this.entity.get().isRemoved() || !this.entity.get().getBlockPos().equals(this.pos)){
+            BlockEntity entity = this.getLevel().getBlockEntity(this.pos);
+            if(entity instanceof TesseractBlockEntity)
+                this.entity = new WeakReference<>((TesseractBlockEntity)entity);
+            else
+                this.entity = null;
+        }
         return this.entity == null ? null : this.entity.get();
     }
 

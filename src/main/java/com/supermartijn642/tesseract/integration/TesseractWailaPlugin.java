@@ -26,13 +26,13 @@ public class TesseractWailaPlugin implements IBlockComponentProvider, IWailaPlug
             @Override
             public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig pluginConfig){
                 // Prevent Jade from showing the energy and fluid capability data
-                tooltip.remove(new ResourceLocation("fe"));
-                tooltip.remove(new ResourceLocation("fluid"));
+                tooltip.remove(ResourceLocation.withDefaultNamespace("fe"));
+                tooltip.remove(ResourceLocation.withDefaultNamespace("fluid"));
             }
 
             @Override
             public ResourceLocation getUid(){
-                return new ResourceLocation("tesseract", "remove_default");
+                return ResourceLocation.fromNamespaceAndPath("tesseract", "remove_default");
             }
 
             @Override
@@ -44,7 +44,7 @@ public class TesseractWailaPlugin implements IBlockComponentProvider, IWailaPlug
 
     @Override
     public ResourceLocation getUid(){
-        return new ResourceLocation("tesseract", "tesseract");
+        return ResourceLocation.fromNamespaceAndPath("tesseract", "tesseract");
     }
 
     @Override

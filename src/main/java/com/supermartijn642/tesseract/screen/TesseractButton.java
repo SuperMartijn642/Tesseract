@@ -13,8 +13,8 @@ import net.minecraft.resources.ResourceLocation;
  */
 public class TesseractButton extends ButtonWidget {
 
-    private static final ResourceLocation BUTTON_BACKGROUND = new ResourceLocation("tesseract", "textures/gui/default_buttons.png");
-    private static final ResourceLocation RED_BUTTON_BACKGROUND = new ResourceLocation("tesseract", "textures/gui/red_buttons.png");
+    private static final ResourceLocation BUTTON_BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/default_buttons.png");
+    private static final ResourceLocation RED_BUTTON_BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/red_buttons.png");
 
     private Component text;
     private ResourceLocation background = BUTTON_BACKGROUND;

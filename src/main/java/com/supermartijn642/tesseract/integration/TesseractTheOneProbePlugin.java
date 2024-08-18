@@ -39,7 +39,7 @@ public class TesseractTheOneProbePlugin {
 
         @Override
         public ResourceLocation getID(){
-            return new ResourceLocation("tesseract", "tesseract");
+            return ResourceLocation.fromNamespaceAndPath("tesseract", "tesseract");
         }
 
         @Override
