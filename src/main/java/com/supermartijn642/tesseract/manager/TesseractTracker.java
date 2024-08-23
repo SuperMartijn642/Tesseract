@@ -108,12 +108,12 @@ public class TesseractTracker {
                 SERVER.referencesToBeUnsaved.add(reference.getSaveIndex());
                 SERVER.referencesToBeSaved.remove(reference);
             }
-            Tesseract.CHANNEL.sendToAllPlayers(new PacketRemoveTesseractReferences(SERVER.referencesToBeRemoved));
+            Tesseract.CHANNEL.sendToAllPlayers(new PacketRemoveTesseractReferences(new ArrayList<>(SERVER.referencesToBeRemoved)));
             SERVER.referencesToBeRemoved.clear();
         }
         // Handle dirty references
         if(!SERVER.dirtyReferences.isEmpty()){
-            Tesseract.CHANNEL.sendToAllPlayers(new PacketAddTesseractReferences(SERVER.dirtyReferences));
+            Tesseract.CHANNEL.sendToAllPlayers(new PacketAddTesseractReferences(new ArrayList<>(SERVER.dirtyReferences)));
             SERVER.dirtyReferences.clear();
         }
     }
