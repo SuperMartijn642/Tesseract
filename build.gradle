@@ -39,7 +39,7 @@ dependencies {
     implementation "curse.maven:supermartijn642s-config-lib-438332:${config_library_file}"
 
     // Jade
-    compileOnly "curse.maven:jade-324717:${jade_file}"
+    implementation "curse.maven:jade-324717:${jade_file}"
     // The One Probe
     compileOnly "curse.maven:the-one-probe-245211:${the_one_probe_file}"
 
