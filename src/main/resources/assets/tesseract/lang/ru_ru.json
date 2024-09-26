@@ -1,6 +1,11 @@
 {
-  "block.tesseract.tesseract": "Тессеракт",
+  "tesseract.block.tesseract": "Тессеракт",
   "tesseract.tesseract.info": "Предметы, жидкости и энергия могут передаваться между несколькими тессерактами",
+  "tesseract.tesseract.highlight.channels": "Каналы:",
+  "tesseract.tesseract.highlight.channel_info": "  %1$s %2$s %3$s",
+  "tesseract.tesseract.highlight.channel_info.separator": "-",
+  "tesseract.tesseract.highlight.channel_info.inactive": "Выключен",
+  "tesseract.tesseract.highlight.redstone_blocked": "Заблокировано редстоун сигналом",
   "gui.tesseract.title": "Тессеракт",
   "gui.tesseract.items": "ТЕССЕРАКТ - ПРЕДМЕТЫ",
   "gui.tesseract.fluid": "ТЕССЕРАКТ - ЖИДКОСТИ",
@@ -28,6 +33,11 @@
   "gui.tesseract.add.suggestion": "Название канала",
   "gui.tesseract.add.add": "Создать",
   "gui.tesseract.add.cancel": "Отменить",
+  "gui.tesseract.remove.title.items": "Удалить канал - ПРЕДМЕТЫ",
+  "gui.tesseract.remove.title.fluid": "Удалить канал - ЖИДКОСТИ",
+  "gui.tesseract.remove.title.energy": "Удалить канал - ЭНЕРГИЯl",
+  "gui.tesseract.remove.remove": "Удалить",
+  "gui.tesseract.remove.cancel": "Отменить",
   "gui.tesseract.info_button": "Информация (скоро)",
   "gui.tesseract.info.title": "Информация",
   "gui.tesseract.info.back": "Назад",
@@ -36,5 +46,7 @@
   "gui.tesseract.info.tab.gui": "Экран Тессеракта",
   "gui.tesseract.info.tab.items": "Передача предметов",
   "gui.tesseract.info.tab.fluid": "Передеча жидкости",
-  "gui.tesseract.info.tab.energy": "Передача энергии"
+  "gui.tesseract.info.tab.energy": "Передача энергии",
+  "config.jade.plugin_tesseract.remove_default": "Тессеракт - Удалить информацию по умолчанию",
+  "config.jade.plugin_tesseract.tesseract": "Тессеракт - Информация"
 }
