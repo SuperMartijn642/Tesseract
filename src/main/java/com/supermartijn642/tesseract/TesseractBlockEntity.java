@@ -163,8 +163,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         return this.getReference().getChannel(type);
     }
 
-    public void onNeighborChanged(BlockPos neighbor){
-        Direction side = Direction.fromDelta(neighbor.getX() - this.worldPosition.getX(), neighbor.getY() - this.worldPosition.getY(), neighbor.getZ() - this.worldPosition.getZ());
+    public void onNeighborChanged(BlockPos neighbor, Direction side){
         BlockState state = this.level.getBlockState(neighbor);
         this.surroundingTesseracts[side.ordinal()] = state.getBlock() == Tesseract.tesseract;
     }

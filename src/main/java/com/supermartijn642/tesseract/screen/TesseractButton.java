@@ -44,15 +44,14 @@ public class TesseractButton extends ButtonWidget {
     }
 
     private void drawButtonBackground(PoseStack matrixStack, float x, float y, float width, float height, float yOffset){
-        ScreenUtils.bindTexture(this.background);
-        ScreenUtils.drawTexture(matrixStack, x, y, 2.0F, 2.0F, 0.0F, yOffset, 0.4F, 0.13333334F);
-        ScreenUtils.drawTexture(matrixStack, x + width - 2.0F, y, 2.0F, 2.0F, 0.6F, yOffset, 0.4F, 0.13333334F);
-        ScreenUtils.drawTexture(matrixStack, x + width - 2.0F, y + height - 2.0F, 2.0F, 2.0F, 0.6F, yOffset + 0.2F, 0.4F, 0.13333334F);
-        ScreenUtils.drawTexture(matrixStack, x, y + height - 2.0F, 2.0F, 2.0F, 0.0F, yOffset + 0.2F, 0.4F, 0.13333334F);
-        ScreenUtils.drawTexture(matrixStack, x + 2.0F, y, width - 4.0F, 2.0F, 0.4F, yOffset, 0.2F, 0.13333334F);
-        ScreenUtils.drawTexture(matrixStack, x + 2.0F, y + height - 2.0F, width - 4.0F, 2.0F, 0.4F, yOffset + 0.2F, 0.2F, 0.13333334F);
-        ScreenUtils.drawTexture(matrixStack, x, y + 2.0F, 2.0F, height - 4.0F, 0.0F, yOffset + 0.13333334F, 0.4F, 0.06666667F);
-        ScreenUtils.drawTexture(matrixStack, x + width - 2.0F, y + 2.0F, 2.0F, height - 4.0F, 0.6F, yOffset + 0.13333334F, 0.4F, 0.06666667F);
-        ScreenUtils.drawTexture(matrixStack, x + 2.0F, y + 2.0F, width - 4.0F, height - 4.0F, 0.4F, yOffset + 0.13333334F, 0.2F, 0.06666667F);
+        ScreenUtils.drawTexture(this.background, matrixStack, x, y, 2.0F, 2.0F, 0.0F, yOffset, 0.4F, 0.13333334F);
+        ScreenUtils.drawTexture(this.background, matrixStack, x + width - 2.0F, y, 2.0F, 2.0F, 0.6F, yOffset, 0.4F, 0.13333334F);
+        ScreenUtils.drawTexture(this.background, matrixStack, x + width - 2.0F, y + height - 2.0F, 2.0F, 2.0F, 0.6F, yOffset + 0.2F, 0.4F, 0.13333334F);
+        ScreenUtils.drawTexture(this.background, matrixStack, x, y + height - 2.0F, 2.0F, 2.0F, 0.0F, yOffset + 0.2F, 0.4F, 0.13333334F);
+        ScreenUtils.drawTexture(this.background, matrixStack, x + 2.0F, y, width - 4.0F, 2.0F, 0.4F, yOffset, 0.2F, 0.13333334F);
+        ScreenUtils.drawTexture(this.background, matrixStack, x + 2.0F, y + height - 2.0F, width - 4.0F, 2.0F, 0.4F, yOffset + 0.2F, 0.2F, 0.13333334F);
+        ScreenUtils.drawTexture(this.background, matrixStack, x, y + 2.0F, 2.0F, height - 4.0F, 0.0F, yOffset + 0.13333334F, 0.4F, 0.06666667F);
+        ScreenUtils.drawTexture(this.background, matrixStack, x + width - 2.0F, y + 2.0F, 2.0F, height - 4.0F, 0.6F, yOffset + 0.13333334F, 0.4F, 0.06666667F);
+        ScreenUtils.drawTexture(this.background, matrixStack, x + 2.0F, y + 2.0F, width - 4.0F, height - 4.0F, 0.4F, yOffset + 0.13333334F, 0.2F, 0.06666667F);
     }
 }

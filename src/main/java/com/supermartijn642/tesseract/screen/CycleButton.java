@@ -24,7 +24,6 @@ public abstract class CycleButton extends AbstractButtonWidget {
 
     @Override
     public void render(WidgetRenderContext context, int mouseX, int mouseY){
-        ScreenUtils.bindTexture(TEXTURE);
-        ScreenUtils.drawTexture(context.poseStack(), this.x, this.y, this.width, this.height, (this.textureX + this.getCycleIndex() * 20) / 120f, (this.active ? this.isFocused() ? 1 : 0 : 2) / 3f, 1 / 6f, 1 / 3f);
+        ScreenUtils.drawTexture(TEXTURE, context.poseStack(), this.x, this.y, this.width, this.height, (this.textureX + this.getCycleIndex() * 20) / 120f, (this.active ? this.isFocused() ? 1 : 0 : 2) / 3f, 1 / 6f, 1 / 3f);
     }
 }

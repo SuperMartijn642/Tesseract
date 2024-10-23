@@ -17,8 +17,11 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
@@ -43,11 +46,13 @@ public class TesseractBlock extends BaseBlock implements EntityHoldingBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving){
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving){
         BlockEntity entity = level.getBlockEntity(pos);
         if(entity instanceof TesseractBlockEntity){
-            ((TesseractBlockEntity)entity).setPowered(level.hasNeighborSignal(pos) || level.hasNeighborSignal(pos.above()));
-            ((TesseractBlockEntity)entity).onNeighborChanged(fromPos);
+            for(Direction side : (orientation == null ? Arrays.asList(Direction.values()) : orientation.getDirections())){
+                ((TesseractBlockEntity)entity).setPowered(level.hasNeighborSignal(pos) || level.hasNeighborSignal(pos.above()));
+                ((TesseractBlockEntity)entity).onNeighborChanged(pos.relative(side), side);
+            }
         }
     }
 

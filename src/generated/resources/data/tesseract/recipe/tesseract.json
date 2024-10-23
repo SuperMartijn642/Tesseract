@@ -6,15 +6,9 @@
     "ABA"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:obsidian"
-    },
-    "B": {
-      "item": "minecraft:ender_pearl"
-    },
-    "C": {
-      "item": "minecraft:diamond_block"
-    }
+    "A": "minecraft:obsidian",
+    "B": "minecraft:ender_pearl",
+    "C": "minecraft:diamond_block"
   },
   "result": {
     "id": "tesseract:tesseract"
