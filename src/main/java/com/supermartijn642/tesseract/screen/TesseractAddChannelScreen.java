@@ -59,8 +59,7 @@ public class TesseractAddChannelScreen extends BlockEntityBaseWidget<TesseractBl
 
     @Override
     protected void render(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity entity){
-        ScreenUtils.bindTexture(BACKGROUND);
-        ScreenUtils.drawTexture(context.poseStack(), 0, 0, this.width(), this.height());
+        ScreenUtils.drawTexture(BACKGROUND, context.poseStack(), 0, 0, this.width(), this.height());
 
         ScreenUtils.drawCenteredString(context.poseStack(), TextComponents.translation("gui.tesseract.add.title." + this.type.name().toLowerCase(Locale.ROOT)).get(), 72, 6, 0xffffffff);
 

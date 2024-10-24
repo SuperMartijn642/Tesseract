@@ -42,8 +42,7 @@ public class LockButton extends AbstractButtonWidget {
         else
             icon = this.locked ? Icon.LOCKED : Icon.UNLOCKED;
 
-        ScreenUtils.bindTexture(icon.location);
-        ScreenUtils.drawTexture(context.poseStack(), this.x, this.y, this.width, this.height, 0, 0, 1, 1);
+        ScreenUtils.drawTexture(icon.location, context.poseStack(), this.x, this.y, this.width, this.height, 0, 0, 1, 1);
     }
 
     public boolean isLocked(){

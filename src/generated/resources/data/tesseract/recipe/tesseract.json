@@ -6,15 +6,9 @@
     "ABA"
   ],
   "key": {
-    "A": {
-      "tag": "c:obsidians"
-    },
-    "B": {
-      "tag": "c:ender_pearls"
-    },
-    "C": {
-      "tag": "c:storage_blocks/diamond"
-    }
+    "A": "#c:obsidians",
+    "B": "#c:ender_pearls",
+    "C": "#c:storage_blocks/diamond"
   },
   "result": {
     "id": "tesseract:tesseract"

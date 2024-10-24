@@ -51,8 +51,7 @@ public class TesseractRemoveChannelScreen extends BlockEntityBaseWidget<Tesserac
 
     @Override
     protected void render(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity entity){
-        ScreenUtils.bindTexture(BACKGROUND);
-        ScreenUtils.drawTexture(context.poseStack(), 0, 0, this.width(), this.height());
+        ScreenUtils.drawTexture(BACKGROUND, context.poseStack(), 0, 0, this.width(), this.height());
 
         Channel channel = TesseractChannelManager.CLIENT.getChannelById(this.type, this.channelId);
         if(channel == null){
@@ -66,8 +65,8 @@ public class TesseractRemoveChannelScreen extends BlockEntityBaseWidget<Tesserac
         PlayerRenderer.renderPlayerHead(channel.creator, context.poseStack(), x, 24, 9, 9);
         ScreenUtils.drawString(context.poseStack(), channel.name, x + 12, 25, 0xffffffff);
         if(channel.creator.equals(ClientUtils.getPlayer().getUUID())){
-            ScreenUtils.bindTexture(channel.isPrivate ? TesseractScreen.LOCK_ON : TesseractScreen.LOCK_OFF);
-            ScreenUtils.drawTexture(context.poseStack(), x + 12 + nameWidth + 3, 24, 9, 9);
+            ResourceLocation texture = channel.isPrivate ? TesseractScreen.LOCK_ON : TesseractScreen.LOCK_OFF;
+            ScreenUtils.drawTexture(texture, context.poseStack(), x + 12 + nameWidth + 3, 24, 9, 9);
         }
 
         super.render(context, mouseX, mouseY, entity);

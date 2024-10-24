@@ -165,9 +165,8 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         return this.getReference().getChannel(type);
     }
 
-    public void onNeighborChanged(BlockPos neighbor){
-        Direction facing = Direction.getNearest(neighbor.getX() - this.worldPosition.getX(), neighbor.getY() - this.worldPosition.getY(), neighbor.getZ() - this.worldPosition.getZ());
-        this.surroundingCapabilities.get(facing).clear();
+    public void onNeighborChanged(BlockPos neighbor, Direction side){
+        this.surroundingCapabilities.get(side).clear();
     }
 
     private void notifyNeighbors(){

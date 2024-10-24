@@ -121,8 +121,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
     @Override
     public void render(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity entity){
         GlStateManager._enableBlend();
-        ScreenUtils.bindTexture(BACKGROUND);
-        ScreenUtils.drawTexture(context.poseStack(), 0, 0, this.width(), this.height());
+        ScreenUtils.drawTexture(BACKGROUND, context.poseStack(), 0, 0, this.width(), this.height());
 
         Component s = TextComponents.translation("gui.tesseract." + type.name().toLowerCase(Locale.ROOT)).get();
         ScreenUtils.drawCenteredString(context.poseStack(), s, 177, 14, 0xffffffff);
@@ -171,17 +170,15 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         this.drawTab(context, EnumChannelType.FLUID, 64, FLUID_ICON);
 
         // transfer
-        ScreenUtils.bindTexture(SIDE_TAB);
-        ScreenUtils.drawTexture(context.poseStack(), -27, 150, 30, 32);
+        ScreenUtils.drawTexture(SIDE_TAB, context.poseStack(), -27, 150, 30, 32);
 
         // info and redstone
-        ScreenUtils.bindTexture(REDSTONE_TAB);
-        ScreenUtils.drawTexture(context.poseStack(), -30, 32, 30, 30);
+        ScreenUtils.drawTexture(REDSTONE_TAB, context.poseStack(), -30, 32, 30, 30);
     }
 
     private void drawTab(WidgetRenderContext context, EnumChannelType type, int x, ResourceLocation icon){
-        ScreenUtils.bindTexture(type == TesseractScreen.type ? TAB_ON : TAB_OFF);
-        ScreenUtils.drawTexture(context.poseStack(), x, type == TesseractScreen.type ? 0 : 2, 28, type == TesseractScreen.type ? 31 : 26);
+        ResourceLocation texture = type == TesseractScreen.type ? TAB_ON : TAB_OFF;
+        ScreenUtils.drawTexture(texture, context.poseStack(), x, type == TesseractScreen.type ? 0 : 2, 28, type == TesseractScreen.type ? 31 : 26);
 
         float width = 16, height = 16;
         float iconX = x + (28 - width) / 2f, iconY = (TesseractScreen.type == type ? 0 : 2) + (29 - height) / 2f;
@@ -190,9 +187,8 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
     }
 
     private void drawChannels(PoseStack matrixStack, int mouseX, int mouseY, TesseractBlockEntity entity){
-        ScreenUtils.bindTexture(CHANNEL_BACKGROUND);
-        ScreenUtils.drawTexture(matrixStack, 3, 31, 102, 156, 0, 0, 102 / 256f, 157 / 256f);
-        ScreenUtils.drawTexture(matrixStack, 26, 187, 56, 16, 0, 0, 56 / 256f, 16 / 256f);
+        ScreenUtils.drawTexture(CHANNEL_BACKGROUND, matrixStack, 3, 31, 102, 156, 0, 0, 102 / 256f, 157 / 256f);
+        ScreenUtils.drawTexture(CHANNEL_BACKGROUND, matrixStack, 26, 187, 56, 16, 0, 0, 56 / 256f, 16 / 256f);
 
         List<Channel> channels = TesseractChannelManager.CLIENT.getChannels(TesseractScreen.type);
         int channelHeight = 13;
@@ -219,8 +215,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
             // channel name and icons
             x += 2;
             if(entity.getChannelId(type) == channel.id){
-                ScreenUtils.bindTexture(CHECKMARK);
-                ScreenUtils.drawTexture(matrixStack, x, y + 2, 9, 9);
+                ScreenUtils.drawTexture(CHECKMARK, matrixStack, x, y + 2, 9, 9);
                 x += 12;
             }
             PlayerRenderer.renderPlayerHead(channel.creator, matrixStack, x, y + 2, 9, 9);
@@ -233,10 +228,8 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
                 name = ClientUtils.getFontRenderer().getSplitter().plainHeadByWidth(name, availableWidth - ClientUtils.getFontRenderer().width("..."), Style.EMPTY) + "...";
             ScreenUtils.drawString(matrixStack, name, x, y + 3, 0xffffffff);
             x += ClientUtils.getFontRenderer().width(name) + 3;
-            if(isOwnedChannel){
-                ScreenUtils.bindTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF);
-                ScreenUtils.drawTexture(matrixStack, x, y + 2, 9, 9);
-            }
+            if(isOwnedChannel)
+                ScreenUtils.drawTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF, matrixStack, x, y + 2, 9, 9);
         }
     }
 
@@ -263,8 +256,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         ScreenUtils.drawString(matrixStack, channel.type.getTranslation(), 129, 91, ScreenUtils.ACTIVE_TEXT_COLOR);
         // accessibility
         ScreenUtils.drawString(matrixStack, TextComponents.string("Accessibility:").italic().get(), 117, 105, 0xff666666);
-        ScreenUtils.bindTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF);
-        ScreenUtils.drawTexture(matrixStack, 116, 114, 11, 11);
+        ScreenUtils.drawTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF, matrixStack, 116, 114, 11, 11);
         ScreenUtils.drawString(matrixStack, TextComponents.translation("gui.tesseract.channel." + (channel.isPrivate ? "private" : "public")).get(), 129, 116, ScreenUtils.ACTIVE_TEXT_COLOR);
     }
 
