@@ -1,5 +1,2 @@
-### Tesseract 1.0.35a
-- Fixed tesseract info not getting synced to the client properly
-
 ### Tesseract 1.0.35
-- Initial release of Tesseract for Minecraft 1.21 & 1.21.1
+- Initial release of Tesseract for Minecraft 1.21.2 & 1.21.3
