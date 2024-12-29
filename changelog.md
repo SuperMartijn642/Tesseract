@@ -1,3 +1,6 @@
+### Tesseract 1.0.36a
+- Fixed packet error when channels names are one character more than should be allowed
+
 ### Tesseract 1.0.36
 - Fixed data for last placed tesseract sometimes getting overwritten when placing a new tesseract after loading a save
 - Added Simplified Chinese translations (thanks to YCJ-GuLi!)
