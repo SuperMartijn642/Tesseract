@@ -124,7 +124,7 @@ public class Channel {
         buffer.writeEnum(this.type);
         buffer.writeUUID(this.creator);
         buffer.writeBoolean(this.isPrivate);
-        buffer.writeUtf(this.name, TesseractAddChannelScreen.CHANNEL_MAX_CHARACTERS);
+        buffer.writeUtf(this.name, TesseractAddChannelScreen.CHANNEL_MAX_CHARACTERS + 1);
     }
 
     public static Channel readClientChannel(FriendlyByteBuf buffer){
@@ -132,7 +132,7 @@ public class Channel {
         EnumChannelType type = buffer.readEnum(EnumChannelType.class);
         UUID creator = buffer.readUUID();
         boolean isPrivate = buffer.readBoolean();
-        String name = buffer.readUtf(TesseractAddChannelScreen.CHANNEL_MAX_CHARACTERS);
+        String name = buffer.readUtf(TesseractAddChannelScreen.CHANNEL_MAX_CHARACTERS + 1);
         return new Channel(id, type, creator, isPrivate, name);
     }
 
