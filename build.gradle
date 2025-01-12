@@ -42,6 +42,10 @@ dependencies {
     compileOnly "curse.maven:jade-324717:${jade_file}"
     // The One Probe
     compileOnly "curse.maven:the-one-probe-245211:${the_one_probe_file}"
+    // WTHIT
+    implementation "curse.maven:wthit-forge-455982:${wthit_file}"
+    // Bad Packets
+    runtimeOnly "curse.maven:badpackets-615134:${bad_packets_file}"
 
     // Just Enough Items
 //    runtimeOnly "curse.maven:jei-238222:${just_enough_items_file}"
