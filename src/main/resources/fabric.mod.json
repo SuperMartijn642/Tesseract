@@ -36,5 +36,11 @@
     "java": "${java_dependency}",
     "supermartijn642corelib": "${core_library_dependency}",
     "supermartijn642configlib": "${config_library_dependency}"
+  },
+  "custom": {
+    "waila:plugins": {
+      "id": "tesseract:tesseract",
+      "initializer": "com.supermartijn642.tesseract.integration.TesseractWTHITPlugin"
+    }
   }
 }
