@@ -1,0 +1,7 @@
+{
+  "tesseract:tesseract": {
+    "entrypoints": {
+      "client": "com.supermartijn642.tesseract.integration.TesseractWTHITPlugin"
+    }
+  }
+}
