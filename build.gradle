@@ -39,6 +39,11 @@ dependencies {
     // Config library
     implementation "curse.maven:supermartijn642s-config-lib-438332:${config_library_file}"
 
+    // WTHIT
+    implementation "curse.maven:wthit-forge-455982:${wthit_file}"
+    // Bad Packets
+    runtimeOnly "curse.maven:badpackets-615134:${bad_packets_file}"
+
     // Just Enough Items
 //    runtimeOnly "curse.maven:jei-238222:${just_enough_items_file}"
 
