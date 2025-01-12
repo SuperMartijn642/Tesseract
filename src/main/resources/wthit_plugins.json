@@ -1,0 +1,5 @@
+{
+  "tesseract:tesseract": {
+    "initializer": "com.supermartijn642.tesseract.integration.TesseractWTHITPlugin"
+  }
+}
