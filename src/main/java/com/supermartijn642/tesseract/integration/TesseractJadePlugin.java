@@ -17,7 +17,7 @@ import snownee.jade.api.config.IPluginConfig;
  * Created 1/26/2021 by SuperMartijn642
  */
 @WailaPlugin("tesseract")
-public class TesseractWailaPlugin implements IBlockComponentProvider, IWailaPlugin {
+public class TesseractJadePlugin implements IBlockComponentProvider, IWailaPlugin {
 
     @Override
     public void registerClient(IWailaClientRegistration registration){
