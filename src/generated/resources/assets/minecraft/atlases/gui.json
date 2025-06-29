@@ -1,0 +1,92 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/add_screen_background"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/fluid_tab_icon"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/side_tab_new"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:gui/sprites/widget/locked_button_disabled"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/item_tab_icon"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/red_buttons"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:gui/sprites/widget/unlocked_button_disabled"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:gui/sprites/widget/locked_button_highlighted"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/lock_off"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/buttons"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/new_gui"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/checkmark_icon"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/tab_off_new"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/background"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/energy_tab_icon"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:gui/sprites/widget/unlocked_button"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:gui/sprites/widget/locked_button"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/default_buttons"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/redstone_tab"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/tab_new"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "tesseract:gui/lock_on"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:gui/sprites/widget/unlocked_button_highlighted"
+    }
+  ]
+}

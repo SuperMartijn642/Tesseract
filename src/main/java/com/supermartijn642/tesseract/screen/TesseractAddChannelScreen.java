@@ -2,7 +2,7 @@ package com.supermartijn642.tesseract.screen;
 
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.TextComponents;
-import com.supermartijn642.core.gui.ScreenUtils;
+import com.supermartijn642.core.gui.GuiGraphicsHelper;
 import com.supermartijn642.core.gui.widget.BlockEntityBaseWidget;
 import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.core.gui.widget.premade.TextFieldWidget;
@@ -29,7 +29,7 @@ public class TesseractAddChannelScreen extends BlockEntityBaseWidget<TesseractBl
     private static final int CHANNEL_MIN_CHARACTERS = 3;
     public static final int CHANNEL_MAX_CHARACTERS = 19;
 
-    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/add_screen_background.png");
+    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/add_screen_background");
 
     private final EnumChannelType type;
 
@@ -58,12 +58,12 @@ public class TesseractAddChannelScreen extends BlockEntityBaseWidget<TesseractBl
     }
 
     @Override
-    protected void render(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity entity){
-        ScreenUtils.drawTexture(BACKGROUND, context.poseStack(), 0, 0, this.width(), this.height());
+    protected void render(WidgetRenderContext context, GuiGraphicsHelper graphics, int mouseX, int mouseY, TesseractBlockEntity entity){
+        graphics.submitSprite(BACKGROUND, 0, 0, this.width(), this.height());
 
-        ScreenUtils.drawCenteredString(context.poseStack(), TextComponents.translation("gui.tesseract.add.title." + this.type.name().toLowerCase(Locale.ROOT)).get(), 72, 6, 0xffffffff);
+        graphics.submitText(TextComponents.translation("gui.tesseract.add.title." + this.type.name().toLowerCase(Locale.ROOT)).get(), 72, 6, p -> p.color(0xffffffff).centerHorizontally());
 
-        super.render(context, mouseX, mouseY, entity);
+        super.render(context, graphics, mouseX, mouseY, entity);
     }
 
     private boolean checkChannelName(String name){
