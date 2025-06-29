@@ -7,6 +7,7 @@ import com.supermartijn642.tesseract.capabilities.CombinedFluidHandler;
 import com.supermartijn642.tesseract.capabilities.CombinedItemHandler;
 import com.supermartijn642.tesseract.screen.TesseractAddChannelScreen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -81,7 +82,7 @@ public class Channel {
 
     public CompoundTag write(){
         CompoundTag compound = new CompoundTag();
-        compound.putUUID("creator", this.creator);
+        compound.putIntArray("creator", UUIDUtil.uuidToIntArray(this.creator));
         compound.putBoolean("private", this.isPrivate);
         compound.putString("name", this.name);
         CompoundTag tesseractCompound = new CompoundTag();
@@ -93,25 +94,25 @@ public class Channel {
     }
 
     public void read(CompoundTag compound){
-        this.creator = compound.getUUID("creator");
-        this.isPrivate = compound.getBoolean("private");
-        this.name = compound.getString("name");
+        this.creator = UUIDUtil.uuidFromIntArray(compound.getIntArray("creator").orElseGet(() -> new int[0]));
+        this.isPrivate = compound.getBooleanOr("private", false);
+        this.name = compound.getStringOr("name", "---");
         this.tesseracts.clear();
         this.sendingTesseracts.clear();
         this.receivingTesseracts.clear();
-        CompoundTag tesseractCompound = compound.getCompound("references");
-        for(String key : tesseractCompound.getAllKeys()){
-            TesseractReference reference = TesseractTracker.SERVER.fromKey(tesseractCompound.getCompound(key));
+        CompoundTag tesseractCompound = compound.getCompoundOrEmpty("references");
+        for(String key : tesseractCompound.keySet()){
+            TesseractReference reference = TesseractTracker.SERVER.fromKey(tesseractCompound.getCompoundOrEmpty(key));
             if(reference != null)
                 this.addTesseract(reference);
         }
 
         if(compound.contains("tesseracts")){ // for older versions
-            tesseractCompound = compound.getCompound("tesseracts");
-            for(String key : tesseractCompound.getAllKeys()){
-                CompoundTag compound2 = tesseractCompound.getCompound(key);
-                String dimension = compound2.getString("dim");
-                BlockPos pos = new BlockPos(compound2.getInt("posx"), compound2.getInt("posy"), compound2.getInt("posz"));
+            tesseractCompound = compound.getCompoundOrEmpty("tesseracts");
+            for(String key : tesseractCompound.keySet()){
+                CompoundTag compound2 = tesseractCompound.getCompoundOrEmpty(key);
+                String dimension = compound2.getStringOr("dim", "");
+                BlockPos pos = new BlockPos(compound2.getIntOr("posx", 0), compound2.getIntOr("posy", 0), compound2.getIntOr("posz", 0));
                 TesseractReference reference = TesseractTracker.SERVER.getReference(dimension, pos);
                 if(reference != null)
                     this.addTesseract(reference);

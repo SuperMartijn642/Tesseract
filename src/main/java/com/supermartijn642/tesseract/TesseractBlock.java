@@ -57,15 +57,7 @@ public class TesseractBlock extends BaseBlock implements EntityHoldingBlock {
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving){
-        BlockEntity entity = level.getBlockEntity(pos);
-        if(entity instanceof TesseractBlockEntity)
-            ((TesseractBlockEntity)entity).onReplaced();
-        super.onRemove(state, level, pos, newState, isMoving);
-    }
-
-    @Override
-    protected void appendItemInformation(ItemStack stack, Consumer<Component> info, boolean advanced){
+    public void appendItemInformation(ItemStack stack, Consumer<Component> info, boolean advanced){
         info.accept(TextComponents.translation("tesseract.tesseract.info").color(ChatFormatting.AQUA).get());
     }
 }

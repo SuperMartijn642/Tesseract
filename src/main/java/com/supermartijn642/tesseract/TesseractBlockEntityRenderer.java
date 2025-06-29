@@ -3,8 +3,8 @@ package com.supermartijn642.tesseract;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.supermartijn642.core.render.CustomBlockEntityRenderer;
-import com.supermartijn642.core.render.RenderConfiguration;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import org.joml.Matrix4f;
 
 /**
@@ -24,7 +24,7 @@ public class TesseractBlockEntityRenderer implements CustomBlockEntityRenderer<T
         poseStack.translate(-0.5, -0.5, -0.5);
 
         Matrix4f matrix4f = poseStack.last().pose();
-        this.renderCube(matrix4f, bufferSource.getBuffer(RenderConfiguration.endPortal()));
+        this.renderCube(matrix4f, bufferSource.getBuffer(RenderType.endPortal()));
 
         poseStack.popPose();
     }
