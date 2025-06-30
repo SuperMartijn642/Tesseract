@@ -1,7 +1,7 @@
 package com.supermartijn642.tesseract.screen;
 
 import com.supermartijn642.core.TextComponents;
-import com.supermartijn642.core.gui.ScreenUtils;
+import com.supermartijn642.core.gui.GuiGraphicsHelper;
 import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.core.gui.widget.premade.AbstractButtonWidget;
 import net.minecraft.network.chat.Component;
@@ -33,7 +33,7 @@ public class LockButton extends AbstractButtonWidget {
     }
 
     @Override
-    public void render(WidgetRenderContext context, int x, int y){
+    public void render(WidgetRenderContext context, GuiGraphicsHelper graphics, int x, int y){
         Icon icon;
         if(!this.active)
             icon = this.locked ? Icon.LOCKED_DISABLED : Icon.UNLOCKED_DISABLED;
@@ -42,7 +42,7 @@ public class LockButton extends AbstractButtonWidget {
         else
             icon = this.locked ? Icon.LOCKED : Icon.UNLOCKED;
 
-        ScreenUtils.drawTexture(icon.location, context.poseStack(), this.x, this.y, this.width, this.height, 0, 0, 1, 1);
+        graphics.submitSprite(icon.location, this.x, this.y, this.width, this.height);
     }
 
     public boolean isLocked(){
@@ -58,13 +58,13 @@ public class LockButton extends AbstractButtonWidget {
         tooltips.accept(TextComponents.translation("gui.tesseract.channel." + (this.locked ? "private" : "public")).get());
     }
 
-    enum Icon {
-        LOCKED(ResourceLocation.withDefaultNamespace("textures/gui/sprites/widget/locked_button.png")),
-        LOCKED_HOVER(ResourceLocation.withDefaultNamespace("textures/gui/sprites/widget/locked_button_highlighted.png")),
-        LOCKED_DISABLED(ResourceLocation.withDefaultNamespace("textures/gui/sprites/widget/locked_button_disabled.png")),
-        UNLOCKED(ResourceLocation.withDefaultNamespace("textures/gui/sprites/widget/unlocked_button.png")),
-        UNLOCKED_HOVER(ResourceLocation.withDefaultNamespace("textures/gui/sprites/widget/unlocked_button_highlighted.png")),
-        UNLOCKED_DISABLED(ResourceLocation.withDefaultNamespace("textures/gui/sprites/widget/unlocked_button_disabled.png"));
+    public enum Icon {
+        LOCKED(ResourceLocation.withDefaultNamespace("gui/sprites/widget/locked_button")),
+        LOCKED_HOVER(ResourceLocation.withDefaultNamespace("gui/sprites/widget/locked_button_highlighted")),
+        LOCKED_DISABLED(ResourceLocation.withDefaultNamespace("gui/sprites/widget/locked_button_disabled")),
+        UNLOCKED(ResourceLocation.withDefaultNamespace("gui/sprites/widget/unlocked_button")),
+        UNLOCKED_HOVER(ResourceLocation.withDefaultNamespace("gui/sprites/widget/unlocked_button_highlighted")),
+        UNLOCKED_DISABLED(ResourceLocation.withDefaultNamespace("gui/sprites/widget/unlocked_button_disabled"));
 
         private final ResourceLocation location;
 

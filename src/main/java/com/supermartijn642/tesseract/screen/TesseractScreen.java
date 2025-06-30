@@ -1,9 +1,8 @@
 package com.supermartijn642.tesseract.screen;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.TextComponents;
-import com.supermartijn642.core.gui.ScreenUtils;
+import com.supermartijn642.core.gui.GuiGraphicsHelper;
 import com.supermartijn642.core.gui.WidgetScreen;
 import com.supermartijn642.core.gui.widget.BlockEntityBaseWidget;
 import com.supermartijn642.core.gui.widget.WidgetRenderContext;
@@ -33,20 +32,19 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
     private static final int MAX_DISPLAYED_CHANNELS = 12;
     private static final int CHANNEL_CUTOFF_LENGTH = 100;
 
-    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/new_gui.png");
+    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/new_gui");
     private static final int BACKGROUND_WIDTH = 249, BACKGROUND_HEIGHT = 211;
-    private static final ResourceLocation CHANNEL_BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/background.png");
-    private static final ResourceLocation TAB_ON = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/tab_new.png");
-    private static final ResourceLocation TAB_OFF = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/tab_off_new.png");
-    private static final ResourceLocation ITEM_ICON = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/item_tab_icon.png");
-    private static final ResourceLocation ENERGY_ICON = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/energy_tab_icon.png");
-    private static final ResourceLocation FLUID_ICON = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/fluid_tab_icon.png");
-    private static final ResourceLocation SCROLL_BUTTONS = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/server_selection.png");
-    public static final ResourceLocation LOCK_ON = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/lock_on.png");
-    public static final ResourceLocation LOCK_OFF = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/lock_off.png");
-    private static final ResourceLocation REDSTONE_TAB = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/redstone_tab.png");
-    private static final ResourceLocation SIDE_TAB = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/side_tab_new.png");
-    private static final ResourceLocation CHECKMARK = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/checkmark_icon.png");
+    public static final ResourceLocation CHANNEL_BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/background");
+    public static final ResourceLocation TAB_ON = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/tab_new");
+    public static final ResourceLocation TAB_OFF = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/tab_off_new");
+    public static final ResourceLocation ITEM_ICON = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/item_tab_icon");
+    public static final ResourceLocation ENERGY_ICON = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/energy_tab_icon");
+    public static final ResourceLocation FLUID_ICON = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/fluid_tab_icon");
+    public static final ResourceLocation LOCK_ON = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/lock_on");
+    public static final ResourceLocation LOCK_OFF = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/lock_off");
+    public static final ResourceLocation REDSTONE_TAB = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/redstone_tab");
+    public static final ResourceLocation SIDE_TAB = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/side_tab_new");
+    public static final ResourceLocation CHECKMARK = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/checkmark_icon");
 
     private static EnumChannelType type = EnumChannelType.ITEMS;
 
@@ -112,30 +110,30 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
     }
 
     @Override
-    protected void renderBackground(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity object){
+    protected void renderBackground(WidgetRenderContext context, GuiGraphicsHelper graphics, int mouseX, int mouseY, TesseractBlockEntity object){
         this.setFocused(true);
-        super.renderBackground(context, mouseX, mouseY, object);
+        super.renderBackground(context, graphics, mouseX, mouseY, object);
     }
 
     @Override
-    public void render(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity entity){
-        ScreenUtils.drawTexture(BACKGROUND, context.poseStack(), 0, 0, this.width(), this.height());
+    public void render(WidgetRenderContext context, GuiGraphicsHelper graphics, int mouseX, int mouseY, TesseractBlockEntity entity){
+        graphics.submitSprite(BACKGROUND, 0, 0, this.width(), this.height());
 
         Component s = TextComponents.translation("gui.tesseract." + type.name().toLowerCase(Locale.ROOT)).get();
-        ScreenUtils.drawCenteredString(context.poseStack(), s, 177, 14, 0xffffffff);
+        graphics.submitText(s, 177, 14, p -> p.color(0xffffffff).centerHorizontally());
 
-        this.drawTabs(context);
-        this.drawChannels(context.poseStack(), mouseX, mouseY, entity);
+        this.drawTabs(graphics);
+        this.drawChannels(graphics, mouseX, mouseY, entity);
 
         Channel channel = TesseractChannelManager.CLIENT.getChannelById(type, this.selectedChannel);
         if(channel != null)
-            this.drawSelectedChannelInfo(context.poseStack(), channel);
+            this.drawSelectedChannelInfo(graphics, channel);
 
-        super.render(context, mouseX, mouseY, entity);
+        super.render(context, graphics, mouseX, mouseY, entity);
     }
 
     @Override
-    protected void renderTooltips(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity entity){
+    protected void renderTooltips(WidgetRenderContext context, GuiGraphicsHelper graphics, int mouseX, int mouseY, TesseractBlockEntity entity){
         List<Channel> channels = TesseractChannelManager.CLIENT.getChannels(TesseractScreen.type);
         for(int i = 0; i < MAX_DISPLAYED_CHANNELS && i + this.scrollOffset < channels.size(); i++){
             Channel channel = channels.get(i + this.scrollOffset);
@@ -143,50 +141,50 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
             if(mouseX >= x && mouseX < x + 9 && mouseY >= y + 2 && mouseY < y + 11){
                 String creatorName = PlayerRenderer.getPlayerUsername(channel.creator);
                 if(creatorName != null)
-                    ScreenUtils.drawTooltip(context.poseStack(), creatorName, mouseX, mouseY);
+                    graphics.submitTooltip(c -> c.literal(creatorName), mouseX, mouseY);
             }
         }
 
         if(mouseX >= 9 && mouseX < 31 && mouseY >= (type == EnumChannelType.ITEMS ? 2 : 4) && mouseY < 28)
-            ScreenUtils.drawTooltip(context.poseStack(), EnumChannelType.ITEMS.getTranslation(), mouseX, mouseY);
+            graphics.submitTooltip(c -> c.text(EnumChannelType.ITEMS.getTranslation()), mouseX, mouseY);
         else if(mouseX >= 38 && mouseX < 60 && mouseY >= (type == EnumChannelType.ENERGY ? 2 : 4) && mouseY < 28)
-            ScreenUtils.drawTooltip(context.poseStack(), EnumChannelType.ENERGY.getTranslation(), mouseX, mouseY);
+            graphics.submitTooltip(c -> c.text(EnumChannelType.ENERGY.getTranslation()), mouseX, mouseY);
         else if(mouseX >= 67 && mouseX < 89 && mouseY >= (type == EnumChannelType.FLUID ? 2 : 4) && mouseY < 28)
-            ScreenUtils.drawTooltip(context.poseStack(), EnumChannelType.FLUID.getTranslation(), mouseX, mouseY);
+            graphics.submitTooltip(c -> c.text(EnumChannelType.FLUID.getTranslation()), mouseX, mouseY);
 
-        super.renderTooltips(context, mouseX, mouseY, entity);
+        super.renderTooltips(context, graphics, mouseX, mouseY, entity);
     }
 
-    private void drawTabs(WidgetRenderContext context){
+    private void drawTabs(GuiGraphicsHelper graphics){
         // items
-        this.drawTab(context, EnumChannelType.ITEMS, 6, ITEM_ICON);
+        this.drawTab(graphics, EnumChannelType.ITEMS, 6, ITEM_ICON);
 
         // energy
-        this.drawTab(context, EnumChannelType.ENERGY, 35, ENERGY_ICON);
+        this.drawTab(graphics, EnumChannelType.ENERGY, 35, ENERGY_ICON);
 
         // fluid
-        this.drawTab(context, EnumChannelType.FLUID, 64, FLUID_ICON);
+        this.drawTab(graphics, EnumChannelType.FLUID, 64, FLUID_ICON);
 
         // transfer
-        ScreenUtils.drawTexture(SIDE_TAB, context.poseStack(), -27, 150, 30, 32);
+        graphics.submitSprite(SIDE_TAB, -27, 150, 30, 32);
 
         // info and redstone
-        ScreenUtils.drawTexture(REDSTONE_TAB, context.poseStack(), -30, 32, 30, 30);
+        graphics.submitSprite(REDSTONE_TAB, -30, 32, 30, 30);
     }
 
-    private void drawTab(WidgetRenderContext context, EnumChannelType type, int x, ResourceLocation icon){
+    private void drawTab(GuiGraphicsHelper graphics, EnumChannelType type, int x, ResourceLocation icon){
         ResourceLocation texture = type == TesseractScreen.type ? TAB_ON : TAB_OFF;
-        ScreenUtils.drawTexture(texture, context.poseStack(), x, type == TesseractScreen.type ? 0 : 2, 28, type == TesseractScreen.type ? 31 : 26);
+        graphics.submitSprite(texture, x, type == TesseractScreen.type ? 0 : 2, 28, type == TesseractScreen.type ? 31 : 26);
 
         float width = 16, height = 16;
         float iconX = x + (28 - width) / 2f, iconY = (TesseractScreen.type == type ? 0 : 2) + (29 - height) / 2f;
 
-        ScreenUtils.drawItem(context.poseStack(), new ItemStack(type.item.get()), null, (int)iconX, (int)iconY);
+        graphics.submitItem(new ItemStack(type.item.get()), (int)iconX, (int)iconY);
     }
 
-    private void drawChannels(PoseStack matrixStack, int mouseX, int mouseY, TesseractBlockEntity entity){
-        ScreenUtils.drawTexture(CHANNEL_BACKGROUND, matrixStack, 3, 31, 102, 156, 0, 0, 102 / 256f, 157 / 256f);
-        ScreenUtils.drawTexture(CHANNEL_BACKGROUND, matrixStack, 26, 187, 56, 16, 0, 0, 56 / 256f, 16 / 256f);
+    private void drawChannels(GuiGraphicsHelper graphics, int mouseX, int mouseY, TesseractBlockEntity entity){
+        graphics.submitSprite(CHANNEL_BACKGROUND, 3, 31, 102, 156, p -> p.uv(0, 0, 102 / 256f, 157 / 256f));
+        graphics.submitSprite(CHANNEL_BACKGROUND, 26, 187, 56, 16, p -> p.uv(0, 0, 56 / 256f, 16 / 256f));
 
         List<Channel> channels = TesseractChannelManager.CLIENT.getChannels(TesseractScreen.type);
         int channelHeight = 13;
@@ -197,26 +195,26 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
 
             // background
             if(entity.getChannelId(type) == channel.id)
-                ScreenUtils.fillRect(matrixStack, x, y, 102, channelHeight, 0x69007050);
+                graphics.submitRectangle(x, y, 102, channelHeight, p -> p.color(0x69007050));
             if(this.selectedChannel == channel.id){
-                ScreenUtils.fillRect(matrixStack, x, y, 102, 1, 0xffffffff);
-                ScreenUtils.fillRect(matrixStack, x, y + 12, 102, 1, 0xffffffff);
-                ScreenUtils.fillRect(matrixStack, x, y, 1, channelHeight, 0xffffffff);
-                ScreenUtils.fillRect(matrixStack, x + 101, y, 1, channelHeight, 0xffffffff);
+                graphics.submitRectangle(x, y, 102, 1, p -> p.color(0xffffffff));
+                graphics.submitRectangle(x, y + 12, 102, 1, p -> p.color(0xffffffff));
+                graphics.submitRectangle(x, y, 1, channelHeight, p -> p.color(0xffffffff));
+                graphics.submitRectangle(x + 101, y, 1, channelHeight, p -> p.color(0xffffffff));
             }else if(mouseX >= x && mouseX < 105 && mouseY >= y && mouseY < y + channelHeight){
-                ScreenUtils.fillRect(matrixStack, x, y, 102, 1, 0xff666666);
-                ScreenUtils.fillRect(matrixStack, x, y + 12, 102, 1, 0xff666666);
-                ScreenUtils.fillRect(matrixStack, x, y, 1, channelHeight, 0xff666666);
-                ScreenUtils.fillRect(matrixStack, x + 101, y, 1, channelHeight, 0xff666666);
+                graphics.submitRectangle(x, y, 102, 1, p -> p.color(0xff666666));
+                graphics.submitRectangle(x, y + 12, 102, 1, p -> p.color(0xff666666));
+                graphics.submitRectangle(x, y, 1, channelHeight, p -> p.color(0xff666666));
+                graphics.submitRectangle(x + 101, y, 1, channelHeight, p -> p.color(0xff666666));
             }
 
             // channel name and icons
             x += 2;
             if(entity.getChannelId(type) == channel.id){
-                ScreenUtils.drawTexture(CHECKMARK, matrixStack, x, y + 2, 9, 9);
+                graphics.submitSprite(CHECKMARK, x, y + 2, 9, 9);
                 x += 12;
             }
-            PlayerRenderer.renderPlayerHead(channel.creator, matrixStack, x, y + 2, 9, 9);
+            PlayerRenderer.renderPlayerHead(channel.creator, graphics, x, y + 2, 9, 9);
             x += 12;
             boolean isOwnedChannel = channel.creator.equals(ClientUtils.getPlayer().getUUID());
             // trim the channel name to fit
@@ -224,38 +222,41 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
             String name = channel.name;
             if(ClientUtils.getFontRenderer().width(name) > availableWidth)
                 name = ClientUtils.getFontRenderer().getSplitter().plainHeadByWidth(name, availableWidth - ClientUtils.getFontRenderer().width("..."), Style.EMPTY) + "...";
-            ScreenUtils.drawString(matrixStack, name, x, y + 3, 0xffffffff);
+            graphics.submitText(name, x, y + 3, p -> p.color(0xffffffff));
             x += ClientUtils.getFontRenderer().width(name) + 3;
             if(isOwnedChannel)
-                ScreenUtils.drawTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF, matrixStack, x, y + 2, 9, 9);
+                graphics.submitSprite(channel.isPrivate ? LOCK_ON : LOCK_OFF, x, y + 2, 9, 9);
         }
     }
 
-    private void drawSelectedChannelInfo(PoseStack matrixStack, Channel channel){
+    private void drawSelectedChannelInfo(GuiGraphicsHelper graphics, Channel channel){
         // channel name
-        matrixStack.pushPose();
-        matrixStack.translate(177, 35, 0);
-        matrixStack.scale(1.2f, 1.2f, 1);
-        ScreenUtils.drawCenteredString(matrixStack, channel.name, 0, 0, ScreenUtils.ACTIVE_TEXT_COLOR);
-        matrixStack.popPose();
+        graphics.poseStack().pushMatrix();
+        graphics.poseStack().translate(177, 35);
+        graphics.poseStack().scale(1.2f, 1.2f);
+        graphics.submitText(channel.name, 0, 0, p -> p.activeColor().centerHorizontally());
+        graphics.poseStack().popMatrix();
         // creator
-        ScreenUtils.drawString(matrixStack, TextComponents.string("Creator:").italic().get(), 117, 55, 0xff666666);
-        PlayerRenderer.renderPlayerHead(channel.creator, matrixStack, 117, 65, 9, 9);
+        graphics.submitText(TextComponents.string("Creator:").italic().get(), 117, 55, p -> p.color(0xff666666));
+        PlayerRenderer.renderPlayerHead(channel.creator, graphics, 117, 65, 9, 9);
         String creatorName = PlayerRenderer.getPlayerUsername(channel.creator);
         if(creatorName != null)
-            ScreenUtils.drawString(matrixStack, creatorName, 129, 66, ScreenUtils.ACTIVE_TEXT_COLOR);
+            //noinspection Convert2MethodRef
+            graphics.submitText(creatorName, 129, 66, p -> p.activeColor());
         // category
-        ScreenUtils.drawString(matrixStack, TextComponents.string("Category:").italic().get(), 117, 80, 0xff666666);
-        matrixStack.pushPose();
-        matrixStack.translate(115, 88, 0);
-        matrixStack.scale(0.8f, 0.8f, 1);
-        ScreenUtils.drawItem(matrixStack, new ItemStack(type.item.get()), null, 0, 0);
-        matrixStack.popPose();
-        ScreenUtils.drawString(matrixStack, channel.type.getTranslation(), 129, 91, ScreenUtils.ACTIVE_TEXT_COLOR);
+        graphics.submitText(TextComponents.string("Category:").italic().get(), 117, 80, p -> p.color(0xff666666));
+        graphics.poseStack().pushMatrix();
+        graphics.poseStack().translate(115, 88);
+        graphics.poseStack().scale(0.8f, 0.8f);
+        graphics.submitItem(new ItemStack(type.item.get()), 0, 0);
+        graphics.poseStack().popMatrix();
+        //noinspection Convert2MethodRef
+        graphics.submitText(channel.type.getTranslation(), 129, 91, p -> p.activeColor());
         // accessibility
-        ScreenUtils.drawString(matrixStack, TextComponents.string("Accessibility:").italic().get(), 117, 105, 0xff666666);
-        ScreenUtils.drawTexture(channel.isPrivate ? LOCK_ON : LOCK_OFF, matrixStack, 116, 114, 11, 11);
-        ScreenUtils.drawString(matrixStack, TextComponents.translation("gui.tesseract.channel." + (channel.isPrivate ? "private" : "public")).get(), 129, 116, ScreenUtils.ACTIVE_TEXT_COLOR);
+        graphics.submitText(TextComponents.string("Accessibility:").italic().get(), 117, 105, p -> p.color(0xff666666));
+        graphics.submitSprite(channel.isPrivate ? LOCK_ON : LOCK_OFF, 116, 114, 11, 11);
+        //noinspection Convert2MethodRef
+        graphics.submitText(TextComponents.translation("gui.tesseract.channel." + (channel.isPrivate ? "private" : "public")).get(), 129, 116, p -> p.activeColor());
     }
 
     private void setChannelType(EnumChannelType type){

@@ -26,7 +26,7 @@ public class TesseractSaveHandler {
     }
 
     private static void onJoin(PlayerEvent.PlayerLoggedInEvent e){
-        if(e.getEntity().getCommandSenderWorld().isClientSide)
+        if(e.getEntity().level().isClientSide)
             return;
 
         TesseractTracker.sendReferences(e.getEntity());
