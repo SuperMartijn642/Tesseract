@@ -1,5 +1,6 @@
 package com.supermartijn642.tesseract;
 
+import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.core.block.BaseBlockEntityType;
 import com.supermartijn642.core.item.BaseBlockItem;
 import com.supermartijn642.core.item.CreativeItemGroup;
@@ -13,8 +14,6 @@ import com.supermartijn642.tesseract.manager.TesseractSaveHandler;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import com.supermartijn642.tesseract.packets.*;
 import com.supermartijn642.tesseract.recipe_conditions.TesseractRecipeCondition;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +51,8 @@ public class Tesseract {
         CHANNEL.registerMessage(PacketRemoveTesseractReferences.class, PacketRemoveTesseractReferences::new, true);
 
         register();
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> TesseractClient::register);
+        if(CommonUtils.getEnvironmentSide().isClient())
+            TesseractClient.register();
         registerGenerators();
     }
 
