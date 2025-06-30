@@ -44,13 +44,13 @@ public class TesseractReference {
 
     public TesseractReference(long index, CompoundTag tag, boolean isClientSide){
         this.index = index;
-        this.dimension = tag.getString("dim");
-        this.pos = new BlockPos(tag.getInt("posx"), tag.getInt("posy"), tag.getInt("posz"));
+        this.dimension = tag.getStringOr("dim","");
+        this.pos = new BlockPos(tag.getIntOr("posx", 0), tag.getIntOr("posy", 0), tag.getIntOr("posz", 0));
         this.isClientSide = isClientSide;
         for(EnumChannelType type : EnumChannelType.values()){
-            this.channels.put(type, tag.getInt(type + "_channel"));
-            this.canSend.put(type, tag.getBoolean(type + "_canSend"));
-            this.canReceive.put(type, tag.getBoolean(type + "_canReceive"));
+            this.channels.put(type, tag.getIntOr(type + "_channel", 0));
+            this.canSend.put(type, tag.getBooleanOr(type + "_canSend", true));
+            this.canReceive.put(type, tag.getBooleanOr(type + "_canReceive", true));
         }
     }
 

@@ -162,7 +162,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     private void notifyNeighbors(){
-        this.level.blockUpdated(this.worldPosition, this.getBlockState().getBlock());
+        this.level.updateNeighborsAt(this.worldPosition, this.getBlockState().getBlock());
     }
 
     private void updateReference(){
@@ -185,14 +185,16 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     protected void readData(CompoundTag compound){
         for(EnumChannelType type : EnumChannelType.values())
             if(compound.contains("transferState" + type.name()))
-                this.transferState.put(type, TransferState.valueOf(compound.getString("transferState" + type.name())));
+                this.transferState.put(type, compound.getString("transferState" + type.name()).map(TransferState::valueOf).orElse(TransferState.BOTH));
         if(compound.contains("redstoneState"))
-            this.redstoneState = RedstoneState.valueOf(compound.getString("redstoneState"));
+            this.redstoneState = compound.getString("redstoneState").map(RedstoneState::valueOf).orElse(RedstoneState.DISABLED);
         if(compound.contains("powered"))
-            this.redstone = compound.getBoolean("powered");
+            this.redstone = compound.getBooleanOr("powered", false);
     }
 
-    public void onReplaced(){
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state){
+        super.preRemoveSideEffects(pos, state);
         if(!this.level.isClientSide)
             TesseractTracker.SERVER.remove(this.level, this.worldPosition);
     }
