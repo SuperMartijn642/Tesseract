@@ -4,7 +4,6 @@ import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.tesseract.TesseractConfig;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelResource;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.LevelEvent;
@@ -19,22 +18,22 @@ public class TesseractSaveHandler {
     private static long lastSaveTime = 0;
 
     public static void registerListeners(){
-        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::onJoin);
-        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::tick);
-        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::save);
-        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::load);
+        PlayerEvent.PlayerLoggedInEvent.BUS.addListener(TesseractSaveHandler::onJoin);
+        TickEvent.LevelTickEvent.Post.BUS.addListener(TesseractSaveHandler::tick);
+        LevelEvent.Save.BUS.addListener(TesseractSaveHandler::save);
+        LevelEvent.Load.BUS.addListener(TesseractSaveHandler::load);
     }
 
     private static void onJoin(PlayerEvent.PlayerLoggedInEvent e){
-        if(e.getEntity().getCommandSenderWorld().isClientSide)
+        if(e.getEntity().level().isClientSide)
             return;
 
         TesseractTracker.sendReferences(e.getEntity());
         TesseractChannelManager.sendChannels(e.getEntity());
     }
 
-    private static void tick(TickEvent.LevelTickEvent e){
-        if(e.level.isClientSide || e.phase != TickEvent.Phase.END || e.level.dimension() != Level.OVERWORLD)
+    private static void tick(TickEvent.LevelTickEvent.Post e){
+        if(e.level.isClientSide || e.level.dimension() != Level.OVERWORLD)
             return;
 
         if(System.currentTimeMillis() - lastSaveTime >= TesseractConfig.saveInterval.get() * 60000){

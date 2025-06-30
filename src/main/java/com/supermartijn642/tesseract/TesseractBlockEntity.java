@@ -6,9 +6,10 @@ import com.supermartijn642.tesseract.manager.TesseractReference;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -172,24 +173,19 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     @Override
-    protected CompoundTag writeData(){
-        CompoundTag compound = new CompoundTag();
+    protected void writeData(ValueOutput output){
         for(EnumChannelType type : EnumChannelType.values())
-            compound.putString("transferState" + type.name(), this.transferState.get(type).name());
-        compound.putString("redstoneState", this.redstoneState.name());
-        compound.putBoolean("powered", this.redstone);
-        return compound;
+            output.putString("transferState" + type.name(), this.transferState.get(type).name());
+        output.putString("redstoneState", this.redstoneState.name());
+        output.putBoolean("powered", this.redstone);
     }
 
     @Override
-    protected void readData(CompoundTag compound){
+    protected void readData(ValueInput input){
         for(EnumChannelType type : EnumChannelType.values())
-            if(compound.contains("transferState" + type.name()))
-                this.transferState.put(type, compound.getString("transferState" + type.name()).map(TransferState::valueOf).orElse(TransferState.BOTH));
-        if(compound.contains("redstoneState"))
-            this.redstoneState = compound.getString("redstoneState").map(RedstoneState::valueOf).orElse(RedstoneState.DISABLED);
-        if(compound.contains("powered"))
-            this.redstone = compound.getBooleanOr("powered", false);
+            this.transferState.put(type, input.getString("transferState" + type.name()).map(TransferState::valueOf).orElse(TransferState.BOTH));
+        this.redstoneState = input.getString("redstoneState").map(RedstoneState::valueOf).orElse(RedstoneState.DISABLED);
+        this.redstone = input.getBooleanOr("powered", false);
     }
 
     @Override

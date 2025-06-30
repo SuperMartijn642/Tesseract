@@ -9,7 +9,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 
 import java.io.DataInputStream;
@@ -36,7 +35,7 @@ public class TesseractTracker {
     }
 
     public static void registerListeners(){
-        MinecraftForge.EVENT_BUS.addListener(TesseractTracker::onTick);
+        TickEvent.LevelTickEvent.Post.BUS.addListener(TesseractTracker::onTick);
     }
 
     private final HashMap<String,HashMap<BlockPos,TesseractReference>> tesseracts = new HashMap<>();
@@ -94,8 +93,8 @@ public class TesseractTracker {
         this.referencesToBeSaved.add(reference);
     }
 
-    public static void onTick(TickEvent.LevelTickEvent e){
-        if(e.level.isClientSide || e.phase != TickEvent.Phase.END || e.level.dimension() != Level.OVERWORLD)
+    public static void onTick(TickEvent.LevelTickEvent.Post e){
+        if(e.level.isClientSide || e.level.dimension() != Level.OVERWORLD)
             return;
 
         // Handle removed references

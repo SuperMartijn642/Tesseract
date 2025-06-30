@@ -2,7 +2,7 @@ package com.supermartijn642.tesseract.screen;
 
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.TextComponents;
-import com.supermartijn642.core.gui.ScreenUtils;
+import com.supermartijn642.core.gui.GuiGraphicsHelper;
 import com.supermartijn642.core.gui.widget.BlockEntityBaseWidget;
 import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.tesseract.EnumChannelType;
@@ -24,7 +24,7 @@ import java.util.Locale;
  */
 public class TesseractRemoveChannelScreen extends BlockEntityBaseWidget<TesseractBlockEntity> {
 
-    private static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "textures/gui/add_screen_background.png");
+    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/add_screen_background");
 
     private final EnumChannelType type;
     private final int channelId;
@@ -50,26 +50,26 @@ public class TesseractRemoveChannelScreen extends BlockEntityBaseWidget<Tesserac
     }
 
     @Override
-    protected void render(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity entity){
-        ScreenUtils.drawTexture(BACKGROUND, context.poseStack(), 0, 0, this.width(), this.height());
+    protected void render(WidgetRenderContext context, GuiGraphicsHelper graphics, int mouseX, int mouseY, TesseractBlockEntity entity){
+        graphics.submitSprite(BACKGROUND, 0, 0, this.width(), this.height());
 
         Channel channel = TesseractChannelManager.CLIENT.getChannelById(this.type, this.channelId);
         if(channel == null){
             ClientUtils.closeScreen();
             return;
         }
-        ScreenUtils.drawCenteredString(context.poseStack(), TextComponents.translation("gui.tesseract.remove.title." + this.type.name().toLowerCase(Locale.ROOT)).get(), 72, 6, 0xffffffff);
+        graphics.submitText(TextComponents.translation("gui.tesseract.remove.title." + this.type.name().toLowerCase(Locale.ROOT)).get(), 72, 6, p -> p.color(0xffffffff).centerHorizontally());
         // Render player head and channel name
         int nameWidth = ClientUtils.getFontRenderer().width(channel.name);
         int x = 72 - (9 + 3 + nameWidth + 3 + 9) / 2;
-        PlayerRenderer.renderPlayerHead(channel.creator, context.poseStack(), x, 24, 9, 9);
-        ScreenUtils.drawString(context.poseStack(), channel.name, x + 12, 25, 0xffffffff);
+        PlayerRenderer.renderPlayerHead(channel.creator, graphics, x, 24, 9, 9);
+        graphics.submitText(channel.name, x + 12, 25, p -> p.color(0xffffffff));
         if(channel.creator.equals(ClientUtils.getPlayer().getUUID())){
             ResourceLocation texture = channel.isPrivate ? TesseractScreen.LOCK_ON : TesseractScreen.LOCK_OFF;
-            ScreenUtils.drawTexture(texture, context.poseStack(), x + 12 + nameWidth + 3, 24, 9, 9);
+            graphics.submitSprite(texture, x + 12 + nameWidth + 3, 24, 9, 9);
         }
 
-        super.render(context, mouseX, mouseY, entity);
+        super.render(context, graphics, mouseX, mouseY, entity);
     }
 
     @Override
