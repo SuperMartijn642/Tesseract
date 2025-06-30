@@ -181,7 +181,7 @@ public class CombinedFluidHandler implements IFluidHandler {
                 if(entity != this.requester){
                     for(IFluidHandler handler : entity.getSurroundingFluidCapabilities()){
                         FluidStack stack = handler.drain(fluid.copy(), FluidAction.SIMULATE);
-                        if(!stack.isEmpty() && resource.isFluidEqual(stack)){
+                        if(!stack.isEmpty() && resource.is(stack.getFluidType())){
                             if(action.execute())
                                 handler.drain(fluid.copy(), FluidAction.EXECUTE);
                             fluid.setAmount(fluid.getAmount() - stack.getAmount());
@@ -229,7 +229,7 @@ public class CombinedFluidHandler implements IFluidHandler {
                                 fluid.setAmount(maxDrain - fluid.getAmount());
                         }else{
                             FluidStack stack = handler.drain(fluid.copy(), FluidAction.SIMULATE);
-                            if(!stack.isEmpty() && fluid.isFluidEqual(stack)){
+                            if(!stack.isEmpty() && fluid.is(stack.getFluidType())){
                                 if(action.execute())
                                     handler.drain(fluid.copy(), FluidAction.EXECUTE);
                                 fluid.setAmount(fluid.getAmount() - stack.getAmount());

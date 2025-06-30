@@ -1,6 +1,5 @@
 package com.supermartijn642.tesseract.screen;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.TextComponents;
@@ -120,7 +119,6 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
 
     @Override
     public void render(WidgetRenderContext context, int mouseX, int mouseY, TesseractBlockEntity entity){
-        GlStateManager._enableBlend();
         ScreenUtils.drawTexture(BACKGROUND, context.poseStack(), 0, 0, this.width(), this.height());
 
         Component s = TextComponents.translation("gui.tesseract." + type.name().toLowerCase(Locale.ROOT)).get();
