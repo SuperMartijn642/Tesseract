@@ -22,6 +22,7 @@ public class TesseractReference {
 
     private final long index;
     private final String dimension;
+    private final RegistryKey<World> dimensionKey;
     private final BlockPos pos;
     private final boolean isClientSide;
     private final EnumMap<EnumChannelType,Integer> channels = new EnumMap<>(EnumChannelType.class);
@@ -31,7 +32,8 @@ public class TesseractReference {
 
     TesseractReference(long index, TesseractBlockEntity entity){
         this.index = index;
-        this.dimension = entity.getLevel().dimension().location().toString();
+        this.dimensionKey = entity.getLevel().dimension();
+        this.dimension = this.dimensionKey.location().toString();
         this.pos = entity.getBlockPos();
         this.isClientSide = entity.getLevel().isClientSide;
         for(EnumChannelType type : EnumChannelType.values()){
@@ -44,6 +46,7 @@ public class TesseractReference {
     public TesseractReference(long index, CompoundNBT tag, boolean isClientSide){
         this.index = index;
         this.dimension = tag.getString("dim");
+        this.dimensionKey = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(this.dimension));
         this.pos = new BlockPos(tag.getInt("posx"), tag.getInt("posy"), tag.getInt("posz"));
         this.isClientSide = isClientSide;
         for(EnumChannelType type : EnumChannelType.values()){
@@ -63,9 +66,8 @@ public class TesseractReference {
 
     public World getLevel(){
         if(this.isClientSide)
-            return ClientUtils.getWorld().dimension().location().toString().equals(this.dimension) ? ClientUtils.getWorld() : null;
-        RegistryKey<World> key = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(this.dimension));
-        return CommonUtils.getLevel(key);
+            return ClientUtils.getWorld().dimension() == this.dimensionKey ? ClientUtils.getWorld() : null;
+        return CommonUtils.getLevel(this.dimensionKey);
     }
 
     public BlockPos getPos(){
@@ -87,7 +89,7 @@ public class TesseractReference {
      */
     public boolean canBeAccessed(){
         World level = this.getLevel();
-        return level != null && this.getLevel().isLoaded(this.pos) && this.isValid();
+        return level != null && level.isLoaded(this.pos) && this.isValid();
     }
 
     public TesseractBlockEntity getTesseract(){
