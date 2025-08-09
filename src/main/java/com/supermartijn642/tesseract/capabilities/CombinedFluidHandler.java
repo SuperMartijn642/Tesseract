@@ -103,6 +103,10 @@ public class CombinedFluidHandler implements Storage<FluidVariant> {
 
     @Override
     public Iterator<StorageView<FluidVariant>> iterator(){
+        if(this.pushRecurrentCall())
+            return Collections.emptyIterator();
+        this.popRecurrentCall();
+
         Iterator<TesseractReference> tesseracts = this.channel.tesseracts.iterator();
         return new FlatMapIterator<>(new FlatMapIterator<>(tesseracts, reference -> {
             if(reference.canBeAccessed()){
@@ -111,7 +115,7 @@ public class CombinedFluidHandler implements Storage<FluidVariant> {
                     return entity.getSurroundingCapabilities(FluidStorage.SIDED).iterator();
             }
             return Collections.emptyIterator();
-        }, this::pushRecurrentCall, this::popRecurrentCall), Storage::iterator);
+        }), Storage::iterator, this::pushRecurrentCall, this::popRecurrentCall);
     }
 
     /**
