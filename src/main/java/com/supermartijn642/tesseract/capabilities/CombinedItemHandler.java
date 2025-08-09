@@ -102,6 +102,10 @@ public class CombinedItemHandler implements Storage<ItemVariant> {
 
     @Override
     public Iterator<StorageView<ItemVariant>> iterator(){
+        if(this.pushRecurrentCall())
+            return Collections.emptyIterator();
+        this.popRecurrentCall();
+
         Iterator<TesseractReference> tesseracts = this.channel.tesseracts.iterator();
         return new FlatMapIterator<>(new FlatMapIterator<>(tesseracts, reference -> {
             if(reference.canBeAccessed()){
@@ -110,7 +114,7 @@ public class CombinedItemHandler implements Storage<ItemVariant> {
                     return entity.getSurroundingItemCapabilities().iterator();
             }
             return Collections.emptyIterator();
-        }, this::pushRecurrentCall, this::popRecurrentCall), Storage::iterator);
+        }), Storage::iterator, this::pushRecurrentCall, this::popRecurrentCall);
     }
 
     /**
