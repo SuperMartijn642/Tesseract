@@ -32,7 +32,7 @@ public class TesseractTracker {
     private static long referenceIndexCounter = 0;
 
     public static TesseractTracker getInstance(Level level){
-        return level.isClientSide ? CLIENT : SERVER;
+        return level.isClientSide() ? CLIENT : SERVER;
     }
 
     public static void registerListeners(){

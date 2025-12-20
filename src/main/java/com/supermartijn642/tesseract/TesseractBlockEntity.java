@@ -32,10 +32,6 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     private final Map<EnumChannelType,Object> capabilities = new EnumMap<>(EnumChannelType.class);
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
-    /**
-     * Counts recurrent calls inside the combined capabilities in order to prevent infinite loops
-     */
-    public int recurrentCalls = 0;
 
     private final Map<Direction,Map<EnumChannelType,BlockApiCache<?,Direction>>> surroundingCapabilities = new HashMap<>();
     private final boolean[] surroundingTesseracts = new boolean[Direction.values().length];
@@ -198,7 +194,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state){
         super.preRemoveSideEffects(pos, state);
-        if(!this.level.isClientSide)
+        if(!this.level.isClientSide())
             TesseractTracker.SERVER.remove(this.level, this.worldPosition);
     }
 }

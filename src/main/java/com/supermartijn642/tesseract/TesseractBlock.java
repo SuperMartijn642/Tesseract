@@ -35,7 +35,7 @@ public class TesseractBlock extends BaseBlock implements EntityHoldingBlock {
 
     @Override
     protected InteractionFeedback interact(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, Direction hitSide, Vec3 hitLocation){
-        if(level.isClientSide)
+        if(level.isClientSide())
             TesseractClient.openScreen(pos);
         return InteractionFeedback.SUCCESS;
     }

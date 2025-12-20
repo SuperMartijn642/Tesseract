@@ -31,7 +31,7 @@ public class TesseractChannelManager {
     }
 
     public static TesseractChannelManager getInstance(Level level){
-        return getInstance(level.isClientSide);
+        return getInstance(level.isClientSide());
     }
 
     private final HashMap<EnumChannelType,ChannelList> types = new HashMap<>();
@@ -103,7 +103,7 @@ public class TesseractChannelManager {
             return;
         if(channel.isPrivate){
             PlayerLookup.all(CommonUtils.getServer()).stream()
-                .filter(player -> player.getGameProfile().getId().equals(channel.creator))
+                .filter(player -> player.getGameProfile().id().equals(channel.creator))
                 .findAny()
                 .ifPresent(player -> Tesseract.CHANNEL.sendToPlayer(player, new PacketAddChannel(channel)));
         }else
@@ -115,7 +115,7 @@ public class TesseractChannelManager {
             return;
         if(channel.isPrivate){
             PlayerLookup.all(CommonUtils.getServer()).stream()
-                .filter(player -> player.getGameProfile().getId().equals(channel.creator))
+                .filter(player -> player.getGameProfile().id().equals(channel.creator))
                 .findAny()
                 .ifPresent(player -> Tesseract.CHANNEL.sendToPlayer(player, new PacketRemoveChannel(channel)));
         }else

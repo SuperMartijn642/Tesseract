@@ -30,13 +30,17 @@ public class TesseractReference {
     private final EnumMap<EnumChannelType,Boolean> canSend = new EnumMap<>(EnumChannelType.class);
     private final EnumMap<EnumChannelType,Boolean> canReceive = new EnumMap<>(EnumChannelType.class);
     private WeakReference<TesseractBlockEntity> entity;
+    /**
+     * Counts recurrent calls inside the combined capabilities in order to prevent infinite loops
+     */
+    public int recurrentCalls = 0;
 
     TesseractReference(long index, TesseractBlockEntity entity){
         this.index = index;
         this.dimensionKey = entity.getLevel().dimension();
         this.dimension = this.dimensionKey.location().toString();
         this.pos = entity.getBlockPos();
-        this.isClientSide = entity.getLevel().isClientSide;
+        this.isClientSide = entity.getLevel().isClientSide();
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, -1);
             this.canSend.put(type, entity.canSend(type));

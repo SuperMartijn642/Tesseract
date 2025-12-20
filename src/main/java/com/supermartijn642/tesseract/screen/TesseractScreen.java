@@ -13,7 +13,7 @@ import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.packets.PacketScreenSetChannel;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -81,7 +81,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         this.removeButton = this.addWidget(new TesseractButton(180, 185, 61, 18, TextComponents.translation("gui.tesseract.remove").get(),
             () -> {
                 Channel channel = TesseractChannelManager.CLIENT.getChannelById(type, this.selectedChannel);
-                if(channel != null && (channel.creator.equals(ClientUtils.getPlayer().getUUID()) || (ClientUtils.getPlayer().hasPermissions(2)) && Screen.hasShiftDown()))
+                if(channel != null && (channel.creator.equals(ClientUtils.getPlayer().getUUID()) || (ClientUtils.getPlayer().hasPermissions(2)) && Minecraft.getInstance().hasShiftDown()))
                     ClientUtils.displayScreen(WidgetScreen.of(new TesseractRemoveChannelScreen(this.blockEntityLevel, this.blockEntityPos, type, this.selectedChannel)));
             }
         ));
@@ -269,8 +269,8 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
     }
 
     @Override
-    protected boolean mousePressed(int mouseX, int mouseY, int button, boolean hasBeenHandled, TesseractBlockEntity entity){
-        if(!hasBeenHandled && button == 0){
+    protected boolean mousePressed(int mouseX, int mouseY, MouseButtonInfo info, boolean isDoubleClick, boolean hasBeenHandled, TesseractBlockEntity entity){
+        if(!hasBeenHandled && info.button() == 0){
             if(mouseY >= 2 && mouseY < 2 + 26){ // tabs
                 if(mouseX >= 6 && mouseX < 6 + 28 && type != EnumChannelType.ITEMS){
                     this.setChannelType(EnumChannelType.ITEMS);
@@ -300,7 +300,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
             }
         }
 
-        return super.mousePressed(mouseX, mouseY, button, hasBeenHandled, entity);
+        return super.mousePressed(mouseX, mouseY, info, isDoubleClick, hasBeenHandled, entity);
     }
 
     @Override
