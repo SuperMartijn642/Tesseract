@@ -10,7 +10,6 @@ import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.core.registry.RegistryEntryAcceptor;
 import com.supermartijn642.tesseract.generators.*;
-import com.supermartijn642.tesseract.integration.TesseractTheOneProbePlugin;
 import com.supermartijn642.tesseract.manager.TesseractSaveHandler;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import com.supermartijn642.tesseract.packets.*;
@@ -37,7 +36,6 @@ public class Tesseract {
     public Tesseract(IEventBus eventBus){
         TesseractTracker.registerListeners();
         TesseractSaveHandler.registerListeners();
-        eventBus.addListener(TesseractTheOneProbePlugin::interModEnqueue);
 
         TesseractConfig.init();
 

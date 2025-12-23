@@ -12,10 +12,11 @@ import java.util.function.Consumer;
 public class TesseractBlockApiProviders {
 
     public static void register(){
+        //noinspection DataFlowIssue
         ModLoadingContext.get().getActiveContainer().getEventBus().addListener((Consumer<RegisterCapabilitiesEvent>)event -> {
-            event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, Tesseract.tesseract_tile, (entity, side) -> entity.getItemCapability());
-            event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, Tesseract.tesseract_tile, (entity, side) -> entity.getFluidCapability());
-            event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, Tesseract.tesseract_tile, (entity, side) -> entity.getEnergyCapability());
+            event.registerBlockEntity(Capabilities.Item.BLOCK, Tesseract.tesseract_tile, (entity, side) -> entity.getItemCapability());
+            event.registerBlockEntity(Capabilities.Fluid.BLOCK, Tesseract.tesseract_tile, (entity, side) -> entity.getFluidCapability());
+            event.registerBlockEntity(Capabilities.Energy.BLOCK, Tesseract.tesseract_tile, (entity, side) -> entity.getEnergyCapability());
         });
     }
 }

@@ -138,15 +138,15 @@ public class Channel {
     }
 
     public CombinedItemHandler getItemHandler(TesseractBlockEntity self){
-        return new CombinedItemHandler(this, self);
+        return new CombinedItemHandler(this, self.getReference());
     }
 
     public CombinedFluidHandler getFluidHandler(TesseractBlockEntity self){
-        return new CombinedFluidHandler(this, self);
+        return new CombinedFluidHandler(this, self.getReference());
     }
 
     public CombinedEnergyStorage getEnergyStorage(TesseractBlockEntity self){
-        return new CombinedEnergyStorage(this, self);
+        return new CombinedEnergyStorage(this, self.getReference());
     }
 
     @Override

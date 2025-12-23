@@ -26,7 +26,7 @@ public class TesseractSaveHandler {
     }
 
     private static void onJoin(PlayerEvent.PlayerLoggedInEvent e){
-        if(e.getEntity().level().isClientSide)
+        if(e.getEntity().level().isClientSide())
             return;
 
         TesseractTracker.sendReferences(e.getEntity());
@@ -34,7 +34,7 @@ public class TesseractSaveHandler {
     }
 
     private static void tick(LevelTickEvent.Post e){
-        if(e.getLevel().isClientSide || e.getLevel().dimension() != Level.OVERWORLD)
+        if(e.getLevel().isClientSide() || e.getLevel().dimension() != Level.OVERWORLD)
             return;
 
         if(System.currentTimeMillis() - lastSaveTime >= TesseractConfig.saveInterval.get() * 60000){

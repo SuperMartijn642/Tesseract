@@ -13,9 +13,10 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,10 +31,6 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     private final EnumMap<EnumChannelType,Object> capabilities = new EnumMap<>(EnumChannelType.class);
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
-    /**
-     * Counts recurrent calls inside the combined capabilities in order to prevent infinite loops
-     */
-    public int recurrentCalls = 0;
 
     private final Map<Direction,Map<EnumChannelType,BlockCapabilityCache<?,Direction>>> surroundingCapabilities = new HashMap<>();
 
@@ -66,36 +63,38 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         return !this.isBlockedByRedstone();
     }
 
-    public IItemHandler getItemCapability(){
-        return (IItemHandler)this.capabilities.computeIfAbsent(EnumChannelType.ITEMS, o -> {
+    public ResourceHandler<ItemResource> getItemCapability(){
+        //noinspection unchecked
+        return (ResourceHandler<ItemResource>)this.capabilities.computeIfAbsent(EnumChannelType.ITEMS, o -> {
             Channel channel = this.getChannel(EnumChannelType.ITEMS);
             return channel == null ? null : channel.getItemHandler(this);
         });
     }
 
-    public IFluidHandler getFluidCapability(){
-        return (IFluidHandler)this.capabilities.computeIfAbsent(EnumChannelType.FLUID, o -> {
+    public ResourceHandler<FluidResource> getFluidCapability(){
+        //noinspection unchecked
+        return (ResourceHandler<FluidResource>)this.capabilities.computeIfAbsent(EnumChannelType.FLUID, o -> {
             Channel channel = this.getChannel(EnumChannelType.FLUID);
             return channel == null ? null : channel.getFluidHandler(this);
         });
     }
 
-    public IEnergyStorage getEnergyCapability(){
-        return (IEnergyStorage)this.capabilities.computeIfAbsent(EnumChannelType.ENERGY, o -> {
+    public EnergyHandler getEnergyCapability(){
+        return (EnergyHandler)this.capabilities.computeIfAbsent(EnumChannelType.ENERGY, o -> {
             Channel channel = this.getChannel(EnumChannelType.ENERGY);
             return channel == null ? null : channel.getEnergyStorage(this);
         });
     }
 
-    public List<IItemHandler> getSurroundingItemCapabilities(){
+    public List<ResourceHandler<ItemResource>> getSurroundingItemCapabilities(){
         return this.getSurroundingCapabilities(EnumChannelType.ITEMS);
     }
 
-    public List<IFluidHandler> getSurroundingFluidCapabilities(){
+    public List<ResourceHandler<FluidResource>> getSurroundingFluidCapabilities(){
         return this.getSurroundingCapabilities(EnumChannelType.FLUID);
     }
 
-    public List<IEnergyStorage> getSurroundingEnergyCapabilities(){
+    public List<EnergyHandler> getSurroundingEnergyCapabilities(){
         return this.getSurroundingCapabilities(EnumChannelType.ENERGY);
     }
 
@@ -104,9 +103,9 @@ public class TesseractBlockEntity extends BaseBlockEntity {
             return Collections.emptyList();
 
         BlockCapability<?,Direction> capability = switch(type){
-            case ITEMS -> Capabilities.ItemHandler.BLOCK;
-            case FLUID -> Capabilities.FluidHandler.BLOCK;
-            case ENERGY -> Capabilities.EnergyStorage.BLOCK;
+            case ITEMS -> Capabilities.Item.BLOCK;
+            case FLUID -> Capabilities.Fluid.BLOCK;
+            case ENERGY -> Capabilities.Energy.BLOCK;
         };
 
         //noinspection unchecked
@@ -199,7 +198,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state){
         super.preRemoveSideEffects(pos, state);
-        if(!this.level.isClientSide)
+        if(!this.level.isClientSide())
             TesseractTracker.SERVER.remove(this.level, this.worldPosition);
     }
 }

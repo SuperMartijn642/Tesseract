@@ -1,146 +1,111 @@
 package com.supermartijn642.tesseract.capabilities;
 
-import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.TransferPreconditions;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+
+import java.util.function.Supplier;
 
 /**
  * Created 3/20/2020 by SuperMartijn642
  */
-public class CombinedEnergyStorage implements IEnergyStorage {
+public class CombinedEnergyStorage implements EnergyHandler {
 
     private final Channel channel;
-    private final TesseractBlockEntity requester;
+    private final TesseractReference requester;
 
-    public CombinedEnergyStorage(Channel channel, TesseractBlockEntity requester){
+    public CombinedEnergyStorage(Channel channel, TesseractReference requester){
         this.channel = channel;
         this.requester = requester;
     }
 
     @Override
-    public int receiveEnergy(int maxReceive, boolean simulate){
-        if(this.pushRecurrentCall())
-            return 0;
-
-        if(!this.requester.canSend(EnumChannelType.ENERGY) || maxReceive <= 0){
-            this.popRecurrentCall();
-            return 0;
-        }
-
-        int amount = maxReceive;
-
-        loop:
-        for(TesseractReference location : this.channel.receivingTesseracts){
-            if(location.canBeAccessed() && location.canReceive(EnumChannelType.ENERGY)){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
-                    for(IEnergyStorage storage : entity.getSurroundingEnergyCapabilities()){
-                        if(!storage.canReceive())
-                            continue;
-                        int received = storage.receiveEnergy(amount, simulate);
-                        if(received > 0){
-                            amount -= received;
-                            if(amount <= 0)
-                                break loop;
-                        }
+    public long getAmountAsLong(){
+        return this.runSafe(0L, () -> {
+            long amount = 0;
+            for(TesseractReference reference : this.channel.tesseracts){
+                if(reference != this.requester && reference.canBeAccessed()){
+                    TesseractBlockEntity entity = reference.getTesseract();
+                    for(EnergyHandler handler : entity.getSurroundingEnergyCapabilities()){
+                        long handlerAmount = handler.getAmountAsLong();
+                        if(handlerAmount < 0)
+                            throw new IllegalStateException("Energy handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + handlerAmount + "' for #getAmountAsLong()!");
+                        amount += handlerAmount;
                     }
                 }
             }
-        }
-
-        this.popRecurrentCall();
-
-        return Math.max(0, maxReceive - amount);
+            return Math.max(0, amount);
+        });
     }
 
     @Override
-    public int extractEnergy(int maxExtract, boolean simulate){
-        if(this.pushRecurrentCall())
-            return 0;
-
-        if(!this.requester.canReceive(EnumChannelType.ENERGY) || maxExtract <= 0){
-            this.popRecurrentCall();
-            return 0;
-        }
-
-        int amount = maxExtract;
-
-        loop:
-        for(TesseractReference location : this.channel.sendingTesseracts){
-            if(location.canBeAccessed() && location.canSend(EnumChannelType.ENERGY)){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
-                    for(IEnergyStorage storage : entity.getSurroundingEnergyCapabilities()){
-                        if(!storage.canExtract())
-                            continue;
-                        int extracted = storage.extractEnergy(amount, simulate);
-                        if(extracted > 0){
-                            amount -= extracted;
-                            if(amount <= 0)
-                                break loop;
-                        }
+    public long getCapacityAsLong(){
+        return this.runSafe(0L, () -> {
+            long capacity = 0;
+            for(TesseractReference reference : this.channel.tesseracts){
+                if(reference != this.requester && reference.canBeAccessed()){
+                    TesseractBlockEntity entity = reference.getTesseract();
+                    for(EnergyHandler handler : entity.getSurroundingEnergyCapabilities()){
+                        long handlerCapacity = handler.getAmountAsLong();
+                        if(handlerCapacity < 0)
+                            throw new IllegalStateException("Energy handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + handlerCapacity + "' for #getCapacityAsLong()!");
+                        capacity += handlerCapacity;
                     }
                 }
             }
-        }
-
-        this.popRecurrentCall();
-
-        return Math.max(0, maxExtract - amount);
+            return capacity;
+        });
     }
 
     @Override
-    public int getEnergyStored(){
-        if(this.pushRecurrentCall())
+    public int insert(int amount, TransactionContext transaction){
+        TransferPreconditions.checkNonNegative(amount);
+        if(!this.requester.canSend(this.channel.type))
             return 0;
-
-        int amount = 0;
-        for(TesseractReference location : this.channel.tesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
-                    for(IEnergyStorage storage : entity.getSurroundingEnergyCapabilities())
-                        amount += storage.getEnergyStored();
+        return this.runSafe(0, () -> {
+            int leftOver = amount;
+            for(TesseractReference reference : this.channel.receivingTesseracts){
+                if(reference != this.requester && reference.canBeAccessed()){
+                    TesseractBlockEntity entity = reference.getTesseract();
+                    for(EnergyHandler handler : entity.getSurroundingEnergyCapabilities()){
+                        int inserted = handler.insert(leftOver, transaction);
+                        if(inserted < 0)
+                            throw new IllegalStateException("Energy handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + inserted + "' for #insert()!");
+                        leftOver -= inserted;
+                        if(leftOver <= 0)
+                            return amount;
+                    }
                 }
             }
-        }
-
-        this.popRecurrentCall();
-
-        return amount;
+            return amount - leftOver;
+        });
     }
 
     @Override
-    public int getMaxEnergyStored(){
-        if(this.pushRecurrentCall())
+    public int extract(int amount, TransactionContext transaction){
+        TransferPreconditions.checkNonNegative(amount);
+        if(!this.requester.canReceive(this.channel.type))
             return 0;
-
-        int amount = 0;
-        for(TesseractReference location : this.channel.tesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
-                    for(IEnergyStorage storage : entity.getSurroundingEnergyCapabilities())
-                        amount += storage.getMaxEnergyStored();
+        return this.runSafe(0, () -> {
+            int leftOver = amount;
+            for(TesseractReference reference : this.channel.sendingTesseracts){
+                if(reference != this.requester && reference.canBeAccessed()){
+                    TesseractBlockEntity entity = reference.getTesseract();
+                    for(EnergyHandler handler : entity.getSurroundingEnergyCapabilities()){
+                        int extracted = handler.extract(leftOver, transaction);
+                        if(extracted < 0)
+                            throw new IllegalStateException("Energy handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + extracted + "' for #extract()!");
+                        leftOver -= extracted;
+                        if(leftOver <= 0)
+                            return amount;
+                    }
                 }
             }
-        }
-
-        this.popRecurrentCall();
-
-        return amount;
-    }
-
-    @Override
-    public boolean canExtract(){
-        return this.requester.canReceive(EnumChannelType.ENERGY);
-    }
-
-    @Override
-    public boolean canReceive(){
-        return this.requester.canSend(EnumChannelType.ENERGY);
+            return amount - leftOver;
+        });
     }
 
     /**
@@ -156,5 +121,15 @@ public class CombinedEnergyStorage implements IEnergyStorage {
 
     private void popRecurrentCall(){
         this.requester.recurrentCalls--;
+    }
+
+    private <T> T runSafe(T defaultValue, Supplier<T> supplier){
+        if(this.pushRecurrentCall())
+            return defaultValue;
+        try{
+            return supplier.get();
+        }finally{
+            this.popRecurrentCall();
+        }
     }
 }
