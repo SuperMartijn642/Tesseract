@@ -30,13 +30,17 @@ public class TesseractReference {
     private final EnumMap<EnumChannelType,Boolean> canSend = new EnumMap<>(EnumChannelType.class);
     private final EnumMap<EnumChannelType,Boolean> canReceive = new EnumMap<>(EnumChannelType.class);
     private WeakReference<TesseractBlockEntity> entity;
+    /**
+     * Counts recurrent calls inside the combined capabilities in order to prevent infinite loops
+     */
+    public int recurrentCalls = 0;
 
     TesseractReference(long index, TesseractBlockEntity entity){
         this.index = index;
         this.dimensionKey = entity.getLevel().dimension();
         this.dimension = this.dimensionKey.location().toString();
         this.pos = entity.getBlockPos();
-        this.isClientSide = entity.getLevel().isClientSide;
+        this.isClientSide = entity.getLevel().isClientSide();
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, -1);
             this.canSend.put(type, entity.canSend(type));
@@ -46,7 +50,7 @@ public class TesseractReference {
 
     public TesseractReference(long index, CompoundTag tag, boolean isClientSide){
         this.index = index;
-        this.dimension = tag.getStringOr("dim","");
+        this.dimension = tag.getStringOr("dim", "");
         this.dimensionKey = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(this.dimension));
         this.pos = new BlockPos(tag.getIntOr("posx", 0), tag.getIntOr("posy", 0), tag.getIntOr("posz", 0));
         this.isClientSide = isClientSide;
@@ -94,14 +98,16 @@ public class TesseractReference {
     }
 
     public TesseractBlockEntity getTesseract(){
-        if(this.entity == null || this.entity.get() == null || this.entity.get().isRemoved() || !this.entity.get().getBlockPos().equals(this.pos)){
-            BlockEntity entity = this.getLevel().getBlockEntity(this.pos);
-            if(entity instanceof TesseractBlockEntity)
-                this.entity = new WeakReference<>((TesseractBlockEntity)entity);
-            else
+        TesseractBlockEntity entity = this.entity == null ? null : this.entity.get();
+        if(entity == null || entity.isRemoved() || !entity.getBlockPos().equals(this.pos)){
+            BlockEntity newEntity = this.getLevel().getBlockEntity(this.pos);
+            if(newEntity instanceof TesseractBlockEntity){
+                entity = (TesseractBlockEntity)newEntity;
+                this.entity = new WeakReference<>(entity);
+            }else
                 this.entity = null;
         }
-        return this.entity == null ? null : this.entity.get();
+        return entity;
     }
 
     public CompoundTag write(){

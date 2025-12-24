@@ -26,7 +26,7 @@ public class PacketCompleteChannelsUpdate implements BasePacket {
         int size = 0;
         for(EnumChannelType type : EnumChannelType.values()){
             channels[type.ordinal()] = new HashSet<>(TesseractChannelManager.SERVER.getPublicChannels(type));
-            channels[type.ordinal()].addAll(TesseractChannelManager.SERVER.getChannelsCreatedBy(type, target.getGameProfile().getId()));
+            channels[type.ordinal()].addAll(TesseractChannelManager.SERVER.getChannelsCreatedBy(type, target.getGameProfile().id()));
             size += channels[type.ordinal()].size();
         }
         this.channels = new ArrayList<>(size);

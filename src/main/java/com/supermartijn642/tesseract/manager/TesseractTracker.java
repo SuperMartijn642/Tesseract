@@ -31,7 +31,7 @@ public class TesseractTracker {
     private static long referenceIndexCounter = 0;
 
     public static TesseractTracker getInstance(Level level){
-        return level.isClientSide ? CLIENT : SERVER;
+        return level.isClientSide() ? CLIENT : SERVER;
     }
 
     public static void registerListeners(){
@@ -94,7 +94,7 @@ public class TesseractTracker {
     }
 
     public static void onTick(TickEvent.LevelTickEvent.Post e){
-        if(e.level.isClientSide || e.level.dimension() != Level.OVERWORLD)
+        if(e.level().isClientSide() || e.level().dimension() != Level.OVERWORLD)
             return;
 
         // Handle removed references

@@ -28,7 +28,7 @@ public class TesseractWTHITPlugin implements IBlockComponentProvider, IWailaClie
                 tooltip.setLine(ResourceLocation.parse("wailax:fluid"));
                 tooltip.setLine(ResourceLocation.parse("wailax:item"));
             }
-        }, TesseractBlockEntity.class);
+        }, TesseractBlockEntity.class, 2000);
     }
 
     @Override
