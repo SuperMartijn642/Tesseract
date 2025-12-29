@@ -45,7 +45,7 @@ public class TesseractTracker {
     private final Set<Long> referencesToBeUnsaved = new HashSet<>();
 
     public TesseractReference add(TesseractBlockEntity self){
-        String dimension = self.getLevel().dimension().location().toString();
+        String dimension = self.getLevel().dimension().identifier().toString();
         BlockPos pos = self.getBlockPos();
         TesseractReference reference = this.getReference(dimension, pos);
         if(reference != null)
@@ -75,7 +75,7 @@ public class TesseractTracker {
     }
 
     public void remove(Level level, BlockPos pos){
-        String dimension = level.dimension().location().toString();
+        String dimension = level.dimension().identifier().toString();
         this.remove(dimension, pos);
     }
 

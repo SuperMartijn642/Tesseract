@@ -17,7 +17,8 @@ import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -32,19 +33,19 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
     private static final int MAX_DISPLAYED_CHANNELS = 12;
     private static final int CHANNEL_CUTOFF_LENGTH = 100;
 
-    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/new_gui");
+    public static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath("tesseract", "gui/new_gui");
     private static final int BACKGROUND_WIDTH = 249, BACKGROUND_HEIGHT = 211;
-    public static final ResourceLocation CHANNEL_BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/background");
-    public static final ResourceLocation TAB_ON = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/tab_new");
-    public static final ResourceLocation TAB_OFF = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/tab_off_new");
-    public static final ResourceLocation ITEM_ICON = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/item_tab_icon");
-    public static final ResourceLocation ENERGY_ICON = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/energy_tab_icon");
-    public static final ResourceLocation FLUID_ICON = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/fluid_tab_icon");
-    public static final ResourceLocation LOCK_ON = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/lock_on");
-    public static final ResourceLocation LOCK_OFF = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/lock_off");
-    public static final ResourceLocation REDSTONE_TAB = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/redstone_tab");
-    public static final ResourceLocation SIDE_TAB = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/side_tab_new");
-    public static final ResourceLocation CHECKMARK = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/checkmark_icon");
+    public static final Identifier CHANNEL_BACKGROUND = Identifier.fromNamespaceAndPath("tesseract", "gui/background");
+    public static final Identifier TAB_ON = Identifier.fromNamespaceAndPath("tesseract", "gui/tab_new");
+    public static final Identifier TAB_OFF = Identifier.fromNamespaceAndPath("tesseract", "gui/tab_off_new");
+    public static final Identifier ITEM_ICON = Identifier.fromNamespaceAndPath("tesseract", "gui/item_tab_icon");
+    public static final Identifier ENERGY_ICON = Identifier.fromNamespaceAndPath("tesseract", "gui/energy_tab_icon");
+    public static final Identifier FLUID_ICON = Identifier.fromNamespaceAndPath("tesseract", "gui/fluid_tab_icon");
+    public static final Identifier LOCK_ON = Identifier.fromNamespaceAndPath("tesseract", "gui/lock_on");
+    public static final Identifier LOCK_OFF = Identifier.fromNamespaceAndPath("tesseract", "gui/lock_off");
+    public static final Identifier REDSTONE_TAB = Identifier.fromNamespaceAndPath("tesseract", "gui/redstone_tab");
+    public static final Identifier SIDE_TAB = Identifier.fromNamespaceAndPath("tesseract", "gui/side_tab_new");
+    public static final Identifier CHECKMARK = Identifier.fromNamespaceAndPath("tesseract", "gui/checkmark_icon");
 
     private static EnumChannelType type = EnumChannelType.ITEMS;
 
@@ -81,7 +82,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         this.removeButton = this.addWidget(new TesseractButton(180, 185, 61, 18, TextComponents.translation("gui.tesseract.remove").get(),
             () -> {
                 Channel channel = TesseractChannelManager.CLIENT.getChannelById(type, this.selectedChannel);
-                if(channel != null && (channel.creator.equals(ClientUtils.getPlayer().getUUID()) || (ClientUtils.getPlayer().hasPermissions(2)) && Minecraft.getInstance().hasShiftDown()))
+                if(channel != null && (channel.creator.equals(ClientUtils.getPlayer().getUUID()) || (ClientUtils.getPlayer().permissions().hasPermission(Permissions.COMMANDS_MODERATOR)) && Minecraft.getInstance().hasShiftDown()))
                     ClientUtils.displayScreen(WidgetScreen.of(new TesseractRemoveChannelScreen(this.blockEntityLevel, this.blockEntityPos, type, this.selectedChannel)));
             }
         ));
@@ -172,8 +173,8 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         graphics.submitSprite(REDSTONE_TAB, -30, 32, 30, 30);
     }
 
-    private void drawTab(GuiGraphicsHelper graphics, EnumChannelType type, int x, ResourceLocation icon){
-        ResourceLocation texture = type == TesseractScreen.type ? TAB_ON : TAB_OFF;
+    private void drawTab(GuiGraphicsHelper graphics, EnumChannelType type, int x, Identifier icon){
+        Identifier texture = type == TesseractScreen.type ? TAB_ON : TAB_OFF;
         graphics.submitSprite(texture, x, type == TesseractScreen.type ? 0 : 2, 28, type == TesseractScreen.type ? 31 : 26);
 
         float width = 16, height = 16;

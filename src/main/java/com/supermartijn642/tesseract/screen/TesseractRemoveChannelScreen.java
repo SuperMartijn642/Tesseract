@@ -14,7 +14,7 @@ import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.packets.PacketScreenRemoveChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 import java.util.Locale;
@@ -24,7 +24,7 @@ import java.util.Locale;
  */
 public class TesseractRemoveChannelScreen extends BlockEntityBaseWidget<TesseractBlockEntity> {
 
-    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/add_screen_background");
+    public static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath("tesseract", "gui/add_screen_background");
 
     private final EnumChannelType type;
     private final int channelId;
@@ -65,7 +65,7 @@ public class TesseractRemoveChannelScreen extends BlockEntityBaseWidget<Tesserac
         PlayerRenderer.renderPlayerHead(channel.creator, graphics, x, 24, 9, 9);
         graphics.submitText(channel.name, x + 12, 25, p -> p.color(0xffffffff));
         if(channel.creator.equals(ClientUtils.getPlayer().getUUID())){
-            ResourceLocation texture = channel.isPrivate ? TesseractScreen.LOCK_ON : TesseractScreen.LOCK_OFF;
+            Identifier texture = channel.isPrivate ? TesseractScreen.LOCK_ON : TesseractScreen.LOCK_OFF;
             graphics.submitSprite(texture, x + 12 + nameWidth + 3, 24, 9, 9);
         }
 
