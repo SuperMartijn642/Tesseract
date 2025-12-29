@@ -8,8 +8,8 @@ import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -38,7 +38,7 @@ public class TesseractReference {
     TesseractReference(long index, TesseractBlockEntity entity){
         this.index = index;
         this.dimensionKey = entity.getLevel().dimension();
-        this.dimension = this.dimensionKey.location().toString();
+        this.dimension = this.dimensionKey.identifier().toString();
         this.pos = entity.getBlockPos();
         this.isClientSide = entity.getLevel().isClientSide();
         for(EnumChannelType type : EnumChannelType.values()){
@@ -51,7 +51,7 @@ public class TesseractReference {
     public TesseractReference(long index, CompoundTag tag, boolean isClientSide){
         this.index = index;
         this.dimension = tag.getStringOr("dim","");
-        this.dimensionKey = ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(this.dimension));
+        this.dimensionKey = ResourceKey.create(Registries.DIMENSION, Identifier.parse(this.dimension));
         this.pos = new BlockPos(tag.getIntOr("posx", 0), tag.getIntOr("posy", 0), tag.getIntOr("posz", 0));
         this.isClientSide = isClientSide;
         for(EnumChannelType type : EnumChannelType.values()){

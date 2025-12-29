@@ -15,7 +15,7 @@ import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.packets.PacketScreenAddChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class TesseractAddChannelScreen extends BlockEntityBaseWidget<TesseractBl
     private static final int CHANNEL_MIN_CHARACTERS = 3;
     public static final int CHANNEL_MAX_CHARACTERS = 19;
 
-    public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/add_screen_background");
+    public static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath("tesseract", "gui/add_screen_background");
 
     private final EnumChannelType type;
 

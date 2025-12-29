@@ -4,8 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.supermartijn642.core.render.CustomBlockEntityRenderer;
 import com.supermartijn642.core.util.Holder;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import org.joml.Matrix4f;
 
 /**
@@ -35,7 +35,7 @@ public class TesseractBlockEntityRenderer implements CustomBlockEntityRenderer<T
         poseStack.scale(0.65f, 0.65f, 0.65f);
         poseStack.translate(-0.5, -0.5, -0.5);
 
-        output.submitCustomGeometry(poseStack, RenderType.endPortal(), (pose, vertexConsumer) -> this.renderCube(pose.pose(), vertexConsumer));
+        output.submitCustomGeometry(poseStack, RenderTypes.endPortal(), (pose, vertexConsumer) -> this.renderCube(pose.pose(), vertexConsumer));
 
         poseStack.popPose();
     }

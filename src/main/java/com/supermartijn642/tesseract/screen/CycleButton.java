@@ -3,14 +3,14 @@ package com.supermartijn642.tesseract.screen;
 import com.supermartijn642.core.gui.GuiGraphicsHelper;
 import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.core.gui.widget.premade.AbstractButtonWidget;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Created 7/5/2020 by SuperMartijn642
  */
 public abstract class CycleButton extends AbstractButtonWidget {
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/buttons");
+    public static final Identifier TEXTURE = Identifier.fromNamespaceAndPath("tesseract", "gui/buttons");
 
     private final int textureX;
     private boolean active = true;

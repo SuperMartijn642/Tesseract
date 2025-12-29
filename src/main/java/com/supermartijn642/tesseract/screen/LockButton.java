@@ -5,7 +5,7 @@ import com.supermartijn642.core.gui.GuiGraphicsHelper;
 import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.core.gui.widget.premade.AbstractButtonWidget;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Consumer;
 
@@ -59,20 +59,20 @@ public class LockButton extends AbstractButtonWidget {
     }
 
     public enum Icon {
-        LOCKED(ResourceLocation.withDefaultNamespace("gui/sprites/widget/locked_button")),
-        LOCKED_HOVER(ResourceLocation.withDefaultNamespace("gui/sprites/widget/locked_button_highlighted")),
-        LOCKED_DISABLED(ResourceLocation.withDefaultNamespace("gui/sprites/widget/locked_button_disabled")),
-        UNLOCKED(ResourceLocation.withDefaultNamespace("gui/sprites/widget/unlocked_button")),
-        UNLOCKED_HOVER(ResourceLocation.withDefaultNamespace("gui/sprites/widget/unlocked_button_highlighted")),
-        UNLOCKED_DISABLED(ResourceLocation.withDefaultNamespace("gui/sprites/widget/unlocked_button_disabled"));
+        LOCKED(Identifier.withDefaultNamespace("gui/sprites/widget/locked_button")),
+        LOCKED_HOVER(Identifier.withDefaultNamespace("gui/sprites/widget/locked_button_highlighted")),
+        LOCKED_DISABLED(Identifier.withDefaultNamespace("gui/sprites/widget/locked_button_disabled")),
+        UNLOCKED(Identifier.withDefaultNamespace("gui/sprites/widget/unlocked_button")),
+        UNLOCKED_HOVER(Identifier.withDefaultNamespace("gui/sprites/widget/unlocked_button_highlighted")),
+        UNLOCKED_DISABLED(Identifier.withDefaultNamespace("gui/sprites/widget/unlocked_button_disabled"));
 
-        private final ResourceLocation location;
+        private final Identifier location;
 
-        Icon(ResourceLocation location){
+        Icon(Identifier location){
             this.location = location;
         }
 
-        public ResourceLocation location(){
+        public Identifier location(){
             return this.location;
         }
     }

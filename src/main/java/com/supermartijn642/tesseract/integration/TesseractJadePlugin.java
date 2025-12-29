@@ -8,7 +8,7 @@ import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import snownee.jade.api.*;
 import snownee.jade.api.config.IPluginConfig;
@@ -20,8 +20,8 @@ import snownee.jade.api.config.IPluginConfig;
 public class TesseractJadePlugin implements IBlockComponentProvider, IWailaPlugin {
 
     @Override
-    public ResourceLocation getUid(){
-        return ResourceLocation.fromNamespaceAndPath("tesseract", "tesseract_component");
+    public Identifier getUid(){
+        return Identifier.fromNamespaceAndPath("tesseract", "tesseract_component");
     }
 
     @Override

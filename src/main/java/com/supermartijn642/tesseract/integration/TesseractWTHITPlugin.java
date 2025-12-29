@@ -9,7 +9,7 @@ import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import mcp.mobius.waila.api.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
@@ -24,9 +24,9 @@ public class TesseractWTHITPlugin implements IBlockComponentProvider, IWailaClie
             @Override
             public void appendBody(ITooltip tooltip, IBlockAccessor accessor, IPluginConfig config){
                 // Prevent WTHIT from showing the energy, fluid, and item capability data
-                tooltip.setLine(ResourceLocation.parse("wailax:energy"));
-                tooltip.setLine(ResourceLocation.parse("wailax:fluid"));
-                tooltip.setLine(ResourceLocation.parse("wailax:item"));
+                tooltip.setLine(Identifier.parse("wailax:energy"));
+                tooltip.setLine(Identifier.parse("wailax:fluid"));
+                tooltip.setLine(Identifier.parse("wailax:item"));
             }
         }, TesseractBlockEntity.class, 2000);
     }
