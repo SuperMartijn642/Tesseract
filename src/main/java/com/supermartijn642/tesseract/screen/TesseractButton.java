@@ -4,18 +4,18 @@ import com.supermartijn642.core.gui.GuiGraphicsHelper;
 import com.supermartijn642.core.gui.widget.WidgetRenderContext;
 import com.supermartijn642.core.gui.widget.premade.ButtonWidget;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Created 5/13/2021 by SuperMartijn642
  */
 public class TesseractButton extends ButtonWidget {
 
-    public static final ResourceLocation BUTTON_BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/default_buttons");
-    public static final ResourceLocation RED_BUTTON_BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/red_buttons");
+    public static final Identifier BUTTON_BACKGROUND = Identifier.fromNamespaceAndPath("tesseract", "gui/default_buttons");
+    public static final Identifier RED_BUTTON_BACKGROUND = Identifier.fromNamespaceAndPath("tesseract", "gui/red_buttons");
 
     private Component text;
-    private ResourceLocation background = BUTTON_BACKGROUND;
+    private Identifier background = BUTTON_BACKGROUND;
     public boolean active = true;
 
     public TesseractButton(int x, int y, int width, int height, Component text, Runnable onPress){

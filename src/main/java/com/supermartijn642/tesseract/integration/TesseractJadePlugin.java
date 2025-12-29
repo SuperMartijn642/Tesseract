@@ -8,7 +8,7 @@ import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import snownee.jade.api.*;
 import snownee.jade.api.config.IPluginConfig;
@@ -26,13 +26,13 @@ public class TesseractJadePlugin implements IBlockComponentProvider, IWailaPlugi
             @Override
             public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig pluginConfig){
                 // Prevent Jade from showing the energy and fluid capability data
-                tooltip.remove(ResourceLocation.withDefaultNamespace("fe"));
-                tooltip.remove(ResourceLocation.withDefaultNamespace("fluid"));
+                tooltip.remove(Identifier.withDefaultNamespace("fe"));
+                tooltip.remove(Identifier.withDefaultNamespace("fluid"));
             }
 
             @Override
-            public ResourceLocation getUid(){
-                return ResourceLocation.fromNamespaceAndPath("tesseract", "remove_default");
+            public Identifier getUid(){
+                return Identifier.fromNamespaceAndPath("tesseract", "remove_default");
             }
 
             @Override
@@ -43,8 +43,8 @@ public class TesseractJadePlugin implements IBlockComponentProvider, IWailaPlugi
     }
 
     @Override
-    public ResourceLocation getUid(){
-        return ResourceLocation.fromNamespaceAndPath("tesseract", "tesseract");
+    public Identifier getUid(){
+        return Identifier.fromNamespaceAndPath("tesseract", "tesseract");
     }
 
     @Override

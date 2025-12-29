@@ -6,6 +6,7 @@ import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.packets.PacketAddChannel;
 import com.supermartijn642.tesseract.packets.PacketCompleteChannelsUpdate;
 import com.supermartijn642.tesseract.packets.PacketRemoveChannel;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
@@ -51,7 +52,7 @@ public class TesseractChannelManager {
 
     public void removeChannel(EnumChannelType type, int id, Player remover){
         Channel channel = this.getChannelById(type, id);
-        if(channel != null && (this == CLIENT || channel.creator.equals(remover.getUUID()) || remover.hasPermissions(2))){
+        if(channel != null && (this == CLIENT || channel.creator.equals(remover.getUUID()) || remover.permissions().hasPermission(Permissions.COMMANDS_MODERATOR))){
             this.types.putIfAbsent(type, new ChannelList(type));
             this.types.get(type).remove(id);
             this.sendRemoveChannelPacket(channel);
