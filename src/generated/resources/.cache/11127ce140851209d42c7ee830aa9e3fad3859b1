@@ -5,6 +5,6 @@ f535424e8cc785231d304390e944ca5483d607c4 assets/tesseract/blockstates/tesseract.
 f5ef7ae2423078ffbca99038a2735d43272f55d5 assets/tesseract/items/tesseract.json
 105075dcd8e264e34795be16837be447203fe962 assets/tesseract/lang/en_us.json
 ffbe68af05b77979e5a2343cd18eb79f71ae72c7 data/minecraft/tags/block/mineable/pickaxe.json
-6e1bf8cfad3b239d66ff219695656a7b276a6679 data/tesseract/advancement/recipes/misc/tesseract.json
+5ad5c6f1c4ac221f3611bf329f23716f9f85c839 data/tesseract/advancement/recipes/tesseract.json
 977e287a3e72c69f906f746e595fa5bd0d5385ab data/tesseract/loot_table/blocks/tesseract.json
 eb053c7e229139a8b85ccf26ca3fa29e36163472 data/tesseract/recipe/tesseract.json

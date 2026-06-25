@@ -2,8 +2,8 @@ package com.supermartijn642.tesseract.manager;
 
 import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.tesseract.TesseractConfig;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLevelEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +22,7 @@ public class TesseractSaveHandler {
     public static void registerListeners(){
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> onJoin(handler.getPlayer()));
         ServerTickEvents.END_SERVER_TICK.register(TesseractSaveHandler::tick);
-        ServerWorldEvents.LOAD.register(TesseractSaveHandler::load);
+        ServerLevelEvents.LOAD.register(TesseractSaveHandler::load);
     }
 
     private static void onJoin(Player player){
