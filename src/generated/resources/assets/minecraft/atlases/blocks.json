@@ -1,12 +1,20 @@
 {
-  "sources": [
+  "textures": {
+    "side": "namespace:my_emissive_side_texture",
+    "end": "namespace:my_emissive_end_texture"
+  },
+  "elements": [
     {
-      "type": "minecraft:single",
-      "resource": "tesseract:blocks/off"
-    },
-    {
-      "type": "minecraft:single",
-      "resource": "tesseract:blocks/center"
+      "from": [ 0, 0, 0 ],
+      "to": [ 16, 16, 16 ],
+      "faces": {
+        "up":    { "texture": "#end", "cullface": "up" },
+        "down":  { "texture": "#end", "cullface": "down" },
+        "north": { "texture": "#side", "cullface": "north" },
+        "east":  { "texture": "#side", "cullface": "east" },
+        "south": { "texture": "#side", "cullface": "south" },
+        "west":  { "texture": "#side", "cullface": "west" }
+      }
     }
   ]
 }
