@@ -1,10 +1,10 @@
 package com.supermartijn642.tesseract.manager;
 
-import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
+import com.supermartijn642.tesseract.TesseractClient;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -70,8 +70,10 @@ public class TesseractReference {
     }
 
     public Level getLevel(){
-        if(this.isClientSide)
-            return ClientUtils.getWorld().dimension() == this.dimensionKey ? ClientUtils.getWorld() : null;
+        if(this.isClientSide){
+            Level level = TesseractClient.getClientLevelNotAsClientLevel();
+            return level.dimension() == this.dimensionKey ? level : null;
+        }
         return CommonUtils.getLevel(this.dimensionKey);
     }
 
