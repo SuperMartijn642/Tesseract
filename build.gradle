@@ -37,7 +37,7 @@ dependencies {
     // Jade
     compileOnly "curse.maven:jade-324717:${jade_file}"
     // WTHIT
-    implementation "curse.maven:wthit-forge-455982:${wthit_file}"
+    compileOnly "curse.maven:wthit-forge-455982:${wthit_file}"
     // Bad Packets
     runtimeOnly "curse.maven:badpackets-615134:${bad_packets_file}"
 
