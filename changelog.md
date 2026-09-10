@@ -1,3 +1,6 @@
+### Tesseract 1.0.38c
+- Added icon and banner images for new NeoForge 26.2.0.50-beta mod list
+
 ### Tesseract 1.0.38b
 - Fixed erroneous atlas source file leading to missing textures for tesseract block
 
