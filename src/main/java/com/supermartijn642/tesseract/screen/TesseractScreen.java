@@ -271,7 +271,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
 
     @Override
     protected boolean mousePressed(int mouseX, int mouseY, MouseButtonInfo info, boolean isDoubleClick, boolean hasBeenHandled, TesseractBlockEntity entity){
-        if(!hasBeenHandled && info.button() == 0){
+        if(!hasBeenHandled && info.button() == 1){
             if(mouseY >= 2 && mouseY < 2 + 26){ // tabs
                 if(mouseX >= 6 && mouseX < 6 + 28 && type != EnumChannelType.ITEMS){
                     this.setChannelType(EnumChannelType.ITEMS);
