@@ -7,6 +7,7 @@ import com.supermartijn642.tesseract.manager.TesseractReference;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
  */
 public class PacketRemoveTesseractReferences implements BasePacket {
 
-    private Collection<Pair<String,BlockPos>> references;
+    private Collection<Pair<ResourceLocation,BlockPos>> references;
 
     public PacketRemoveTesseractReferences(Collection<TesseractReference> references){
         this.references = references.stream().map(reference -> Pair.of(reference.getDimension(), reference.getPos())).collect(Collectors.toSet());
@@ -29,8 +30,8 @@ public class PacketRemoveTesseractReferences implements BasePacket {
     @Override
     public void write(FriendlyByteBuf buffer){
         buffer.writeInt(this.references.size());
-        for(Pair<String,BlockPos> reference : this.references){
-            buffer.writeUtf(reference.left());
+        for(Pair<ResourceLocation,BlockPos> reference : this.references){
+            buffer.writeResourceLocation(reference.left());
             buffer.writeBlockPos(reference.right());
         }
     }
@@ -40,14 +41,14 @@ public class PacketRemoveTesseractReferences implements BasePacket {
         int size = buffer.readInt();
         this.references = new ArrayList<>(size);
         for(int i = 0; i < size; i++)
-            this.references.add(Pair.of(buffer.readUtf(), buffer.readBlockPos()));
+            this.references.add(Pair.of(buffer.readResourceLocation(), buffer.readBlockPos()));
     }
 
     @Override
     public void handle(PacketContext context){
         if(context.getHandlingSide().isServer())
             return;
-        for(Pair<String,BlockPos> reference : this.references)
+        for(Pair<ResourceLocation,BlockPos> reference : this.references)
             TesseractTracker.CLIENT.remove(reference.left(), reference.right());
     }
 }
