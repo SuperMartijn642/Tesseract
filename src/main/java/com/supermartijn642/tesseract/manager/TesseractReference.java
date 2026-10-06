@@ -4,6 +4,7 @@ import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -16,6 +17,34 @@ import java.util.EnumMap;
  */
 public final class TesseractReference {
 
+    /**
+     * Encoding of tesseract reference for server->client networking.
+     */
+    public static void encode(TesseractReference reference, PacketBuffer buffer){
+        buffer.writeVarInt(reference.dimension);
+        buffer.writeBlockPos(reference.pos);
+        for(EnumChannelType type : EnumChannelType.BY_INDEX){
+            buffer.writeVarInt(reference.channels.get(type));
+            buffer.writeBoolean(reference.canSend.get(type));
+            buffer.writeBoolean(reference.canReceive.get(type));
+        }
+    }
+
+    public static TesseractReference decode(PacketBuffer buffer){
+        TesseractReference reference = new TesseractReference(
+            0,
+            buffer.readVarInt(),
+            buffer.readBlockPos(),
+            true
+        );
+        for(EnumChannelType type : EnumChannelType.BY_INDEX){
+            reference.channels.put(type, buffer.readVarInt());
+            reference.canSend.put(type, buffer.readBoolean());
+            reference.canReceive.put(type, buffer.readBoolean());
+        }
+        return reference;
+    }
+
     private final long index;
     private final int dimension;
     private final BlockPos pos;
@@ -25,13 +54,21 @@ public final class TesseractReference {
     private final EnumMap<EnumChannelType,Boolean> canReceive = new EnumMap<>(EnumChannelType.class);
     private @Nullable TesseractBlockEntity entity;
 
-    public TesseractReference(long index, TesseractBlockEntity entity){
+    private TesseractReference(long index, int dimension, BlockPos pos, boolean isClientSide){
         this.index = index;
-        this.dimension = entity.getWorld().provider.getDimension();
-        this.pos = entity.getPos();
-        this.isClientSide = entity.getWorld().isRemote;
+        this.dimension = dimension;
+        this.pos = pos;
+        this.isClientSide = isClientSide;
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, -1);
+            this.canSend.put(type, true);
+            this.canReceive.put(type, true);
+        }
+    }
+
+    TesseractReference(long index, TesseractBlockEntity entity){
+        this(index, entity.getWorld().provider.getDimension(), entity.getPos(), entity.getWorld().isRemote);
+        for(EnumChannelType type : EnumChannelType.values()){
             this.canSend.put(type, entity.canSend(type));
             this.canReceive.put(type, entity.canReceive(type));
         }
@@ -39,10 +76,12 @@ public final class TesseractReference {
     }
 
     public TesseractReference(long index, NBTTagCompound tag, boolean isClientSide){
-        this.index = index;
-        this.dimension = tag.getInteger("dim");
-        this.pos = new BlockPos(tag.getInteger("posx"), tag.getInteger("posy"), tag.getInteger("posz"));
-        this.isClientSide = isClientSide;
+        this(
+            index,
+            tag.getInteger("dim"),
+            new BlockPos(tag.getInteger("posx"), tag.getInteger("posy"), tag.getInteger("posz")),
+            isClientSide
+        );
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, tag.getInteger(type + "_channel"));
             this.canSend.put(type, tag.getBoolean(type + "_canSend"));
