@@ -26,13 +26,13 @@ public class PacketRemoveChannel implements BasePacket {
 
     @Override
     public void write(FriendlyByteBuf buffer){
-        buffer.writeInt(this.type.getIndex());
+        buffer.writeVarInt(this.type.getIndex());
         buffer.writeInt(this.id);
     }
 
     @Override
     public void read(FriendlyByteBuf buffer){
-        this.type = EnumChannelType.byIndex(buffer.readInt());
+        this.type = EnumChannelType.byIndex(buffer.readVarInt());
         this.id = buffer.readInt();
     }
 
