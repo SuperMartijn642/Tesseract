@@ -114,14 +114,14 @@ public class CombinedResourceHandler<S extends TransferVariant<?>> implements St
      * If not, it will just increase the recurrent call counter.
      */
     private boolean pushRecurrentCall(){
-        if(this.requester.recurrentCalls >= 1)
+        if(this.channel.recurrentCalls >= 1)
             return true;
-        this.requester.recurrentCalls++;
+        this.channel.recurrentCalls++;
         return false;
     }
 
     private void popRecurrentCall(){
-        this.requester.recurrentCalls--;
+        this.channel.recurrentCalls--;
     }
 
     private <T> T runSafe(T defaultValue, Supplier<T> supplier){
