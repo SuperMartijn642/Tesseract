@@ -32,6 +32,11 @@ public class Channel {
     public final Set<TesseractReference> sendingTesseracts = new LinkedHashSet<>();
     public final Set<TesseractReference> receivingTesseracts = new LinkedHashSet<>();
 
+    /**
+     * Counts recurrent calls inside the combined capabilities in order to prevent infinite loops
+     */
+    public int recurrentCalls = 0;
+
     public Channel(int id, EnumChannelType type, UUID creator, boolean isPrivate, String name){
         this.id = id;
         this.type = type;
