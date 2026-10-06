@@ -134,7 +134,7 @@ public class TesseractTracker {
     }
 
     public TesseractReference fromKey(CompoundTag key){
-        ResourceLocation dimension = ResourceLocation.parse(key.getString("dimension"));
+        ResourceLocation dimension = new ResourceLocation(key.getString("dimension"));
         BlockPos pos = new BlockPos(key.getInt("posx"), key.getInt("posy"), key.getInt("posz"));
         return this.getReference(dimension, pos);
     }
