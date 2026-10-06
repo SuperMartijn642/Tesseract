@@ -27,14 +27,14 @@ public class PacketScreenSetChannel extends BlockEntityBasePacket<TesseractBlock
     @Override
     public void write(PacketBuffer buffer){
         super.write(buffer);
-        buffer.writeInt(this.type.getIndex());
+        buffer.writeVarInt(this.type.getIndex());
         buffer.writeInt(this.id);
     }
 
     @Override
     public void read(PacketBuffer buffer){
         super.read(buffer);
-        this.type = EnumChannelType.byIndex(buffer.readInt());
+        this.type = EnumChannelType.byIndex(buffer.readVarInt());
         this.id = buffer.readInt();
     }
 
