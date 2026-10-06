@@ -19,7 +19,7 @@ import java.util.EnumMap;
 /**
  * Created 3/22/2020 by SuperMartijn642
  */
-public class TesseractReference {
+public final class TesseractReference {
 
     private final long index;
     private final Identifier dimension;
