@@ -1,13 +1,10 @@
 package com.supermartijn642.tesseract.manager;
 
-import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
@@ -95,12 +92,6 @@ public final class TesseractReference {
 
     public int getDimension(){
         return this.dimension;
-    }
-
-    public World getLevel(){
-        if(this.isClientSide)
-            return ClientUtils.getWorld().provider.getDimension() == this.dimension ? ClientUtils.getWorld() : null;
-        return DimensionManager.getWorld(this.dimension);
     }
 
     public BlockPos getPos(){
