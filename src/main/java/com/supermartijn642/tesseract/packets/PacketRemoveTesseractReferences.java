@@ -55,8 +55,6 @@ public class PacketRemoveTesseractReferences implements BasePacket {
 
     @Override
     public void handle(PacketContext context){
-        if(context.getHandlingSide().isServer())
-            return;
         for(Int2ObjectMap.Entry<List<BlockPos>> entry : this.references.int2ObjectEntrySet()){
             int dimension = entry.getIntKey();
             for(BlockPos pos : entry.getValue())
