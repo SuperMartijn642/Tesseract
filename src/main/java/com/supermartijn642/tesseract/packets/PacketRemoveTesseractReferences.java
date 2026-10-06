@@ -2,25 +2,26 @@ package com.supermartijn642.tesseract.packets;
 
 import com.supermartijn642.core.network.BasePacket;
 import com.supermartijn642.core.network.PacketContext;
-import com.supermartijn642.core.util.Pair;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * Created 14/04/2023 by SuperMartijn642
  */
 public class PacketRemoveTesseractReferences implements BasePacket {
 
-    private Collection<Pair<Integer,BlockPos>> references;
+    private Int2ObjectMap<List<BlockPos>> references;
 
     public PacketRemoveTesseractReferences(Collection<TesseractReference> references){
-        this.references = references.stream().map(reference -> Pair.of(reference.getDimension(), reference.getPos())).collect(Collectors.toSet());
+        this.references = new Int2ObjectArrayMap<>(4);
+        for(TesseractReference reference : references)
+            this.references.computeIfAbsent(reference.getDimension(), o -> new ArrayList<>()).add(reference.getPos());
     }
 
     public PacketRemoveTesseractReferences(){
@@ -29,25 +30,37 @@ public class PacketRemoveTesseractReferences implements BasePacket {
     @Override
     public void write(PacketBuffer buffer){
         buffer.writeInt(this.references.size());
-        for(Pair<Integer,BlockPos> reference : this.references){
-            buffer.writeInt(reference.left());
-            buffer.writeBlockPos(reference.right());
+        for(Int2ObjectMap.Entry<List<BlockPos>> entry : this.references.int2ObjectEntrySet()){
+            buffer.writeVarInt(entry.getIntKey());
+            List<BlockPos> positions = entry.getValue();
+            buffer.writeInt(positions.size());
+            for(BlockPos position : positions)
+                buffer.writeBlockPos(position);
         }
     }
 
     @Override
     public void read(PacketBuffer buffer){
-        int size = buffer.readInt();
-        this.references = new ArrayList<>(size);
-        for(int i = 0; i < size; i++)
-            this.references.add(Pair.of(buffer.readInt(), buffer.readBlockPos()));
+        int dimensions = buffer.readInt();
+        this.references = new Int2ObjectArrayMap<>(Math.min(16, dimensions));
+        for(int i = 0; i < dimensions; i++){
+            int dimension = buffer.readVarInt();
+            int numberOfPositions = buffer.readInt();
+            Set<BlockPos> positions = new HashSet<>(Math.min(16, numberOfPositions));
+            for(int j = 0; j < numberOfPositions; j++)
+                positions.add(buffer.readBlockPos());
+            this.references.put(dimension, new ArrayList<>(positions));
+        }
     }
 
     @Override
     public void handle(PacketContext context){
         if(context.getHandlingSide().isServer())
             return;
-        for(Pair<Integer,BlockPos> reference : this.references)
-            TesseractTracker.CLIENT.remove(reference.left(), reference.right());
+        for(Int2ObjectMap.Entry<List<BlockPos>> entry : this.references.int2ObjectEntrySet()){
+            int dimension = entry.getIntKey();
+            for(BlockPos pos : entry.getValue())
+                TesseractTracker.CLIENT.remove(dimension, pos);
+        }
     }
 }
