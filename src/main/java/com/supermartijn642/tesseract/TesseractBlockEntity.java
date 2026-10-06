@@ -8,6 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
@@ -38,8 +39,10 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     public TesseractReference getReference(){
-        if(this.reference == null)
+        if(this.reference == null){
             this.reference = TesseractTracker.getInstance(this.world).add(this);
+            this.reference.update(this);
+        }
         return this.reference;
     }
 
@@ -192,6 +195,27 @@ public class TesseractBlockEntity extends BaseBlockEntity {
             this.redstoneState = RedstoneState.valueOf(compound.getString("redstoneState"));
         if(compound.hasKey("powered"))
             this.redstone = compound.getBoolean("powered");
+    }
+
+    @Override
+    public void setWorld(World level){
+        super.setWorld(level);
+        if(!this.tileEntityInvalid)
+            this.updateReference();
+    }
+
+    @Override
+    public void setPos(BlockPos pos){
+        super.setPos(pos);
+        if(!this.tileEntityInvalid)
+            this.updateReference();
+    }
+
+    @Override
+    public void validate(){
+        super.validate();
+        if(this.world != null)
+            this.updateReference();
     }
 
     public void onReplaced(){
