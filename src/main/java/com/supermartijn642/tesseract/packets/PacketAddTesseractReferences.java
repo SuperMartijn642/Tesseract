@@ -30,22 +30,16 @@ public class PacketAddTesseractReferences implements BasePacket {
         buffer.writeBoolean(this.clear);
         buffer.writeInt(this.references.size());
         for(TesseractReference reference : this.references)
-            buffer.writeNbt(reference.write());
+            TesseractReference.encode(reference, buffer);
     }
 
     @Override
     public void read(FriendlyByteBuf buffer){
         this.clear = buffer.readBoolean();
         int size = buffer.readInt();
-        this.references = new ArrayList<>(size);
-        for(int i = 0; i < size; i++){
-            try{
-                TesseractReference reference = new TesseractReference(0, buffer.readNbt(), true);
-                this.references.add(reference);
-            }catch(Exception e){
-                throw new RuntimeException("Received invalid tesseract reference data!", e);
-            }
-        }
+        this.references = new ArrayList<>(Math.min(256, size));
+        for(int i = 0; i < size; i++)
+            this.references.add(TesseractReference.decode(buffer));
     }
 
     @Override
