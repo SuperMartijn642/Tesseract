@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
@@ -41,8 +42,10 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     public TesseractReference getReference(){
-        if(this.reference == null)
+        if(this.reference == null){
             this.reference = TesseractTracker.getInstance(this.level).add(this);
+            this.reference.update(this);
+        }
         return this.reference;
     }
 
@@ -195,6 +198,20 @@ public class TesseractBlockEntity extends BaseBlockEntity {
             this.redstoneState = RedstoneState.valueOf(compound.getString("redstoneState"));
         if(compound.contains("powered"))
             this.redstone = compound.getBoolean("powered");
+    }
+
+    @Override
+    public void setLevel(Level level){
+        super.setLevel(level);
+        if(!this.remove)
+            this.updateReference();
+    }
+
+    @Override
+    public void clearRemoved(){
+        super.clearRemoved();
+        if(this.level != null)
+            this.updateReference();
     }
 
     public void onReplaced(){
