@@ -1,16 +1,11 @@
 package com.supermartijn642.tesseract.manager;
 
-import com.supermartijn642.core.ClientUtils;
-import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
@@ -50,7 +45,6 @@ public final class TesseractReference {
 
     private final long index;
     private final ResourceLocation dimension;
-    private final RegistryKey<World> dimensionKey;
     private final BlockPos pos;
     private final boolean isClientSide;
     private final EnumMap<EnumChannelType,Integer> channels = new EnumMap<>(EnumChannelType.class);
@@ -61,7 +55,6 @@ public final class TesseractReference {
     private TesseractReference(long index, ResourceLocation dimension, BlockPos pos, boolean isClientSide){
         this.index = index;
         this.dimension = dimension;
-        this.dimensionKey = RegistryKey.create(Registry.DIMENSION_REGISTRY, this.dimension);
         this.pos = pos;
         this.isClientSide = isClientSide;
         for(EnumChannelType type : EnumChannelType.values()){
@@ -100,12 +93,6 @@ public final class TesseractReference {
 
     public ResourceLocation getDimension(){
         return this.dimension;
-    }
-
-    public World getLevel(){
-        if(this.isClientSide)
-            return ClientUtils.getWorld().dimension() == this.dimensionKey ? ClientUtils.getWorld() : null;
-        return CommonUtils.getLevel(this.dimensionKey);
     }
 
     public BlockPos getPos(){
