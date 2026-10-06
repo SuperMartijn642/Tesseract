@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -40,14 +41,14 @@ public class TesseractTracker {
         MinecraftForge.EVENT_BUS.addListener(TesseractTracker::onTick);
     }
 
-    private final Map<String,Map<BlockPos,TesseractReference>> tesseracts = new HashMap<>();
+    private final Map<ResourceLocation,Map<BlockPos,TesseractReference>> tesseracts = new HashMap<>();
     private final Set<TesseractReference> dirtyReferences = new HashSet<>();
     private final Set<TesseractReference> referencesToBeRemoved = new HashSet<>();
     private final Set<TesseractReference> referencesToBeSaved = new HashSet<>();
     private final Set<Long> referencesToBeUnsaved = new HashSet<>();
 
     public TesseractReference add(TesseractBlockEntity self){
-        String dimension = self.getLevel().dimension().location().toString();
+        ResourceLocation dimension = self.getLevel().dimension().location();
         BlockPos pos = self.getBlockPos();
         TesseractReference reference = this.getReference(dimension, pos);
         if(reference != null)
@@ -64,7 +65,7 @@ public class TesseractTracker {
 
     public void add(TesseractReference reference){
         if(this == CLIENT){
-            String dimension = reference.getDimension();
+            ResourceLocation dimension = reference.getDimension();
             BlockPos pos = reference.getPos();
             TesseractReference oldReference = this.tesseracts.computeIfAbsent(dimension, o -> new Object2ReferenceOpenHashMap<>()).put(pos, reference);
             if(oldReference != null && oldReference != reference && oldReference.canBeAccessed())
@@ -72,16 +73,15 @@ public class TesseractTracker {
         }
     }
 
-    public TesseractReference getReference(String dimension, BlockPos pos){
+    public TesseractReference getReference(ResourceLocation dimension, BlockPos pos){
         return this.tesseracts.containsKey(dimension) ? this.tesseracts.get(dimension).get(pos) : null;
     }
 
     public void remove(World level, BlockPos pos){
-        String dimension = level.dimension().location().toString();
-        this.remove(dimension, pos);
+        this.remove(level.dimension().location(), pos);
     }
 
-    public void remove(String dimension, BlockPos pos){
+    public void remove(ResourceLocation dimension, BlockPos pos){
         if(this == SERVER){
             TesseractReference reference = this.getReference(dimension, pos);
             if(reference != null)
@@ -126,7 +126,7 @@ public class TesseractTracker {
 
     public CompoundNBT writeKey(TesseractReference reference){
         CompoundNBT tag = new CompoundNBT();
-        tag.putString("dimension", reference.getDimension());
+        tag.putString("dimension", reference.getDimension().toString());
         tag.putInt("posx", reference.getPos().getX());
         tag.putInt("posy", reference.getPos().getY());
         tag.putInt("posz", reference.getPos().getZ());
@@ -134,7 +134,7 @@ public class TesseractTracker {
     }
 
     public TesseractReference fromKey(CompoundNBT key){
-        String dimension = key.getString("dimension");
+        ResourceLocation dimension = new ResourceLocation(key.getString("dimension"));
         BlockPos pos = new BlockPos(key.getInt("posx"), key.getInt("posy"), key.getInt("posz"));
         return this.getReference(dimension, pos);
     }
