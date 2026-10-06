@@ -2,12 +2,11 @@ package com.supermartijn642.tesseract.manager;
 
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
+import com.supermartijn642.tesseract.util.PerChannel;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.EnumMap;
 
 /**
  * Created 3/22/2020 by SuperMartijn642
@@ -35,9 +34,9 @@ public final class TesseractReference {
             true
         );
         for(EnumChannelType type : EnumChannelType.BY_INDEX){
-            reference.channels.put(type, buffer.readVarInt());
-            reference.canSend.put(type, buffer.readBoolean());
-            reference.canReceive.put(type, buffer.readBoolean());
+            reference.channels.set(type, buffer.readVarInt());
+            reference.canSend.set(type, buffer.readBoolean());
+            reference.canReceive.set(type, buffer.readBoolean());
         }
         return reference;
     }
@@ -46,9 +45,9 @@ public final class TesseractReference {
     private final int dimension;
     private final BlockPos pos;
     private final boolean isClientSide;
-    private final EnumMap<EnumChannelType,Integer> channels = new EnumMap<>(EnumChannelType.class);
-    private final EnumMap<EnumChannelType,Boolean> canSend = new EnumMap<>(EnumChannelType.class);
-    private final EnumMap<EnumChannelType,Boolean> canReceive = new EnumMap<>(EnumChannelType.class);
+    private final PerChannel<Integer> channels = new PerChannel<>(-1);
+    private final PerChannel<Boolean> canSend = new PerChannel<>(true);
+    private final PerChannel<Boolean> canReceive = new PerChannel<>(true);
     private @Nullable TesseractBlockEntity entity;
 
     private TesseractReference(long index, int dimension, BlockPos pos, boolean isClientSide){
@@ -56,18 +55,13 @@ public final class TesseractReference {
         this.dimension = dimension;
         this.pos = pos;
         this.isClientSide = isClientSide;
-        for(EnumChannelType type : EnumChannelType.values()){
-            this.channels.put(type, -1);
-            this.canSend.put(type, true);
-            this.canReceive.put(type, true);
-        }
     }
 
     TesseractReference(long index, TesseractBlockEntity entity){
         this(index, entity.getLevel().getDimension().getType().getId(), entity.getBlockPos(), entity.getLevel().isClientSide());
         for(EnumChannelType type : EnumChannelType.values()){
-            this.canSend.put(type, entity.canSend(type));
-            this.canReceive.put(type, entity.canReceive(type));
+            this.canSend.set(type, entity.canSend(type));
+            this.canReceive.set(type, entity.canReceive(type));
         }
         this.entity = entity;
     }
@@ -80,9 +74,9 @@ public final class TesseractReference {
             isClientSide
         );
         for(EnumChannelType type : EnumChannelType.values()){
-            this.channels.put(type, tag.getInt(type + "_channel"));
-            this.canSend.put(type, tag.getBoolean(type + "_canSend"));
-            this.canReceive.put(type, tag.getBoolean(type + "_canReceive"));
+            this.channels.set(type, tag.getInt(type + "_channel"));
+            this.canSend.set(type, tag.getBoolean(type + "_canSend"));
+            this.canReceive.set(type, tag.getBoolean(type + "_canReceive"));
         }
     }
 
@@ -143,7 +137,7 @@ public final class TesseractReference {
             return null;
         Channel channel = TesseractChannelManager.getInstance(this.isClientSide).getChannelById(type, this.channels.get(type));
         if(channel == null && !this.isClientSide){
-            this.channels.put(type, -1);
+            this.channels.set(type, -1);
             this.markDirty();
             if(this.canBeAccessed())
                 this.getTesseract().channelChanged(type);
@@ -155,7 +149,7 @@ public final class TesseractReference {
         if(channel == this.channels.get(type))
             return;
         Channel oldChannel = this.getChannel(type);
-        this.channels.put(type, channel);
+        this.channels.set(type, channel);
         if(oldChannel != null)
             oldChannel.removeTesseract(this);
         Channel newChannel = this.getChannel(type);
@@ -171,12 +165,10 @@ public final class TesseractReference {
         for(EnumChannelType type : EnumChannelType.values()){
             boolean changed = false;
             boolean canSend = entity.canSend(type);
-            //noinspection DataFlowIssue
-            if(canSend != this.canSend.put(type, canSend))
+            if(canSend != this.canSend.set(type, canSend))
                 changed = true;
             boolean canReceive = entity.canReceive(type);
-            //noinspection DataFlowIssue
-            if(canReceive != this.canReceive.put(type, canReceive))
+            if(canReceive != this.canReceive.set(type, canReceive))
                 changed = true;
             if(changed){
                 Channel channel = this.getChannel(type);
