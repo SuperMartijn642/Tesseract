@@ -22,7 +22,7 @@ import java.util.EnumMap;
 public class TesseractReference {
 
     private final long index;
-    private final String dimension;
+    private final Identifier dimension;
     private final ResourceKey<Level> dimensionKey;
     private final BlockPos pos;
     private final boolean isClientSide;
@@ -34,7 +34,7 @@ public class TesseractReference {
     TesseractReference(long index, TesseractBlockEntity entity){
         this.index = index;
         this.dimensionKey = entity.getLevel().dimension();
-        this.dimension = this.dimensionKey.identifier().toString();
+        this.dimension = this.dimensionKey.identifier();
         this.pos = entity.getBlockPos();
         this.isClientSide = entity.getLevel().isClientSide();
         for(EnumChannelType type : EnumChannelType.values()){
@@ -46,8 +46,8 @@ public class TesseractReference {
 
     public TesseractReference(long index, CompoundTag tag, boolean isClientSide){
         this.index = index;
-        this.dimension = tag.getStringOr("dim","");
-        this.dimensionKey = ResourceKey.create(Registries.DIMENSION, Identifier.parse(this.dimension));
+        this.dimension = Identifier.parse(tag.getStringOr("dim", ""));
+        this.dimensionKey = ResourceKey.create(Registries.DIMENSION, this.dimension);
         this.pos = new BlockPos(tag.getIntOr("posx", 0), tag.getIntOr("posy", 0), tag.getIntOr("posz", 0));
         this.isClientSide = isClientSide;
         for(EnumChannelType type : EnumChannelType.values()){
@@ -61,7 +61,7 @@ public class TesseractReference {
         return this.index;
     }
 
-    public String getDimension(){
+    public Identifier getDimension(){
         return this.dimension;
     }
 
@@ -80,7 +80,7 @@ public class TesseractReference {
         boolean isValid = level != null && level.getBlockState(this.pos).getBlock() == Tesseract.tesseract && level.getBlockEntity(this.pos) instanceof TesseractBlockEntity;
 
         if(!isValid && !this.isClientSide)
-            TesseractTracker.SERVER.remove(this.dimension, this.pos);
+            TesseractTracker.SERVER.remove(level, this.pos);
 
         return isValid;
     }
@@ -106,7 +106,7 @@ public class TesseractReference {
 
     public CompoundTag write(){
         CompoundTag compound = new CompoundTag();
-        compound.putString("dim", this.dimension);
+        compound.putString("dim", this.dimension.toString());
         compound.putInt("posx", this.pos.getX());
         compound.putInt("posy", this.pos.getY());
         compound.putInt("posz", this.pos.getZ());
