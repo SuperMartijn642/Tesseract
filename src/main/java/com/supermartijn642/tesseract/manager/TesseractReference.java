@@ -190,16 +190,4 @@ public class TesseractReference {
                 channel.removeTesseract(this);
         }
     }
-
-    @Override
-    public boolean equals(Object o){
-        return this == o;
-    }
-
-    @Override
-    public int hashCode(){
-        int result = this.dimension.hashCode();
-        result = 31 * result + (this.pos != null ? this.pos.hashCode() : 0);
-        return result;
-    }
 }
