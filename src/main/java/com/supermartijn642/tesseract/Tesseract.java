@@ -5,6 +5,7 @@ import com.supermartijn642.core.item.BaseBlockItem;
 import com.supermartijn642.core.item.CreativeItemGroup;
 import com.supermartijn642.core.item.ItemProperties;
 import com.supermartijn642.core.network.PacketChannel;
+import com.supermartijn642.core.network.PacketDirection;
 import com.supermartijn642.core.registry.GeneratorRegistrationHandler;
 import com.supermartijn642.core.registry.RegistrationHandler;
 import com.supermartijn642.core.registry.RegistryEntryAcceptor;
@@ -37,16 +38,16 @@ public class Tesseract implements ModInitializer {
 
         TesseractConfig.init();
 
-        CHANNEL.registerMessage(PacketCompleteChannelsUpdate.class, PacketCompleteChannelsUpdate::new, true);
-        CHANNEL.registerMessage(PacketScreenAddChannel.class, PacketScreenAddChannel::new, true);
-        CHANNEL.registerMessage(PacketScreenRemoveChannel.class, PacketScreenRemoveChannel::new, true);
-        CHANNEL.registerMessage(PacketScreenSetChannel.class, PacketScreenSetChannel::new, true);
-        CHANNEL.registerMessage(PacketScreenCycleRedstoneState.class, PacketScreenCycleRedstoneState::new, true);
-        CHANNEL.registerMessage(PacketScreenCycleTransferState.class, PacketScreenCycleTransferState::new, true);
-        CHANNEL.registerMessage(PacketAddChannel.class, PacketAddChannel::new, true);
-        CHANNEL.registerMessage(PacketRemoveChannel.class, PacketRemoveChannel::new, true);
-        CHANNEL.registerMessage(PacketAddTesseractReferences.class, PacketAddTesseractReferences::new, true);
-        CHANNEL.registerMessage(PacketRemoveTesseractReferences.class, PacketRemoveTesseractReferences::new, true);
+        CHANNEL.registerMessage(PacketAddChannel.class, PacketAddChannel::new, PacketDirection.SERVER_TO_CLIENT, true);
+        CHANNEL.registerMessage(PacketAddTesseractReferences.class, PacketAddTesseractReferences::new, PacketDirection.SERVER_TO_CLIENT, true);
+        CHANNEL.registerMessage(PacketCompleteChannelsUpdate.class, PacketCompleteChannelsUpdate::new, PacketDirection.SERVER_TO_CLIENT, true);
+        CHANNEL.registerMessage(PacketRemoveChannel.class, PacketRemoveChannel::new, PacketDirection.SERVER_TO_CLIENT, true);
+        CHANNEL.registerMessage(PacketRemoveTesseractReferences.class, PacketRemoveTesseractReferences::new, PacketDirection.SERVER_TO_CLIENT, true);
+        CHANNEL.registerMessage(PacketScreenAddChannel.class, PacketScreenAddChannel::new, PacketDirection.CLIENT_TO_SERVER, true);
+        CHANNEL.registerMessage(PacketScreenCycleRedstoneState.class, PacketScreenCycleRedstoneState::new, PacketDirection.CLIENT_TO_SERVER, true);
+        CHANNEL.registerMessage(PacketScreenCycleTransferState.class, PacketScreenCycleTransferState::new, PacketDirection.CLIENT_TO_SERVER, true);
+        CHANNEL.registerMessage(PacketScreenRemoveChannel.class, PacketScreenRemoveChannel::new, PacketDirection.CLIENT_TO_SERVER, true);
+        CHANNEL.registerMessage(PacketScreenSetChannel.class, PacketScreenSetChannel::new, PacketDirection.CLIENT_TO_SERVER, true);
 
         register();
         registerGenerators();
