@@ -25,10 +25,6 @@ public class TesseractReference {
     private final EnumMap<EnumChannelType,Boolean> canSend = new EnumMap<>(EnumChannelType.class);
     private final EnumMap<EnumChannelType,Boolean> canReceive = new EnumMap<>(EnumChannelType.class);
     private WeakReference<TesseractBlockEntity> entity;
-    /**
-     * Counts recurrent calls inside the combined capabilities in order to prevent infinite loops
-     */
-    public int recurrentCalls = 0;
 
     public TesseractReference(long index, TesseractBlockEntity entity){
         this.index = index;
