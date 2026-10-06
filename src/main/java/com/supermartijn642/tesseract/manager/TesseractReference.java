@@ -3,14 +3,13 @@ package com.supermartijn642.tesseract.manager;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.tesseract.EnumChannelType;
-import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.WeakReference;
 import java.util.EnumMap;
 
 /**
@@ -25,7 +24,7 @@ public final class TesseractReference {
     private final EnumMap<EnumChannelType,Integer> channels = new EnumMap<>(EnumChannelType.class);
     private final EnumMap<EnumChannelType,Boolean> canSend = new EnumMap<>(EnumChannelType.class);
     private final EnumMap<EnumChannelType,Boolean> canReceive = new EnumMap<>(EnumChannelType.class);
-    private WeakReference<TesseractBlockEntity> entity;
+    private @Nullable TesseractBlockEntity entity;
 
     TesseractReference(long index, TesseractBlockEntity entity){
         this.index = index;
@@ -37,6 +36,7 @@ public final class TesseractReference {
             this.canSend.put(type, entity.canSend(type));
             this.canReceive.put(type, entity.canReceive(type));
         }
+        this.entity = entity;
     }
 
     public TesseractReference(long index, CompoundNBT tag, boolean isClientSide){
@@ -72,28 +72,18 @@ public final class TesseractReference {
         return this.pos;
     }
 
-    public boolean isValid(){
-        World level = this.getLevel();
-        boolean isValid = level != null && level.getBlockState(this.pos).getBlock() == Tesseract.tesseract && level.getBlockEntity(this.pos) instanceof TesseractBlockEntity;
-
-        if(!isValid && !this.isClientSide)
-            TesseractTracker.SERVER.remove(this.dimension, this.pos);
-
-        return isValid;
-    }
-
     /**
      * Checks whether the tesseract is loaded and valid
      */
     public boolean canBeAccessed(){
-        World level = this.getLevel();
-        return level != null && level.isLoaded(this.pos) && this.isValid();
+        return this.getTesseract() != null;
     }
 
+    @Nullable
     public TesseractBlockEntity getTesseract(){
-        if(this.entity == null || this.entity.get() == null || this.entity.get().isRemoved() || !this.entity.get().getBlockPos().equals(this.pos))
-            this.entity = new WeakReference<>((TesseractBlockEntity)this.getLevel().getBlockEntity(this.pos));
-        return this.entity == null ? null : this.entity.get();
+        if(this.entity != null && (this.entity.isRemoved() || !this.entity.getBlockPos().equals(this.pos)))
+            this.entity = null;
+        return this.entity;
     }
 
     public CompoundNBT write(){
@@ -151,6 +141,7 @@ public final class TesseractReference {
     }
 
     public void update(TesseractBlockEntity entity){
+        this.entity = entity;
         for(EnumChannelType type : EnumChannelType.values()){
             boolean changed = false;
             boolean canSend = entity.canSend(type);

@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -41,8 +42,10 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     public TesseractReference getReference(){
-        if(this.reference == null)
+        if(this.reference == null){
             this.reference = TesseractTracker.getInstance(this.level).add(this);
+            this.reference.update(this);
+        }
         return this.reference;
     }
 
@@ -188,6 +191,27 @@ public class TesseractBlockEntity extends BaseBlockEntity {
             this.redstoneState = RedstoneState.valueOf(compound.getString("redstoneState"));
         if(compound.contains("powered"))
             this.redstone = compound.getBoolean("powered");
+    }
+
+    @Override
+    public void setLevel(World level){
+        super.setLevel(level);
+        if(!this.remove)
+            this.updateReference();
+    }
+
+    @Override
+    public void setPosition(BlockPos pos){
+        super.setPosition(pos);
+        if(!this.remove)
+            this.updateReference();
+    }
+
+    @Override
+    public void clearRemoved(){
+        super.clearRemoved();
+        if(this.level != null)
+            this.updateReference();
     }
 
     public void onReplaced(){
