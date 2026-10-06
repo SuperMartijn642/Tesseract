@@ -19,6 +19,9 @@ import java.util.UUID;
  */
 public class Channel {
 
+    public static final int CHANNEL_MIN_CHARACTERS = 3;
+    public static final int CHANNEL_MAX_CHARACTERS = 19;
+
     public final int id;
     public final EnumChannelType type;
     public UUID creator;
@@ -128,7 +131,7 @@ public class Channel {
         buffer.writeEnum(this.type);
         buffer.writeUUID(this.creator);
         buffer.writeBoolean(this.isPrivate);
-        buffer.writeUtf(this.name);
+        buffer.writeUtf(this.name, Channel.CHANNEL_MAX_CHARACTERS + 1);
     }
 
     public static Channel readClientChannel(PacketBuffer buffer){
@@ -136,7 +139,7 @@ public class Channel {
         EnumChannelType type = buffer.readEnum(EnumChannelType.class);
         UUID creator = buffer.readUUID();
         boolean isPrivate = buffer.readBoolean();
-        String name = buffer.readUtf(32767);
+        String name = buffer.readUtf(Channel.CHANNEL_MAX_CHARACTERS + 1);
         return new Channel(id, type, creator, isPrivate, name);
     }
 
