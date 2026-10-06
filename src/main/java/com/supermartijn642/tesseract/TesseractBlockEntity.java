@@ -26,8 +26,8 @@ import java.util.function.Function;
 public class TesseractBlockEntity extends BaseBlockEntity {
 
     private TesseractReference reference;
-    private final EnumMap<EnumChannelType,TransferState> transferState = new EnumMap<>(EnumChannelType.class);
-    private final EnumMap<EnumChannelType,LazyOptional<?>> capabilities = new EnumMap<>(EnumChannelType.class);
+    private final Map<EnumChannelType,TransferState> transferState = new EnumMap<>(EnumChannelType.class);
+    private final Map<EnumChannelType,LazyOptional<?>> capabilities = new EnumMap<>(EnumChannelType.class);
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
 
