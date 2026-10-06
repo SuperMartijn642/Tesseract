@@ -25,13 +25,13 @@ public class PacketScreenCycleTransferState extends BlockEntityBasePacket<Tesser
     @Override
     public void write(FriendlyByteBuf buffer){
         super.write(buffer);
-        buffer.writeInt(this.type.getIndex());
+        buffer.writeVarInt(this.type.getIndex());
     }
 
     @Override
     public void read(FriendlyByteBuf buffer){
         super.read(buffer);
-        this.type = EnumChannelType.byIndex(buffer.readInt());
+        this.type = EnumChannelType.byIndex(buffer.readVarInt());
     }
 
     @Override
