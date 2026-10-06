@@ -6,6 +6,7 @@ import com.supermartijn642.tesseract.manager.TesseractReference;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -41,8 +42,10 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     public TesseractReference getReference(){
-        if(this.reference == null)
+        if(this.reference == null){
             this.reference = TesseractTracker.getInstance(this.level).add(this);
+            this.reference.update(this);
+        }
         return this.reference;
     }
 
@@ -182,6 +185,20 @@ public class TesseractBlockEntity extends BaseBlockEntity {
             this.transferState.put(type, input.getString("transferState" + type.name()).map(TransferState::valueOf).orElse(TransferState.BOTH));
         this.redstoneState = input.getString("redstoneState").map(RedstoneState::valueOf).orElse(RedstoneState.DISABLED);
         this.redstone = input.getBooleanOr("powered", false);
+    }
+
+    @Override
+    public void setLevel(Level level){
+        super.setLevel(level);
+        if(!this.remove)
+            this.updateReference();
+    }
+
+    @Override
+    public void clearRemoved(){
+        super.clearRemoved();
+        if(this.level != null)
+            this.updateReference();
     }
 
     @Override
