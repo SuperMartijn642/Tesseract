@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -116,7 +117,7 @@ public class Channel {
             tesseractCompound = compound.getCompoundOrEmpty("tesseracts");
             for(String key : tesseractCompound.keySet()){
                 CompoundTag compound2 = tesseractCompound.getCompoundOrEmpty(key);
-                String dimension = compound2.getStringOr("dim", "");
+                ResourceLocation dimension = ResourceLocation.parse(compound2.getStringOr("dim", ""));
                 BlockPos pos = new BlockPos(compound2.getIntOr("posx", 0), compound2.getIntOr("posy", 0), compound2.getIntOr("posz", 0));
                 TesseractReference reference = TesseractTracker.SERVER.getReference(dimension, pos);
                 if(reference != null)
