@@ -26,9 +26,6 @@ import java.util.Locale;
  */
 public class TesseractAddChannelScreen extends BlockEntityBaseWidget<TesseractBlockEntity> {
 
-    private static final int CHANNEL_MIN_CHARACTERS = 3;
-    public static final int CHANNEL_MAX_CHARACTERS = 19;
-
     public static final ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath("tesseract", "gui/add_screen_background");
 
     private final EnumChannelType type;
@@ -44,7 +41,7 @@ public class TesseractAddChannelScreen extends BlockEntityBaseWidget<TesseractBl
 
     @Override
     protected void addWidgets(TesseractBlockEntity entity){
-        this.nameField = this.addWidget(new TextFieldWidget(7, 21, 107, 18, "", CHANNEL_MAX_CHARACTERS, this::checkChannelName));
+        this.nameField = this.addWidget(new TextFieldWidget(7, 21, 107, 18, "", Channel.CHANNEL_MAX_CHARACTERS, this::checkChannelName));
         this.nameField.setSuggestion(ClientUtils.translate("gui.tesseract.add.suggestion"));
         this.addButton = this.addWidget(new TesseractButton(8, 43, 61, 14, TextComponents.translation("gui.tesseract.add.add").get(), this::addChannel));
         this.addButton.active = false;
@@ -68,7 +65,7 @@ public class TesseractAddChannelScreen extends BlockEntityBaseWidget<TesseractBl
 
     private boolean checkChannelName(String name){
         name = name.trim();
-        if(name.length() < CHANNEL_MIN_CHARACTERS || name.length() > CHANNEL_MAX_CHARACTERS + 1){
+        if(name.length() < Channel.CHANNEL_MIN_CHARACTERS || name.length() > Channel.CHANNEL_MAX_CHARACTERS + 1){
             this.addButton.active = false;
             return false;
         }
