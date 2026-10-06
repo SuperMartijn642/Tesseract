@@ -28,21 +28,21 @@ public class PacketScreenAddChannel implements BasePacket {
 
     @Override
     public void write(PacketBuffer buffer){
-        buffer.writeInt(this.type.getIndex());
+        buffer.writeVarInt(this.type.getIndex());
         buffer.writeUtf(this.name, Channel.CHANNEL_MAX_CHARACTERS + 1);
         buffer.writeBoolean(this.isPrivate);
     }
 
     @Override
     public void read(PacketBuffer buffer){
-        this.type = EnumChannelType.byIndex(buffer.readInt());
+        this.type = EnumChannelType.byIndex(buffer.readVarInt());
         this.name = buffer.readUtf(Channel.CHANNEL_MAX_CHARACTERS + 1).trim();
         this.isPrivate = buffer.readBoolean();
     }
 
     @Override
     public boolean verify(PacketContext context){
-        return this.type != null && this.name.equals(SharedConstants.filterText(this.name))
+        return this.name.equals(SharedConstants.filterText(this.name))
             && this.name.length() >= Channel.CHANNEL_MIN_CHARACTERS
             && this.name.length() <= Channel.CHANNEL_MAX_CHARACTERS;
     }
