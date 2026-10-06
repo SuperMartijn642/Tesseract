@@ -4,6 +4,7 @@ import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.packets.PacketAddTesseractReferences;
 import com.supermartijn642.tesseract.packets.PacketRemoveTesseractReferences;
+import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -39,7 +40,7 @@ public class TesseractTracker {
         ServerTickEvents.END_SERVER_TICK.register(TesseractTracker::onTick);
     }
 
-    private final HashMap<String,HashMap<BlockPos,TesseractReference>> tesseracts = new HashMap<>();
+    private final Map<String,Map<BlockPos,TesseractReference>> tesseracts = new HashMap<>();
     private final Set<TesseractReference> dirtyReferences = new HashSet<>();
     private final Set<TesseractReference> referencesToBeRemoved = new HashSet<>();
     private final Set<TesseractReference> referencesToBeSaved = new HashSet<>();
@@ -57,7 +58,7 @@ public class TesseractTracker {
             this.markDirty(reference);
         }else
             reference = new TesseractReference(0, self);
-        this.tesseracts.computeIfAbsent(dimension, o -> new HashMap<>()).put(pos, reference);
+        this.tesseracts.computeIfAbsent(dimension, o -> new Object2ReferenceOpenHashMap<>()).put(pos, reference);
         return reference;
     }
 
@@ -65,7 +66,7 @@ public class TesseractTracker {
         if(this == CLIENT){
             String dimension = reference.getDimension();
             BlockPos pos = reference.getPos();
-            TesseractReference oldReference = this.tesseracts.computeIfAbsent(dimension, o -> new HashMap<>()).put(pos, reference);
+            TesseractReference oldReference = this.tesseracts.computeIfAbsent(dimension, o -> new Object2ReferenceOpenHashMap<>()).put(pos, reference);
             if(oldReference != null && oldReference != reference && oldReference.canBeAccessed())
                 oldReference.getTesseract().invalidateReference();
         }
@@ -188,8 +189,7 @@ public class TesseractTracker {
                                     tag = NbtIo.read(input);
                                 }
                                 TesseractReference reference = new TesseractReference(index, tag, false);
-                                SERVER.tesseracts.putIfAbsent(reference.getDimension(), new HashMap<>());
-                                SERVER.tesseracts.get(reference.getDimension()).put(reference.getPos(), reference);
+                                SERVER.tesseracts.computeIfAbsent(reference.getDimension(), o -> new Object2ReferenceOpenHashMap<>()).put(reference.getPos(), reference);
                             }catch(IOException exception){
                                 Tesseract.LOGGER.error("Failed to read tesseract data from file '~/tesseract/tracking/" + file.getFileName() + "':", exception);
                             }
