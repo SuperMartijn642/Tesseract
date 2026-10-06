@@ -11,10 +11,7 @@ import net.minecraft.world.level.Level;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created 3/20/2020 by SuperMartijn642
@@ -32,7 +29,7 @@ public class TesseractChannelManager {
         return getInstance(level.isClientSide);
     }
 
-    private final HashMap<EnumChannelType,ChannelList> types = new HashMap<>();
+    private final Map<EnumChannelType,ChannelList> types = new EnumMap<>(EnumChannelType.class);
 
     public Channel addChannel(EnumChannelType type, UUID creator, boolean isPrivate, String name){
         this.types.putIfAbsent(type, new ChannelList(type));
