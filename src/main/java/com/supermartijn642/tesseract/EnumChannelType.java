@@ -16,6 +16,8 @@ public enum EnumChannelType {
     FLUID(1, () -> Items.BUCKET, "gui.tesseract.type.fluid"),
     ENERGY(2, () -> Items.REDSTONE, "gui.tesseract.type.energy");
 
+    private static final EnumChannelType[] BY_INDEX = {ITEMS, FLUID, ENERGY};
+
     private final int index;
     public final Supplier<Item> item;
     public final String translationKey;
@@ -35,9 +37,6 @@ public enum EnumChannelType {
     }
 
     public static EnumChannelType byIndex(int index){
-        for(EnumChannelType type : values())
-            if(type.index == index)
-                return type;
-        return null;
+        return BY_INDEX[index];
     }
 }
