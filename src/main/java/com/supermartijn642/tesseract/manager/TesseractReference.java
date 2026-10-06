@@ -7,6 +7,7 @@ import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -19,6 +20,34 @@ import java.util.EnumMap;
  */
 public final class TesseractReference {
 
+    /**
+     * Encoding of tesseract reference for server->client networking.
+     */
+    public static void encode(TesseractReference reference, FriendlyByteBuf buffer){
+        buffer.writeResourceLocation(reference.dimension);
+        buffer.writeBlockPos(reference.pos);
+        for(EnumChannelType type : EnumChannelType.BY_INDEX){
+            buffer.writeVarInt(reference.channels.get(type));
+            buffer.writeBoolean(reference.canSend.get(type));
+            buffer.writeBoolean(reference.canReceive.get(type));
+        }
+    }
+
+    public static TesseractReference decode(FriendlyByteBuf buffer){
+        TesseractReference reference = new TesseractReference(
+            0,
+            buffer.readResourceLocation(),
+            buffer.readBlockPos(),
+            true
+        );
+        for(EnumChannelType type : EnumChannelType.BY_INDEX){
+            reference.channels.put(type, buffer.readVarInt());
+            reference.canSend.put(type, buffer.readBoolean());
+            reference.canReceive.put(type, buffer.readBoolean());
+        }
+        return reference;
+    }
+
     private final long index;
     private final ResourceLocation dimension;
     private final ResourceKey<Level> dimensionKey;
@@ -29,14 +58,22 @@ public final class TesseractReference {
     private final EnumMap<EnumChannelType,Boolean> canReceive = new EnumMap<>(EnumChannelType.class);
     private @Nullable TesseractBlockEntity entity;
 
-    TesseractReference(long index, TesseractBlockEntity entity){
+    private TesseractReference(long index, ResourceLocation dimension, BlockPos pos, boolean isClientSide){
         this.index = index;
-        this.dimensionKey = entity.getLevel().dimension();
-        this.dimension = this.dimensionKey.location();
-        this.pos = entity.getBlockPos();
-        this.isClientSide = entity.getLevel().isClientSide;
+        this.dimension = dimension;
+        this.dimensionKey = ResourceKey.create(Registries.DIMENSION, this.dimension);
+        this.pos = pos;
+        this.isClientSide = isClientSide;
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, -1);
+            this.canSend.put(type, true);
+            this.canReceive.put(type, true);
+        }
+    }
+
+    TesseractReference(long index, TesseractBlockEntity entity){
+        this(index, entity.getLevel().dimension().location(), entity.getBlockPos(), entity.getLevel().isClientSide());
+        for(EnumChannelType type : EnumChannelType.values()){
             this.canSend.put(type, entity.canSend(type));
             this.canReceive.put(type, entity.canReceive(type));
         }
@@ -44,11 +81,12 @@ public final class TesseractReference {
     }
 
     public TesseractReference(long index, CompoundTag tag, boolean isClientSide){
-        this.index = index;
-        this.dimension = ResourceLocation.parse(tag.getStringOr("dim", ""));
-        this.dimensionKey = ResourceKey.create(Registries.DIMENSION, this.dimension);
-        this.pos = new BlockPos(tag.getIntOr("posx", 0), tag.getIntOr("posy", 0), tag.getIntOr("posz", 0));
-        this.isClientSide = isClientSide;
+        this(
+            index,
+            ResourceLocation.parse(tag.getStringOr("dim", "")),
+            new BlockPos(tag.getIntOr("posx", 0), tag.getIntOr("posy", 0), tag.getIntOr("posz", 0)),
+            isClientSide
+        );
         for(EnumChannelType type : EnumChannelType.values()){
             this.channels.put(type, tag.getIntOr(type + "_channel", 0));
             this.canSend.put(type, tag.getBooleanOr(type + "_canSend", true));
