@@ -2,6 +2,9 @@ package com.supermartijn642.tesseract.manager;
 
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,10 +25,10 @@ public class ChannelList {
     private int channelId = 0;
 
     public final EnumChannelType type;
-    private final ArrayList<Channel> channels = new ArrayList<>();
-    private final ArrayList<Channel> publicChannels = new ArrayList<>();
-    private final HashMap<Integer,Channel> channelsById = new HashMap<>();
-    private final HashMap<UUID,List<Channel>> channelsByCreator = new HashMap<>();
+    private final List<Channel> channels = new ArrayList<>();
+    private final List<Channel> publicChannels = new ArrayList<>();
+    private final Int2ObjectMap<Channel> channelsById = new Int2ObjectOpenHashMap<>();
+    private final Map<UUID,List<Channel>> channelsByCreator = new Object2ObjectOpenHashMap<>();
     private final List<Integer> removedIds = new ArrayList<>();
 
     public ChannelList(EnumChannelType type){

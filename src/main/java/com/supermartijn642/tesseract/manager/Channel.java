@@ -5,11 +5,11 @@ import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.capabilities.CombinedEnergyStorage;
 import com.supermartijn642.tesseract.capabilities.CombinedFluidHandler;
 import com.supermartijn642.tesseract.capabilities.CombinedItemHandler;
+import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,9 +25,9 @@ public class Channel {
 
     public String name;
 
-    public final Set<TesseractReference> tesseracts = new LinkedHashSet<>();
-    public final Set<TesseractReference> sendingTesseracts = new LinkedHashSet<>();
-    public final Set<TesseractReference> receivingTesseracts = new LinkedHashSet<>();
+    public final Set<TesseractReference> tesseracts = new ReferenceArraySet<>(); // Iteration is most important, insertion/removal is sparse and only by direct user action
+    public final Set<TesseractReference> sendingTesseracts = new ReferenceArraySet<>();
+    public final Set<TesseractReference> receivingTesseracts = new ReferenceArraySet<>();
 
     /**
      * Counts recurrent calls inside the combined capabilities in order to prevent infinite loops
