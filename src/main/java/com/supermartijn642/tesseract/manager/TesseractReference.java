@@ -3,7 +3,6 @@ package com.supermartijn642.tesseract.manager;
 import com.supermartijn642.core.ClientUtils;
 import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.tesseract.EnumChannelType;
-import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -11,9 +10,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.WeakReference;
 import java.util.EnumMap;
 
 /**
@@ -29,7 +27,7 @@ public final class TesseractReference {
     private final EnumMap<EnumChannelType,Integer> channels = new EnumMap<>(EnumChannelType.class);
     private final EnumMap<EnumChannelType,Boolean> canSend = new EnumMap<>(EnumChannelType.class);
     private final EnumMap<EnumChannelType,Boolean> canReceive = new EnumMap<>(EnumChannelType.class);
-    private WeakReference<TesseractBlockEntity> entity;
+    private @Nullable TesseractBlockEntity entity;
 
     TesseractReference(long index, TesseractBlockEntity entity){
         this.index = index;
@@ -42,6 +40,7 @@ public final class TesseractReference {
             this.canSend.put(type, entity.canSend(type));
             this.canReceive.put(type, entity.canReceive(type));
         }
+        this.entity = entity;
     }
 
     public TesseractReference(long index, CompoundTag tag, boolean isClientSide){
@@ -75,35 +74,18 @@ public final class TesseractReference {
         return this.pos;
     }
 
-    public boolean isValid(){
-        Level level = this.getLevel();
-        boolean isValid = level != null && level.getBlockState(this.pos).getBlock() == Tesseract.tesseract && level.getBlockEntity(this.pos) instanceof TesseractBlockEntity;
-
-        if(!isValid && !this.isClientSide)
-            TesseractTracker.SERVER.remove(level, this.pos);
-
-        return isValid;
-    }
-
     /**
      * Checks whether the tesseract is loaded and valid
      */
     public boolean canBeAccessed(){
-        Level level = this.getLevel();
-        return level != null && level.isLoaded(this.pos) && this.isValid();
+        return this.getTesseract() != null;
     }
 
+    @Nullable
     public TesseractBlockEntity getTesseract(){
-        TesseractBlockEntity entity = this.entity == null ? null : this.entity.get();
-        if(entity == null || entity.isRemoved() || !entity.getBlockPos().equals(this.pos)){
-            BlockEntity newEntity = this.getLevel().getBlockEntity(this.pos);
-            if(newEntity instanceof TesseractBlockEntity){
-                entity = (TesseractBlockEntity)newEntity;
-                this.entity = new WeakReference<>(entity);
-            }else
-                this.entity = null;
-        }
-        return entity;
+        if(this.entity != null && (this.entity.isRemoved() || !this.entity.getBlockPos().equals(this.pos)))
+            this.entity = null;
+        return this.entity;
     }
 
     public CompoundTag write(){
@@ -161,6 +143,7 @@ public final class TesseractReference {
     }
 
     public void update(TesseractBlockEntity entity){
+        this.entity = entity;
         for(EnumChannelType type : EnumChannelType.values()){
             boolean changed = false;
             boolean canSend = entity.canSend(type);
