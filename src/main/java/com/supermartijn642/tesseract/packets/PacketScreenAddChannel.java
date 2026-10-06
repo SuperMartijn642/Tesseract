@@ -3,6 +3,7 @@ package com.supermartijn642.tesseract.packets;
 import com.supermartijn642.core.network.BasePacket;
 import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
+import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.StringUtil;
@@ -28,20 +29,22 @@ public class PacketScreenAddChannel implements BasePacket {
     @Override
     public void write(FriendlyByteBuf buffer){
         buffer.writeInt(this.type.getIndex());
-        buffer.writeUtf(this.name);
+        buffer.writeUtf(this.name, Channel.CHANNEL_MAX_CHARACTERS + 1);
         buffer.writeBoolean(this.isPrivate);
     }
 
     @Override
     public void read(FriendlyByteBuf buffer){
         this.type = EnumChannelType.byIndex(buffer.readInt());
-        this.name = buffer.readUtf(32767);
+        this.name = buffer.readUtf(Channel.CHANNEL_MAX_CHARACTERS + 1).trim();
         this.isPrivate = buffer.readBoolean();
     }
 
     @Override
     public boolean verify(PacketContext context){
-        return this.type != null && !this.name.trim().isEmpty() && this.name.trim().equals(StringUtil.filterText(this.name.trim()));
+        return this.type != null && this.name.equals(StringUtil.filterText(this.name))
+            && this.name.length() >= Channel.CHANNEL_MIN_CHARACTERS
+            && this.name.length() <= Channel.CHANNEL_MAX_CHARACTERS;
     }
 
     @Override
