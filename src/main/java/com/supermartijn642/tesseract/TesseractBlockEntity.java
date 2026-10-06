@@ -4,6 +4,7 @@ import com.supermartijn642.core.block.BaseBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
+import com.supermartijn642.tesseract.util.PerChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -27,19 +28,17 @@ import java.util.*;
 public class TesseractBlockEntity extends BaseBlockEntity {
 
     private TesseractReference reference;
-    private final Map<EnumChannelType,TransferState> transferState = new EnumMap<>(EnumChannelType.class);
-    private final Map<EnumChannelType,LazyOptional<?>> capabilities = new EnumMap<>(EnumChannelType.class);
+    private final PerChannel<TransferState> transferState = new PerChannel<>(TransferState.BOTH);
+    private final PerChannel<LazyOptional<?>> capabilities = new PerChannel<>();
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
 
-    private final Map<Direction,Map<EnumChannelType,LazyOptional<?>>> surroundingCapabilities = new EnumMap<>(Direction.class);
+    private final Map<Direction,PerChannel<LazyOptional<?>>> surroundingCapabilities = new EnumMap<>(Direction.class);
 
     public TesseractBlockEntity(BlockPos pos, BlockState state){
         super(Tesseract.tesseract_tile, pos, state);
-        for(EnumChannelType type : EnumChannelType.values())
-            this.transferState.put(type, TransferState.BOTH);
         for(Direction facing : Direction.values())
-            this.surroundingCapabilities.put(facing, new EnumMap<>(EnumChannelType.class));
+            this.surroundingCapabilities.put(facing, new PerChannel<>());
     }
 
     public TesseractReference getReference(){
@@ -73,19 +72,19 @@ public class TesseractBlockEntity extends BaseBlockEntity {
             Channel channel = this.getChannel(EnumChannelType.ITEMS);
             if(channel == null)
                 return LazyOptional.empty();
-            return this.capabilities.computeIfAbsent(EnumChannelType.ITEMS, o -> LazyOptional.of(() -> channel.getItemHandler(this))).cast();
+            return this.capabilities.computeIfAbsent(EnumChannelType.ITEMS, () -> LazyOptional.of(() -> channel.getItemHandler(this))).cast();
         }
         if(capability == ForgeCapabilities.FLUID_HANDLER){
             Channel channel = this.getChannel(EnumChannelType.FLUID);
             if(channel == null)
                 return LazyOptional.empty();
-            return this.capabilities.computeIfAbsent(EnumChannelType.FLUID, o -> LazyOptional.of(() -> channel.getFluidHandler(this))).cast();
+            return this.capabilities.computeIfAbsent(EnumChannelType.FLUID, () -> LazyOptional.of(() -> channel.getFluidHandler(this))).cast();
         }
         if(capability == ForgeCapabilities.ENERGY){
             Channel channel = this.getChannel(EnumChannelType.ENERGY);
             if(channel == null)
                 return LazyOptional.empty();
-            return this.capabilities.computeIfAbsent(EnumChannelType.FLUID, o -> LazyOptional.of(() -> channel.getEnergyStorage(this))).cast();
+            return this.capabilities.computeIfAbsent(EnumChannelType.FLUID, () -> LazyOptional.of(() -> channel.getEnergyStorage(this))).cast();
         }
         return super.getCapability(capability, side);
     }
@@ -118,7 +117,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
                 if(entity != null && !(entity instanceof TesseractBlockEntity)){
                     optional = entity.getCapability(api, side.getOpposite());
                     if(optional.isPresent())
-                        this.surroundingCapabilities.get(side).put(type, optional);
+                        this.surroundingCapabilities.get(side).set(type, optional);
                     else
                         optional = null;
                 }
@@ -152,7 +151,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
 
     public void cycleTransferState(EnumChannelType type){
         TransferState transferState = this.transferState.get(type);
-        this.transferState.put(type, transferState == TransferState.BOTH ? TransferState.SEND : transferState == TransferState.SEND ? TransferState.RECEIVE : TransferState.BOTH);
+        this.transferState.set(type, transferState == TransferState.BOTH ? TransferState.SEND : transferState == TransferState.SEND ? TransferState.RECEIVE : TransferState.BOTH);
         this.updateReference();
         this.dataChanged();
     }
@@ -181,7 +180,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
 
     public void onNeighborChanged(BlockPos neighbor){
         Direction facing = Direction.getNearest(neighbor.getX() - this.worldPosition.getX(), neighbor.getY() - this.worldPosition.getY(), neighbor.getZ() - this.worldPosition.getZ());
-        this.surroundingCapabilities.get(facing).clear();
+        this.surroundingCapabilities.get(facing).reset();
     }
 
     private void notifyNeighbors(){
@@ -208,7 +207,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     protected void readData(CompoundTag compound){
         for(EnumChannelType type : EnumChannelType.values())
             if(compound.contains("transferState" + type.name()))
-                this.transferState.put(type, TransferState.valueOf(compound.getString("transferState" + type.name())));
+                this.transferState.set(type, TransferState.valueOf(compound.getString("transferState" + type.name())));
         if(compound.contains("redstoneState"))
             this.redstoneState = RedstoneState.valueOf(compound.getString("redstoneState"));
         if(compound.contains("powered"))
@@ -239,6 +238,6 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         super.onChunkUnloaded();
         // Invalidate capabilities
         this.capabilities.values().forEach(LazyOptional::invalidate);
-        this.capabilities.clear();
+        this.capabilities.reset();
     }
 }
