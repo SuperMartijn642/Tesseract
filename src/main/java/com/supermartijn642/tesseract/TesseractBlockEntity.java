@@ -26,10 +26,6 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     private final EnumMap<EnumChannelType,Object> capabilities = new EnumMap<>(EnumChannelType.class);
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
-    /**
-     * Counts recurrent calls inside the combined capabilities in order to prevent infinite loops
-     */
-    public int recurrentCalls = 0;
 
     private final Map<EnumFacing,Map<Capability<?>,Object>> surroundingCapabilities = new EnumMap<>(EnumFacing.class);
 
