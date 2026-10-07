@@ -1,8 +1,8 @@
 package com.supermartijn642.tesseract.capabilities;
 
+import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 
 /**
@@ -11,6 +11,6 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 public class CombinedItemHandler extends CombinedResourceHandler<ItemVariant> {
 
     public CombinedItemHandler(Channel channel, TesseractReference requester){
-        super(channel, requester, entity -> entity.getSurroundingCapabilities(ItemStorage.SIDED));
+        super(channel, requester, TesseractBlockEntity::getSurroundingItemCapabilities);
     }
 }
