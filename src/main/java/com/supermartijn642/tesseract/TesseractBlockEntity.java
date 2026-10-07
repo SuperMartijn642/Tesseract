@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import team.reborn.energy.api.EnergyStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
@@ -104,12 +103,18 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         if(this.level == null)
             return Collections.emptyList();
 
+        ArrayList<Object> capabilities = new ArrayList<>(6);
+        for(Direction side : Direction.values()){
+            if(this.surroundingTesseracts[side.ordinal()])
+                continue;
+            Object capability = this.surroundingCapabilities.get(side)
+                .computeIfAbsent(type, () -> BlockApiCache.create(api, (ServerLevel)this.level, this.worldPosition.relative(side)))
+                .find(side);
+            if(capability != null)
+                capabilities.add(capability);
+        }
         //noinspection unchecked
-        return (List<T>)Arrays.stream(Direction.values())
-            .filter(side -> !this.surroundingTesseracts[side.ordinal()])
-            .map(side -> this.surroundingCapabilities.get(side).computeIfAbsent(type, () -> BlockApiCache.create(api, (ServerLevel)this.level, this.worldPosition.relative(side))).find(side))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+        return (List<T>)capabilities;
     }
 
     public boolean canSend(EnumChannelType type){
