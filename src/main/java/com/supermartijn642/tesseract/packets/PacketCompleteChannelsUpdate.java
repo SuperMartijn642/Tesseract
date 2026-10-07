@@ -6,6 +6,7 @@ import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 
 import java.util.ArrayList;
@@ -20,21 +21,17 @@ public class PacketCompleteChannelsUpdate implements BasePacket {
 
     private List<Channel> channels;
 
-    public PacketCompleteChannelsUpdate(boolean server){
-        if(!server)
-            throw new IllegalStateException();
-
-        List<Channel>[] lists = new List[EnumChannelType.values().length];
-        int index = 0;
+    public PacketCompleteChannelsUpdate(PlayerEntity target){
+        Set<Channel>[] channels = new Set[EnumChannelType.values().length];
         int size = 0;
         for(EnumChannelType type : EnumChannelType.values()){
-            lists[index] = TesseractChannelManager.SERVER.getChannels(type);
-            size += lists[index].size();
-            index++;
+            channels[type.ordinal()] = new HashSet<>(TesseractChannelManager.SERVER.getPublicChannels(type));
+            channels[type.ordinal()].addAll(TesseractChannelManager.SERVER.getChannelsCreatedBy(type, target.getGameProfile().getId()));
+            size += channels[type.ordinal()].size();
         }
         this.channels = new ArrayList<>(size);
-        for(List<Channel> list : lists)
-            this.channels.addAll(list);
+        for(Set<Channel> set : channels)
+            this.channels.addAll(set);
     }
 
     public PacketCompleteChannelsUpdate(){
@@ -60,11 +57,8 @@ public class PacketCompleteChannelsUpdate implements BasePacket {
     @Override
     public void handle(PacketContext buffer){
         TesseractChannelManager.CLIENT.clear();
-        Set<EnumChannelType> types = new HashSet<>(3);
-        this.channels.forEach(channel -> {
-            TesseractChannelManager.CLIENT.addChannel(channel);
-            types.add(channel.type);
-        });
-        types.forEach(type -> TesseractChannelManager.CLIENT.sortChannels(ClientUtils.getPlayer(), type));
+        this.channels.forEach(TesseractChannelManager.CLIENT::addChannel);
+        for(EnumChannelType type : EnumChannelType.values())
+            TesseractChannelManager.CLIENT.sortChannels(ClientUtils.getPlayer(), type);
     }
 }

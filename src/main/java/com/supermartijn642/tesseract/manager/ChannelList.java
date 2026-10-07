@@ -68,9 +68,6 @@ public class ChannelList {
 
     public List<Channel> sortForPlayer(PlayerEntity player){
         final UUID uuid = player.getUUID();
-
-        this.channels.removeIf(channel -> channel.isPrivate && !channel.creator.equals(uuid));
-
         this.channels.sort((a, b) -> {
             boolean aUuid = a.creator.equals(uuid);
             boolean bUuid = b.creator.equals(uuid);
@@ -87,6 +84,10 @@ public class ChannelList {
 
     public List<Channel> getChannels(){
         return Collections.unmodifiableList(this.channels);
+    }
+
+    public List<Channel> getPublicChannels(){
+        return Collections.unmodifiableList(this.publicChannels);
     }
 
     public List<Channel> getChannelsCreatedBy(UUID creator){
