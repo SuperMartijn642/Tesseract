@@ -109,7 +109,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
                 continue;
             Object capability = this.surroundingCapabilities.get(side)
                 .computeIfAbsent(type, () -> BlockApiCache.create(api, (ServerLevel)this.level, this.worldPosition.relative(side)))
-                .find(side);
+                .find(side.getOpposite());
             if(capability != null)
                 capabilities.add(capability);
         }
