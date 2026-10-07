@@ -8,6 +8,7 @@ import com.supermartijn642.tesseract.capabilities.CombinedItemHandler;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Iterator;
@@ -123,22 +124,20 @@ public class Channel {
         }
     }
 
-    public CompoundTag writeClientChannel(){
-        CompoundTag tag = new CompoundTag();
-        tag.putInt("id", this.id);
-        tag.putInt("type", this.type.getIndex());
-        tag.putUUID("creator", this.creator);
-        tag.putBoolean("private", this.isPrivate);
-        tag.putString("name", this.name);
-        return tag;
+    public void writeClientChannel(FriendlyByteBuf buffer){
+        buffer.writeInt(this.id);
+        buffer.writeEnum(this.type);
+        buffer.writeUUID(this.creator);
+        buffer.writeBoolean(this.isPrivate);
+        buffer.writeUtf(this.name);
     }
 
-    public static Channel readClientChannel(CompoundTag tag){
-        int id = tag.getInt("id");
-        EnumChannelType type = EnumChannelType.byIndex(tag.getInt("type"));
-        UUID creator = tag.getUUID("creator");
-        boolean isPrivate = tag.getBoolean("private");
-        String name = tag.getString("name");
+    public static Channel readClientChannel(FriendlyByteBuf buffer){
+        int id = buffer.readInt();
+        EnumChannelType type = buffer.readEnum(EnumChannelType.class);
+        UUID creator = buffer.readUUID();
+        boolean isPrivate = buffer.readBoolean();
+        String name = buffer.readUtf(32767);
         return new Channel(id, type, creator, isPrivate, name);
     }
 
