@@ -8,6 +8,7 @@ import com.supermartijn642.tesseract.packets.PacketCompleteChannelsUpdate;
 import com.supermartijn642.tesseract.packets.PacketRemoveChannel;
 import com.supermartijn642.tesseract.util.PerChannel;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.world.World;
 
 import java.io.IOException;
@@ -91,10 +92,9 @@ public class TesseractChannelManager {
         if(this != SERVER)
             return;
         if(channel.isPrivate){
-            CommonUtils.getServer().getPlayerList().getPlayers().stream()
-                .filter(player -> player.getGameProfile().getId().equals(channel.creator))
-                .findAny()
-                .ifPresent(player -> Tesseract.CHANNEL.sendToPlayer(player, new PacketAddChannel(channel)));
+            ServerPlayerEntity player = CommonUtils.getServer().getPlayerList().getPlayer(channel.creator);
+            if(player != null)
+                Tesseract.CHANNEL.sendToPlayer(player, new PacketAddChannel(channel));
         }else
             Tesseract.CHANNEL.sendToAllPlayers(new PacketAddChannel(channel));
     }
@@ -103,10 +103,9 @@ public class TesseractChannelManager {
         if(this != SERVER)
             return;
         if(channel.isPrivate){
-            CommonUtils.getServer().getPlayerList().getPlayers().stream()
-                .filter(player -> player.getGameProfile().getId().equals(channel.creator))
-                .findAny()
-                .ifPresent(player -> Tesseract.CHANNEL.sendToPlayer(player, new PacketRemoveChannel(channel)));
+            ServerPlayerEntity player = CommonUtils.getServer().getPlayerList().getPlayer(channel.creator);
+            if(player != null)
+                Tesseract.CHANNEL.sendToPlayer(player, new PacketRemoveChannel(channel));
         }else
             Tesseract.CHANNEL.sendToAllPlayers(new PacketRemoveChannel(channel));
     }
