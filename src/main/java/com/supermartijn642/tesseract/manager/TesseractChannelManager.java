@@ -1,5 +1,6 @@
 package com.supermartijn642.tesseract.manager;
 
+import com.supermartijn642.core.CommonUtils;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.packets.PacketAddChannel;
@@ -50,7 +51,7 @@ public class TesseractChannelManager {
         if(channel != null && (this == CLIENT || channel.creator.equals(remover.getUUID()) || remover.hasPermissions(2))){
             this.types.putIfAbsent(type, new ChannelList(type));
             this.types.get(type).remove(id);
-            this.sendRemoveChannelPacket(type, id);
+            this.sendRemoveChannelPacket(channel);
         }
     }
 
@@ -64,6 +65,11 @@ public class TesseractChannelManager {
     public List<Channel> getChannels(EnumChannelType type){
         this.types.putIfAbsent(type, new ChannelList(type));
         return this.types.get(type).getChannels();
+    }
+
+    public List<Channel> getPublicChannels(EnumChannelType type){
+        this.types.putIfAbsent(type, new ChannelList(type));
+        return this.types.get(type).getPublicChannels();
     }
 
     public List<Channel> getChannelsCreatedBy(EnumChannelType type, UUID creator){
@@ -85,17 +91,31 @@ public class TesseractChannelManager {
 
     public void sendCompleteUpdatePacket(PlayerEntity player){
         if(this == SERVER)
-            Tesseract.CHANNEL.sendToPlayer(player, new PacketCompleteChannelsUpdate(true));
+            Tesseract.CHANNEL.sendToPlayer(player, new PacketCompleteChannelsUpdate(player));
     }
 
     public void sendAddChannelPacket(Channel channel){
-        if(this == SERVER)
+        if(this != SERVER)
+            return;
+        if(channel.isPrivate){
+            CommonUtils.getServer().getPlayerList().getPlayers().stream()
+                .filter(player -> player.getGameProfile().getId().equals(channel.creator))
+                .findAny()
+                .ifPresent(player -> Tesseract.CHANNEL.sendToPlayer(player, new PacketAddChannel(channel)));
+        }else
             Tesseract.CHANNEL.sendToAllPlayers(new PacketAddChannel(channel));
     }
 
-    public void sendRemoveChannelPacket(EnumChannelType type, int id){
-        if(this == SERVER)
-            Tesseract.CHANNEL.sendToAllPlayers(new PacketRemoveChannel(type, id));
+    public void sendRemoveChannelPacket(Channel channel){
+        if(this != SERVER)
+            return;
+        if(channel.isPrivate){
+            CommonUtils.getServer().getPlayerList().getPlayers().stream()
+                .filter(player -> player.getGameProfile().getId().equals(channel.creator))
+                .findAny()
+                .ifPresent(player -> Tesseract.CHANNEL.sendToPlayer(player, new PacketRemoveChannel(channel)));
+        }else
+            Tesseract.CHANNEL.sendToAllPlayers(new PacketRemoveChannel(channel));
     }
 
     public static void saveChannels(Path saveDirectory){
