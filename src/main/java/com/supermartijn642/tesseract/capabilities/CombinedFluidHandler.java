@@ -5,7 +5,6 @@ import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 
@@ -33,7 +32,7 @@ public class CombinedFluidHandler implements IFluidHandler {
             for(TesseractReference reference : this.channel.tesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
+                    for(IFluidHandler handler : entity.getSurroundingFluidCapabilities()){
                         IFluidTankProperties[] handlerTanks = handler.getTankProperties();
                         if(handlerTanks != null)
                             tanks.addAll(Arrays.asList(handlerTanks));
@@ -59,7 +58,7 @@ public class CombinedFluidHandler implements IFluidHandler {
             for(TesseractReference reference : this.channel.receivingTesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
+                    for(IFluidHandler handler : entity.getSurroundingFluidCapabilities()){
                         int inserted = handler.fill(leftOver, doFill);
                         if(inserted < 0)
                             throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + inserted + "' for #fill()!");
@@ -95,7 +94,7 @@ public class CombinedFluidHandler implements IFluidHandler {
             for(TesseractReference reference : this.channel.sendingTesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
+                    for(IFluidHandler handler : entity.getSurroundingFluidCapabilities()){
                         FluidStack extracted = handler.drain(leftOver, doDrain);
                         if(leftOver.amount != leftOverAmount)
                             throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' modified fluid stack argument in #drain()!");
@@ -136,7 +135,7 @@ public class CombinedFluidHandler implements IFluidHandler {
             for(TesseractReference reference : this.channel.sendingTesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY)){
+                    for(IFluidHandler handler : entity.getSurroundingFluidCapabilities()){
                         // If nothing has been extracted yet, extract anything
                         if(resource == null){
                             FluidStack extracted = handler.drain(leftOverAmount, doDrain);

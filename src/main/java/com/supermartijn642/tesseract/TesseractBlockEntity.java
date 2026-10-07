@@ -11,8 +11,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -28,14 +31,14 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
 
-    private final Map<EnumFacing,Map<Capability<?>,Object>> surroundingCapabilities = new EnumMap<>(EnumFacing.class);
+    private final Map<EnumFacing,Map<EnumChannelType,Object>> surroundingCapabilities = new EnumMap<>(EnumFacing.class);
 
     public TesseractBlockEntity(){
         super(Tesseract.tesseract_tile);
         for(EnumChannelType type : EnumChannelType.values())
             this.transferState.put(type, TransferState.BOTH);
         for(EnumFacing facing : EnumFacing.values())
-            this.surroundingCapabilities.put(facing, new HashMap<>());
+            this.surroundingCapabilities.put(facing, new EnumMap<>(EnumChannelType.class));
     }
 
     public TesseractReference getReference(){
@@ -93,23 +96,35 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         return super.getCapability(capability, side);
     }
 
-    public <T> List<T> getSurroundingCapabilities(Capability<T> capability){
+    public List<IItemHandler> getSurroundingItemCapabilities(){
+        return this.getSurroundingCapabilities(EnumChannelType.ITEMS, CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+    }
+
+    public List<IFluidHandler> getSurroundingFluidCapabilities(){
+        return this.getSurroundingCapabilities(EnumChannelType.FLUID, CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+    }
+
+    public List<IEnergyStorage> getSurroundingEnergyCapabilities(){
+        return this.getSurroundingCapabilities(EnumChannelType.ENERGY, CapabilityEnergy.ENERGY);
+    }
+
+    private <T> List<T> getSurroundingCapabilities(EnumChannelType type, Capability<T> api){
         if(this.world == null)
             return Collections.emptyList();
 
-        ArrayList<T> list = new ArrayList<>();
-        for(EnumFacing facing : EnumFacing.values()){
-            Object object = this.surroundingCapabilities.get(facing).computeIfAbsent(capability, o -> {
-                TileEntity entity = this.world.getTileEntity(this.pos.offset(facing));
+        ArrayList<Object> capabilities = new ArrayList<>();
+        for(EnumFacing side : EnumFacing.values()){
+            Object capability = this.surroundingCapabilities.get(side).computeIfAbsent(type, o -> {
+                TileEntity entity = this.world.getTileEntity(this.pos.offset(side));
                 if(entity != null && !(entity instanceof TesseractBlockEntity))
-                    return entity.getCapability(capability, facing.getOpposite());
+                    return entity.getCapability(api, side.getOpposite());
                 return null;
             });
-            if(object != null)
-                //noinspection unchecked
-                list.add((T)object);
+            if(capability != null)
+                capabilities.add(capability);
         }
-        return list;
+        //noinspection unchecked
+        return (List<T>)capabilities;
     }
 
     public boolean canSend(EnumChannelType type){

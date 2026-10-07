@@ -5,7 +5,6 @@ import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
@@ -31,7 +30,7 @@ public class CombinedItemHandler implements IItemHandler {
             for(TesseractReference reference : this.channel.tesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY))
+                    for(IItemHandler handler : entity.getSurroundingItemCapabilities())
                         size += handler.getSlots();
                 }
             }
@@ -49,7 +48,7 @@ public class CombinedItemHandler implements IItemHandler {
             for(TesseractReference reference : this.channel.tesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+                    for(IItemHandler handler : entity.getSurroundingItemCapabilities()){
                         if(index - counter < handler.getSlots())
                             return handler.getStackInSlot(index - counter);
                         else
@@ -70,7 +69,7 @@ public class CombinedItemHandler implements IItemHandler {
             for(TesseractReference reference : this.channel.tesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+                    for(IItemHandler handler : entity.getSurroundingItemCapabilities()){
                         if(index - counter < handler.getSlots()){
                             int capacity = handler.getSlotLimit(index - counter);
                             if(capacity < 0)
@@ -96,7 +95,7 @@ public class CombinedItemHandler implements IItemHandler {
             for(TesseractReference reference : this.channel.tesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+                    for(IItemHandler handler : entity.getSurroundingItemCapabilities()){
                         if(index - counter < handler.getSlots())
                             return handler.isItemValid(index, stack);
                         else
@@ -120,7 +119,7 @@ public class CombinedItemHandler implements IItemHandler {
             for(TesseractReference reference : this.channel.tesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+                    for(IItemHandler handler : entity.getSurroundingItemCapabilities()){
                         if(index - counter < handler.getSlots()){
                             if(!reference.canReceive(this.channel.type))
                                 return stack;
@@ -146,7 +145,7 @@ public class CombinedItemHandler implements IItemHandler {
             for(TesseractReference reference : this.channel.tesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(IItemHandler handler : entity.getSurroundingCapabilities(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)){
+                    for(IItemHandler handler : entity.getSurroundingItemCapabilities()){
                         if(index - counter < handler.getSlots()){
                             if(!reference.canSend(this.channel.type))
                                 return ItemStack.EMPTY;
