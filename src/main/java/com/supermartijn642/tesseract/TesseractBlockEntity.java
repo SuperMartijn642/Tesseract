@@ -14,11 +14,13 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Function;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
@@ -31,14 +33,14 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
 
-    private final Map<Direction,Map<Capability<?>,LazyOptional<?>>> surroundingCapabilities = new EnumMap<>(Direction.class);
+    private final Map<Direction,Map<EnumChannelType,LazyOptional<?>>> surroundingCapabilities = new EnumMap<>(Direction.class);
 
     public TesseractBlockEntity(BlockPos pos, BlockState state){
         super(Tesseract.tesseract_tile, pos, state);
         for(EnumChannelType type : EnumChannelType.values())
             this.transferState.put(type, TransferState.BOTH);
         for(Direction facing : Direction.values())
-            this.surroundingCapabilities.put(facing, new HashMap<>());
+            this.surroundingCapabilities.put(facing, new EnumMap<>(EnumChannelType.class));
     }
 
     public TesseractReference getReference(){
@@ -89,23 +91,44 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         return super.getCapability(capability, side);
     }
 
-    public <T> List<T> getSurroundingCapabilities(Capability<T> capability){
+    public List<IItemHandler> getSurroundingItemCapabilities(){
+        return this.getSurroundingCapabilities(EnumChannelType.ITEMS, ForgeCapabilities.ITEM_HANDLER);
+    }
+
+    public List<IFluidHandler> getSurroundingFluidCapabilities(){
+        return this.getSurroundingCapabilities(EnumChannelType.FLUID, ForgeCapabilities.FLUID_HANDLER);
+    }
+
+    public List<IEnergyStorage> getSurroundingEnergyCapabilities(){
+        return this.getSurroundingCapabilities(EnumChannelType.ENERGY, ForgeCapabilities.ENERGY);
+    }
+
+    private <T> List<T> getSurroundingCapabilities(EnumChannelType type, Capability<T> api){
         if(this.level == null)
             return Collections.emptyList();
 
-        ArrayList<T> list = new ArrayList<>();
-        for(Direction facing : Direction.values()){
-            LazyOptional<?> optional = computeIfLazyAbsent(this.surroundingCapabilities.get(facing), capability, o -> {
-                BlockEntity entity = this.level.getBlockEntity(this.worldPosition.relative(facing));
-                if(entity != null && !(entity instanceof TesseractBlockEntity))
-                    return entity.getCapability(capability, facing.getOpposite());
-                return LazyOptional.empty();
-            });
-            if(optional.isPresent())
-                //noinspection unchecked,DataFlowIssue
-                list.add((T)optional.orElseGet(() -> null));
+        ArrayList<Object> capabilities = new ArrayList<>();
+        for(Direction side : Direction.values()){
+            LazyOptional<?> optional = this.surroundingCapabilities.get(side).get(type);
+            if(optional != null && !optional.isPresent()){
+                this.surroundingCapabilities.get(side).remove(type);
+                optional = null;
+            }
+            if(optional == null){
+                BlockEntity entity = this.level.getBlockEntity(this.worldPosition.relative(side));
+                if(entity != null && !(entity instanceof TesseractBlockEntity)){
+                    optional = entity.getCapability(api, side.getOpposite());
+                    if(optional.isPresent())
+                        this.surroundingCapabilities.get(side).put(type, optional);
+                    else
+                        optional = null;
+                }
+            }
+            if(optional != null)
+                capabilities.add(optional.orElse(null));
         }
-        return list;
+        //noinspection unchecked
+        return (List<T>)capabilities;
     }
 
     public boolean canSend(EnumChannelType type){
@@ -214,50 +237,5 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         // Invalidate capabilities
         this.capabilities.values().forEach(LazyOptional::invalidate);
         this.capabilities.clear();
-    }
-
-    /**
-     * A replacement wrapper for {@link Map#computeIfAbsent(Object, Function)}
-     * that can handle a {@link LazyOptional} being invalidated.
-     * @param map             A mapping between a generic key and a value wrapped in a
-     *                        LazyOptional.
-     * @param key             The key to test for.
-     * @param mappingFunction The mapping function to execute if the value
-     *                        is missing or invalidated. This function should probably
-     *                        not return null, instead it should probably return
-     *                        {@link LazyOptional#empty}.
-     * @param <K>             The generic key type.
-     * @return The value associated with the key (either pre-existing, or
-     * newly created if the value was previously missing or
-     * invalidated) wrapped in a LazyOptional. This can be null, if
-     * the mapping function returns a null, though it shouldn't.
-     */
-    private static <K> LazyOptional<?> computeIfLazyAbsent(Map<K,LazyOptional<?>> map, K key, Function<? super K,? extends LazyOptional<?>> mappingFunction){
-        // If the value is fully missing, defer to the original functionality of Map.
-        if(!map.containsKey(key)){
-            return map.computeIfAbsent(key, mappingFunction);
-        }
-
-        LazyOptional<?> value = map.get(key);
-
-        // If the value is null, defer to the original functionality of Map.
-        if(value == null){
-            return map.computeIfAbsent(key, mappingFunction);
-        }
-
-        // If the value is present, there is no need to perform the mapping.
-        if(value.isPresent()){
-            return value;
-        }
-
-        // Create the new value.
-        value = mappingFunction.apply(key);
-
-        // If the value is not null (which should always be true), store it into the map.
-        if(value != null){
-            map.put(key, value);
-        }
-
-        return value;
     }
 }
