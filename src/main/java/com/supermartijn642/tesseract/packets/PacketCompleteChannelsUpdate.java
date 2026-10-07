@@ -6,11 +6,12 @@ import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created 4/23/2020 by SuperMartijn642
@@ -41,32 +42,19 @@ public class PacketCompleteChannelsUpdate implements BasePacket {
 
     @Override
     public void write(PacketBuffer buffer){
-        NBTTagCompound compound = new NBTTagCompound();
-
-        Iterator<Channel> iterator = this.channels.iterator();
-        for(int index = 0; iterator.hasNext(); index++)
-            compound.setTag(Integer.toString(index), iterator.next().writeClientChannel());
-
-        buffer.writeCompoundTag(compound);
+        buffer.writeInt(this.channels.size());
+        for(Channel channel : this.channels)
+            channel.writeClientChannel(buffer);
     }
 
     @Override
     public void read(PacketBuffer buffer){
-        NBTTagCompound compound = null;
-        try{
-            compound = buffer.readCompoundTag();
-        }catch(IOException ignore){
-            return;
-        }
-
-        this.channels = new ArrayList<>();
-        for(String key : compound.getKeySet())
-            this.channels.add(Channel.readClientChannel(compound.getCompoundTag(key)));
-    }
-
-    @Override
-    public boolean verify(PacketContext context){
-        return this.channels != null;
+        int channels = buffer.readInt();
+        if(channels > 500)
+            throw new IllegalStateException("Too many channels!");
+        this.channels = new ArrayList<>(channels);
+        for(int i = 0; i < channels; i++)
+            this.channels.add(Channel.readClientChannel(buffer));
     }
 
     @Override
