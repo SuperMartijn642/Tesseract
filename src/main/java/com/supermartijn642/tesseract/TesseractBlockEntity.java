@@ -33,7 +33,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     private RedstoneState redstoneState = RedstoneState.DISABLED;
     private boolean redstone;
 
-    private final Map<Direction,PerChannel<BlockCapabilityCache<?,Direction>>> surroundingCapabilities = new HashMap<>();
+    private final Map<Direction,PerChannel<BlockCapabilityCache<?,Direction>>> surroundingCapabilities = new EnumMap<>(Direction.class);
 
     public TesseractBlockEntity(BlockPos pos, BlockState state){
         super(Tesseract.tesseract_tile, pos, state);
