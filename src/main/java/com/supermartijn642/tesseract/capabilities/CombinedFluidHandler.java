@@ -1,6 +1,5 @@
 package com.supermartijn642.tesseract.capabilities;
 
-import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
@@ -9,6 +8,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
+import java.util.function.Supplier;
 
 /**
  * Created 3/20/2020 by SuperMartijn642
@@ -16,240 +16,216 @@ import javax.annotation.Nonnull;
 public class CombinedFluidHandler implements IFluidHandler {
 
     private final Channel channel;
-    private final TesseractBlockEntity requester;
+    private final TesseractReference requester;
 
-    public CombinedFluidHandler(Channel channel, TesseractBlockEntity requester){
+    public CombinedFluidHandler(Channel channel, TesseractReference requester){
         this.channel = channel;
         this.requester = requester;
     }
 
     @Override
     public int getTanks(){
-        if(this.pushRecurrentCall())
-            return 0;
-
-        int tanks = 0;
-        for(TesseractReference location : this.channel.tesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
+        return this.runSafe(0, () -> {
+            int size = 0;
+            for(TesseractReference reference : this.channel.tesseracts){
+                if(reference != this.requester && reference.canBeAccessed()){
+                    TesseractBlockEntity entity = reference.getTesseract();
                     for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER))
-                        tanks += Math.max(handler.getTanks(), 0);
+                        size += handler.getTanks();
                 }
             }
-        }
-
-        this.popRecurrentCall();
-
-        return tanks;
+            return size;
+        });
     }
 
     @Nonnull
     @Override
-    public FluidStack getFluidInTank(int tank){
-        if(this.pushRecurrentCall())
+    public FluidStack getFluidInTank(int index){
+        if(index < 0)
+            throw new IllegalArgumentException("Tank index must not be negative!");
+        return this.runSafe(FluidStack.EMPTY, () -> {
+            int counter = 0;
+            for(TesseractReference reference : this.channel.tesseracts){
+                if(reference != this.requester && reference.canBeAccessed()){
+                    TesseractBlockEntity entity = reference.getTesseract();
+                    for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
+                        if(index - counter < handler.getTanks())
+                            return handler.getFluidInTank(index - counter);
+                        else
+                            counter += handler.getTanks();
+                    }
+                }
+            }
             return FluidStack.EMPTY;
-
-        FluidStack stack = FluidStack.EMPTY;
-        int tanks = 0;
-        loop:
-        for(TesseractReference location : this.channel.tesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
-                        if(tank - tanks < handler.getTanks()){
-                            stack = handler.getFluidInTank(tank - tanks);
-                            break loop;
-                        }else
-                            tanks += Math.max(handler.getTanks(), 0);
-                    }
-                }
-            }
-        }
-
-        this.popRecurrentCall();
-
-        return stack;
+        });
     }
 
     @Override
-    public int getTankCapacity(int tank){
-        if(this.pushRecurrentCall())
+    public int getTankCapacity(int index){
+        if(index < 0)
+            throw new IllegalArgumentException("Tank index must not be negative!");
+        return this.runSafe(0, () -> {
+            int counter = 0;
+            for(TesseractReference reference : this.channel.tesseracts){
+                if(reference != this.requester && reference.canBeAccessed()){
+                    TesseractBlockEntity entity = reference.getTesseract();
+                    for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
+                        if(index - counter < handler.getTanks()){
+                            int capacity = handler.getTankCapacity(index - counter);
+                            if(capacity < 0)
+                                throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + capacity + "' for #getTankCapacity()!");
+                            return capacity;
+                        }else
+                            counter += handler.getTanks();
+                    }
+                }
+            }
             return 0;
-
-        int capacity = 0;
-        int tanks = 0;
-        loop:
-        for(TesseractReference location : this.channel.tesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
-                    for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
-                        if(tank - tanks < handler.getTanks()){
-                            capacity = handler.getTankCapacity(tank - tanks);
-                            break loop;
-                        }else
-                            tanks += Math.max(handler.getTanks(), 0);
-                    }
-                }
-            }
-        }
-
-        this.popRecurrentCall();
-
-        return capacity;
+        });
     }
 
     @Override
-    public boolean isFluidValid(int tank, @Nonnull FluidStack stack){
-        if(this.pushRecurrentCall())
-            return false;
-
-        boolean valid = false;
-        int tanks = 0;
-        loop:
-        for(TesseractReference location : this.channel.tesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
+    public boolean isFluidValid(int index, @Nonnull FluidStack resource){
+        if(index < 0)
+            throw new IllegalArgumentException("Tank index must not be negative!");
+        if(resource.isEmpty())
+            throw new IllegalArgumentException("Stack must not be empty!");
+        return this.runSafe(true, () -> {
+            int counter = 0;
+            for(TesseractReference reference : this.channel.tesseracts){
+                if(reference != this.requester && reference.canBeAccessed()){
+                    TesseractBlockEntity entity = reference.getTesseract();
                     for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
-                        if(tank - tanks < handler.getTanks()){
-                            valid = handler.isFluidValid(tank - tanks, stack);
-                            break loop;
-                        }else
-                            tanks += Math.max(handler.getTanks(), 0);
+                        if(index - counter < handler.getTanks())
+                            return handler.isFluidValid(index, resource);
+                        else
+                            counter += handler.getTanks();
                     }
                 }
             }
-        }
-
-        this.popRecurrentCall();
-
-        return valid;
+            return true;
+        });
     }
 
     @Override
     public int fill(FluidStack resource, FluidAction action){
-        if(this.pushRecurrentCall())
+        if(!this.requester.canSend(this.channel.type))
             return 0;
-
-        if(!this.requester.canSend(EnumChannelType.FLUID) || resource.isEmpty()){
-            this.popRecurrentCall();
-            return 0;
-        }
-
-        FluidStack fluid = resource.copy();
-        int amount = 0;
-
-        loop:
-        for(TesseractReference location : this.channel.receivingTesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
+        return this.runSafe(0, () -> {
+            boolean copied = false;
+            FluidStack leftOver = resource;
+            int leftOverAmount = resource.getAmount();
+            for(TesseractReference reference : this.channel.receivingTesseracts){
+                if(reference != this.requester && reference.canBeAccessed()){
+                    TesseractBlockEntity entity = reference.getTesseract();
                     for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
-                        amount += handler.fill(fluid, action);
-                        if(amount >= resource.getAmount())
-                            break loop;
-                        fluid.setAmount(resource.getAmount() - amount);
+                        int inserted = handler.fill(leftOver, action);
+                        if(inserted < 0)
+                            throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + inserted + "' for #fill()!");
+                        if(leftOver.getAmount() != leftOverAmount)
+                            throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' modified fluid stack argument in #fill()!");
+                        if(inserted > 0){
+                            leftOverAmount -= inserted;
+                            if(leftOverAmount <= 0)
+                                return resource.getAmount();
+                            if(!copied)
+                                leftOver = leftOver.copy();
+                            leftOver.shrink(inserted);
+                        }
                     }
                 }
             }
-        }
-
-        this.popRecurrentCall();
-
-        return amount;
+            return resource.getAmount() - leftOverAmount;
+        });
     }
 
     @Nonnull
     @Override
     public FluidStack drain(FluidStack resource, FluidAction action){
-        if(this.pushRecurrentCall())
+        if(resource.isEmpty())
+            throw new IllegalArgumentException("Stack must not be empty!");
+        if(!this.requester.canReceive(this.channel.type))
             return FluidStack.EMPTY;
-
-        if(!this.requester.canReceive(EnumChannelType.FLUID) || resource == null || resource.isEmpty()){
-            this.popRecurrentCall();
-            return FluidStack.EMPTY;
-        }
-
-        FluidStack fluid = resource.copy();
-
-        loop:
-        for(TesseractReference location : this.channel.sendingTesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
+        return this.runSafe(FluidStack.EMPTY, () -> {
+            boolean copied = false;
+            FluidStack leftOver = resource;
+            int leftOverAmount = resource.getAmount();
+            for(TesseractReference reference : this.channel.sendingTesseracts){
+                if(reference != this.requester && reference.canBeAccessed()){
+                    TesseractBlockEntity entity = reference.getTesseract();
                     for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
-                        FluidStack stack = handler.drain(fluid.copy(), FluidAction.SIMULATE);
-                        if(!stack.isEmpty() && resource.isFluidEqual(stack)){
-                            if(action.execute())
-                                handler.drain(fluid.copy(), FluidAction.EXECUTE);
-                            fluid.setAmount(fluid.getAmount() - stack.getAmount());
+                        FluidStack extracted = handler.drain(leftOver, action);
+                        if(leftOver.getAmount() != leftOverAmount)
+                            throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' modified fluid stack argument in #drain()!");
+                        if(!extracted.isEmpty()){
+                            if(!resource.isFluidEqual(extracted))
+                                throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned different fluid than was requested from #drain()!");
+                            leftOverAmount -= extracted.getAmount();
+                            if(leftOverAmount < 0)
+                                return resource;
+                            if(!copied)
+                                leftOver = leftOver.copy();
+                            leftOver.setAmount(leftOverAmount);
                         }
-                        if(fluid.isEmpty())
-                            break loop;
                     }
                 }
             }
-        }
-
-        this.popRecurrentCall();
-
-        if(fluid.getAmount() == resource.getAmount())
-            return FluidStack.EMPTY;
-
-        fluid.setAmount(resource.getAmount() - fluid.getAmount());
-        return fluid;
+            if(leftOver == resource)
+                return FluidStack.EMPTY;
+            leftOver.setAmount(resource.getAmount() - leftOverAmount);
+            return leftOver;
+        });
     }
 
     @Nonnull
     @Override
-    public FluidStack drain(int maxDrain, FluidAction action){
-        if(this.pushRecurrentCall())
+    public FluidStack drain(int amount, FluidAction action){
+        if(amount < 0)
+            throw new IllegalArgumentException("Drain amount must not be negative!");
+        if(!this.requester.canReceive(this.channel.type))
             return FluidStack.EMPTY;
-
-        if(!this.requester.canReceive(EnumChannelType.FLUID) || maxDrain <= 0){
-            this.popRecurrentCall();
-            return FluidStack.EMPTY;
-        }
-
-        FluidStack fluid = null;
-
-        loop:
-        for(TesseractReference location : this.channel.sendingTesseracts){
-            if(location.canBeAccessed()){
-                TesseractBlockEntity entity = location.getTesseract();
-                if(entity != this.requester){
+        return this.runSafe(FluidStack.EMPTY, () -> {
+            FluidStack resource = null;
+            FluidStack leftOver = null;
+            int leftOverAmount = amount;
+            for(TesseractReference reference : this.channel.sendingTesseracts){
+                if(reference != this.requester && reference.canBeAccessed()){
+                    TesseractBlockEntity entity = reference.getTesseract();
                     for(IFluidHandler handler : entity.getSurroundingCapabilities(ForgeCapabilities.FLUID_HANDLER)){
-                        if(fluid == null){
-                            fluid = handler.drain(maxDrain, action);
-                            if(fluid.isEmpty())
-                                fluid = null;
-                            else
-                                fluid.setAmount(maxDrain - fluid.getAmount());
-                        }else{
-                            FluidStack stack = handler.drain(fluid.copy(), FluidAction.SIMULATE);
-                            if(!stack.isEmpty() && fluid.isFluidEqual(stack)){
-                                if(action.execute())
-                                    handler.drain(fluid.copy(), FluidAction.EXECUTE);
-                                fluid.setAmount(fluid.getAmount() - stack.getAmount());
+                        // If nothing has been extracted yet, extract anything
+                        if(resource == null){
+                            FluidStack extracted = handler.drain(leftOverAmount, action);
+                            if(!extracted.isEmpty()){
+                                leftOverAmount -= extracted.getAmount();
+                                if(leftOverAmount < 0)
+                                    return extracted;
+                                resource = extracted;
+                                leftOver = resource.copy();
+                                leftOver.setAmount(leftOverAmount);
                             }
-                            if(fluid.isEmpty())
-                                break loop;
+                        }else{ // If fluid has been extracted, extract more of the same fluid
+                            FluidStack extracted = handler.drain(leftOver, action);
+                            if(leftOver.getAmount() != leftOverAmount)
+                                throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' modified fluid stack argument in #drain()!");
+                            if(!extracted.isEmpty()){
+                                if(!resource.isFluidEqual(extracted))
+                                    throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned different fluid than was requested from #drain()!");
+                                leftOverAmount -= extracted.getAmount();
+                                if(leftOverAmount < 0){
+                                    leftOver.setAmount(amount);
+                                    return leftOver;
+                                }
+                                leftOver.setAmount(leftOverAmount);
+                            }
                         }
                     }
                 }
             }
-        }
-
-        this.popRecurrentCall();
-
-        if(fluid == null)
-            return FluidStack.EMPTY;
-
-        fluid.setAmount(maxDrain - fluid.getAmount());
-        return fluid;
+            if(resource == null)
+                return FluidStack.EMPTY;
+            leftOver.setAmount(amount - leftOverAmount);
+            return leftOver;
+        });
     }
 
     /**
@@ -265,5 +241,15 @@ public class CombinedFluidHandler implements IFluidHandler {
 
     private void popRecurrentCall(){
         this.requester.recurrentCalls--;
+    }
+
+    private <T> T runSafe(T defaultValue, Supplier<T> supplier){
+        if(this.pushRecurrentCall())
+            return defaultValue;
+        try{
+            return supplier.get();
+        }finally{
+            this.popRecurrentCall();
+        }
     }
 }
