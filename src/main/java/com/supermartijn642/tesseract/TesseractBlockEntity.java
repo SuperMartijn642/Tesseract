@@ -73,22 +73,22 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing side){
         if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY){
-            return (T)this.capabilities.computeIfAbsent(EnumChannelType.ITEMS, o -> {
-                Channel channel = this.getChannel(EnumChannelType.ITEMS);
-                return channel == null ? null : channel.getItemHandler(this);
-            });
+            Channel channel = this.getChannel(EnumChannelType.ITEMS);
+            if(channel == null)
+                return null;
+            return (T)this.capabilities.computeIfAbsent(EnumChannelType.ITEMS, o -> channel.getItemHandler(this));
         }
         if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY){
-            return (T)this.capabilities.computeIfAbsent(EnumChannelType.FLUID, o -> {
-                Channel channel = this.getChannel(EnumChannelType.FLUID);
-                return channel == null ? null : channel.getFluidHandler(this);
-            });
+            Channel channel = this.getChannel(EnumChannelType.FLUID);
+            if(channel == null)
+                return null;
+            return (T)this.capabilities.computeIfAbsent(EnumChannelType.FLUID, o -> channel.getFluidHandler(this));
         }
         if(capability == CapabilityEnergy.ENERGY){
-            return (T)this.capabilities.computeIfAbsent(EnumChannelType.ENERGY, o -> {
-                Channel channel = this.getChannel(EnumChannelType.ENERGY);
-                return channel == null ? null : channel.getEnergyStorage(this);
-            });
+            Channel channel = this.getChannel(EnumChannelType.ENERGY);
+            if(channel == null)
+                return null;
+            return (T)this.capabilities.computeIfAbsent(EnumChannelType.FLUID, o -> channel.getEnergyStorage(this));
         }
         return super.getCapability(capability, side);
     }
