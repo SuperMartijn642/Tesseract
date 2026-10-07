@@ -30,7 +30,7 @@ public class CombinedEnergyStorage implements EnergyStorage {
             for(TesseractReference reference : this.channel.tesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(EnergyStorage handler : entity.getSurroundingCapabilities(EnergyStorage.SIDED)){
+                    for(EnergyStorage handler : entity.getSurroundingEnergyCapabilities()){
                         long handlerAmount = handler.getAmount();
                         if(handlerAmount < 0)
                             throw new IllegalStateException("Energy storage of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + handlerAmount + "' for #getAmount()!");
@@ -49,7 +49,7 @@ public class CombinedEnergyStorage implements EnergyStorage {
             for(TesseractReference reference : this.channel.tesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(EnergyStorage handler : entity.getSurroundingCapabilities(EnergyStorage.SIDED)){
+                    for(EnergyStorage handler : entity.getSurroundingEnergyCapabilities()){
                         long handlerCapacity = handler.getCapacity();
                         if(handlerCapacity < 0)
                             throw new IllegalStateException("Energy storage of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + handlerCapacity + "' for #getCapacity()!");
@@ -76,7 +76,7 @@ public class CombinedEnergyStorage implements EnergyStorage {
             for(TesseractReference reference : this.channel.receivingTesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(EnergyStorage handler : entity.getSurroundingCapabilities(EnergyStorage.SIDED)){
+                    for(EnergyStorage handler : entity.getSurroundingEnergyCapabilities()){
                         if(handler.supportsInsertion()){
                             long inserted = handler.insert(leftOver, transaction);
                             if(inserted < 0)
@@ -107,7 +107,7 @@ public class CombinedEnergyStorage implements EnergyStorage {
             for(TesseractReference reference : this.channel.sendingTesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(EnergyStorage handler : entity.getSurroundingCapabilities(EnergyStorage.SIDED)){
+                    for(EnergyStorage handler : entity.getSurroundingEnergyCapabilities()){
                         if(handler.supportsExtraction()){
                             long extracted = handler.extract(leftOver, transaction);
                             if(extracted < 0)
