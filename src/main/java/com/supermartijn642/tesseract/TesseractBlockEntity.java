@@ -21,7 +21,6 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created 3/19/2020 by SuperMartijn642
@@ -89,33 +88,31 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     public List<ResourceHandler<ItemResource>> getSurroundingItemCapabilities(){
-        return this.getSurroundingCapabilities(EnumChannelType.ITEMS);
+        return this.getSurroundingCapabilities(EnumChannelType.ITEMS, Capabilities.Item.BLOCK);
     }
 
     public List<ResourceHandler<FluidResource>> getSurroundingFluidCapabilities(){
-        return this.getSurroundingCapabilities(EnumChannelType.FLUID);
+        return this.getSurroundingCapabilities(EnumChannelType.FLUID, Capabilities.Fluid.BLOCK);
     }
 
     public List<EnergyHandler> getSurroundingEnergyCapabilities(){
-        return this.getSurroundingCapabilities(EnumChannelType.ENERGY);
+        return this.getSurroundingCapabilities(EnumChannelType.ENERGY, Capabilities.Energy.BLOCK);
     }
 
-    private <T> List<T> getSurroundingCapabilities(EnumChannelType type){
+    private <T> List<T> getSurroundingCapabilities(EnumChannelType type, BlockCapability<T,Direction> api){
         if(this.level == null)
             return Collections.emptyList();
 
-        BlockCapability<?,Direction> capability = switch(type){
-            case ITEMS -> Capabilities.Item.BLOCK;
-            case FLUID -> Capabilities.Fluid.BLOCK;
-            case ENERGY -> Capabilities.Energy.BLOCK;
-        };
-
+        ArrayList<Object> capabilities = new ArrayList<>(6);
+        for(Direction side : Direction.values()){
+            Object capability = this.surroundingCapabilities.get(side)
+                .computeIfAbsent(type, () -> this.surroundingCapabilities.get(side).computeIfAbsent(type, () -> BlockCapabilityCache.create(api, (ServerLevel)this.level, this.worldPosition.relative(side), side.getOpposite(), () -> !this.remove, () -> {})))
+                .getCapability();
+            if(capability != null)
+                capabilities.add(capability);
+        }
         //noinspection unchecked
-        return (List<T>)Arrays.stream(Direction.values())
-            .map(side -> this.surroundingCapabilities.get(side).computeIfAbsent(type, () -> BlockCapabilityCache.create(capability, (ServerLevel)this.level, this.worldPosition.relative(side), side.getOpposite(), () -> !this.remove, () -> {})))
-            .map(BlockCapabilityCache::getCapability)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+        return (List<T>)capabilities;
     }
 
     public boolean canSend(EnumChannelType type){
