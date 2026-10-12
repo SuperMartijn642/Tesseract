@@ -1,3 +1,6 @@
+### Tesseract 1.0.39a
+- Fixed crash due to unobfuscated jar being published
+
 ### Tesseract 1.0.39
 - Improved performance when inserting into/extracting from tesseracts on large channels 
 - Improved performance when querying capabilities for neighboring blocks
