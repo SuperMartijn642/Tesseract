@@ -115,7 +115,7 @@ java {
 }
 
 publishMods {
-    file = jar.archiveFile
+    file = remapJar.archiveFile
     displayName = "${mod_name} ${mod_version} for Fabric ${minecraft_suffix.substring(2)}"
     version = project.version
     //noinspection UnnecessaryQualifiedReference
