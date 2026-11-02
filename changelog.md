@@ -1,3 +1,6 @@
+### Tesseract 1.0.39a
+- Fixed tesseracts reporting amount stored as capacity
+
 ### Tesseract 1.0.39
 - Improved performance when inserting into/extracting from tesseracts on large channels 
 - Improved performance when querying capabilities for neighboring blocks
