@@ -49,7 +49,7 @@ public class CombinedEnergyStorage implements EnergyHandler {
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
                     for(EnergyHandler handler : entity.getSurroundingEnergyCapabilities()){
-                        long handlerCapacity = handler.getAmountAsLong();
+                        long handlerCapacity = handler.getCapacityAsLong();
                         if(handlerCapacity < 0)
                             throw new IllegalStateException("Energy handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + handlerCapacity + "' for #getCapacityAsLong()!");
                         capacity += handlerCapacity;
