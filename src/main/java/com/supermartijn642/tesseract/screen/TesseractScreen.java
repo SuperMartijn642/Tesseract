@@ -202,7 +202,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
                 graphics.submitRectangle(x, y + 12, 102, 1, p -> p.color(0xffffffff));
                 graphics.submitRectangle(x, y, 1, channelHeight, p -> p.color(0xffffffff));
                 graphics.submitRectangle(x + 101, y, 1, channelHeight, p -> p.color(0xffffffff));
-            }else if(mouseX >= x && mouseX < 105 && mouseY >= y && mouseY < y + channelHeight){
+            }else if(mouseX >= x && mouseX < x + 105 && mouseY >= y && mouseY < y + channelHeight){
                 graphics.submitRectangle(x, y, 102, 1, p -> p.color(0xff666666));
                 graphics.submitRectangle(x, y + 12, 102, 1, p -> p.color(0xff666666));
                 graphics.submitRectangle(x, y, 1, channelHeight, p -> p.color(0xff666666));
