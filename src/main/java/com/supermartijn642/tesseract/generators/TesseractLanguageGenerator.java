@@ -37,6 +37,7 @@ public class TesseractLanguageGenerator extends LanguageGenerator {
         this.translation("gui.tesseract.set", "Activate");
         this.translation("gui.tesseract.unset", "Deactivate");
         this.translation("gui.tesseract.remove", "Remove");
+        this.translation("gui.tesseract.remove.shift", "Hold shift to remove another player's channel");
         this.translation("gui.tesseract.add", "Create");
         this.translation("gui.tesseract.transfer.send", "SEND ONLY");
         this.translation("gui.tesseract.transfer.receive", "RECEIVE ONLY");
