@@ -23,6 +23,7 @@ public class TesseractSaveHandler {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> onJoin(handler.getPlayer()));
         ServerTickEvents.END_SERVER_TICK.register(TesseractSaveHandler::tick);
         ServerWorldEvents.LOAD.register(TesseractSaveHandler::load);
+        ServerWorldEvents.UNLOAD.register(TesseractSaveHandler::unload);
     }
 
     private static void onJoin(Player player){
@@ -60,5 +61,14 @@ public class TesseractSaveHandler {
         TesseractTracker.loadReferences(saveDirectory);
         TesseractChannelManager.loadChannels(saveDirectory);
         lastSaveTime = System.currentTimeMillis();
+    }
+
+    private static void unload(MinecraftServer server, Level level){
+        if(level.isClientSide() || level.dimension() != Level.OVERWORLD)
+            return;
+
+        // Clear all references and channels when the server stops
+        TesseractTracker.unloadReferences();
+        TesseractChannelManager.SERVER.clear();
     }
 }
