@@ -138,7 +138,7 @@ public class CombinedItemHandler implements IItemHandler {
     public ItemStack extractItem(int index, int amount, boolean simulate){
         if(index < 0)
             throw new IllegalArgumentException("Slot index must not be negative!");
-        if(!this.requester.canSend(EnumChannelType.ITEMS))
+        if(!this.requester.canReceive(EnumChannelType.ITEMS))
             return ItemStack.EMPTY;
         return this.runSafe(ItemStack.EMPTY, () -> {
             int counter = 0;
