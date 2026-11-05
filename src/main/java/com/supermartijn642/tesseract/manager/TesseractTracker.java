@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -79,6 +80,11 @@ public class TesseractTracker {
 
     public TesseractReference getReference(ResourceLocation dimension, BlockPos pos){
         return this.tesseracts.containsKey(dimension) ? this.tesseracts.get(dimension).get(pos) : null;
+    }
+
+    public void forEachReference(Consumer<TesseractReference> consumer){
+        for(Map<BlockPos,TesseractReference> references : this.tesseracts.values())
+            references.values().forEach(consumer);
     }
 
     public void remove(World level, BlockPos pos){
