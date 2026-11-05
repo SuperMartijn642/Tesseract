@@ -5,6 +5,7 @@ import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import com.supermartijn642.tesseract.manager.TesseractTracker;
 import com.supermartijn642.tesseract.util.PerChannel;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -128,6 +129,10 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         }
         //noinspection unchecked
         return (List<T>)capabilities;
+    }
+
+    public boolean isInInteractionRange(PlayerEntity player){
+        return player.level == this.level && player.distanceToSqr(this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 0.5, this.worldPosition.getZ() + 0.5) <= 16 * 16;
     }
 
     public boolean canSend(EnumChannelType type){
