@@ -53,8 +53,12 @@ public class TesseractTracker {
         int dimension = self.getLevel().getDimension().getType().getId();
         BlockPos pos = self.getBlockPos();
         TesseractReference reference = this.getReference(dimension, pos);
-        if(reference != null)
-            return reference;
+        if(reference != null){
+            // If the reference is in the removal queue, remove it now
+            if(!this.referencesToBeRemoved.remove(reference))
+                return reference;
+            this.removeReference(reference);
+        }
         // Create a new reference
         if(this == SERVER){
             reference = new TesseractReference(referenceIndexCounter++, self);
@@ -93,6 +97,14 @@ public class TesseractTracker {
             this.tesseracts.get(dimension).remove(pos);
     }
 
+    private void removeReference(TesseractReference reference){
+        reference.delete();
+        this.tesseracts.get(reference.getDimension()).remove(reference.getPos());
+        this.dirtyReferences.remove(reference);
+        this.referencesToBeUnsaved.add(reference.getSaveIndex());
+        this.referencesToBeSaved.remove(reference);
+    }
+
     void markDirty(TesseractReference reference){
         this.dirtyReferences.add(reference);
         this.referencesToBeSaved.add(reference);
@@ -104,13 +116,8 @@ public class TesseractTracker {
 
         // Handle removed references
         if(!SERVER.referencesToBeRemoved.isEmpty()){
-            for(TesseractReference reference : SERVER.referencesToBeRemoved){
-                reference.delete();
-                SERVER.tesseracts.get(reference.getDimension()).remove(reference.getPos());
-                SERVER.dirtyReferences.remove(reference);
-                SERVER.referencesToBeUnsaved.add(reference.getSaveIndex());
-                SERVER.referencesToBeSaved.remove(reference);
-            }
+            for(TesseractReference reference : SERVER.referencesToBeRemoved)
+                SERVER.removeReference(reference);
             Tesseract.CHANNEL.sendToAllPlayers(new PacketRemoveTesseractReferences(new ArrayList<>(SERVER.referencesToBeRemoved)));
             SERVER.referencesToBeRemoved.clear();
         }
