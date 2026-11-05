@@ -125,6 +125,14 @@ public final class TesseractReference {
         return compound;
     }
 
+    /**
+     * Used when loading legacy tesseract data.
+     */
+    void setChannelWhileLoading(EnumChannelType type, int channel){
+        this.channels.set(type, channel);
+        this.markDirty();
+    }
+
     public boolean canSend(EnumChannelType type){
         return this.canSend.get(type);
     }
