@@ -96,7 +96,7 @@ public class CombinedFluidHandler implements IFluidHandler {
                     TesseractBlockEntity entity = reference.getTesseract();
                     for(IFluidHandler handler : entity.getSurroundingFluidCapabilities()){
                         if(index - counter < handler.getTanks())
-                            return handler.isFluidValid(index, resource);
+                            return handler.isFluidValid(index - counter, resource);
                         else
                             counter += handler.getTanks();
                     }
