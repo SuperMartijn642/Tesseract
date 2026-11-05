@@ -1,5 +1,7 @@
 package com.supermartijn642.tesseract.capabilities;
 
+import com.google.common.collect.Iterators;
+import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
@@ -97,16 +99,17 @@ public class CombinedResourceHandler<S extends TransferVariant<?>> implements St
             return Collections.emptyIterator();
         this.popRecurrentCall();
 
-        // TODO the #extract on the storage views should ideally be guarded with a check for whether the relevant tesseract allows receiving resources
-
         Iterator<TesseractReference> tesseracts = this.channel.tesseracts.iterator();
-        return new FlatMapIterator<>(new FlatMapIterator<>(tesseracts, reference -> {
+        return new FlatMapIterator<>(tesseracts, reference -> {
             if(reference != this.requester && reference.canBeAccessed()){
                 TesseractBlockEntity entity = reference.getTesseract();
-                return this.getSurroundingCapabilities.apply(entity).iterator();
+                return new FlatMapIterator<>(
+                    this.getSurroundingCapabilities.apply(entity).iterator(),
+                    storage -> Iterators.transform(storage.iterator(), view -> new WrappedStorageView(view, reference))
+                );
             }
             return Collections.emptyIterator();
-        }), Storage::iterator, this::pushRecurrentCall, this::popRecurrentCall);
+        }, this::pushRecurrentCall, this::popRecurrentCall);
     }
 
     /**
@@ -131,6 +134,52 @@ public class CombinedResourceHandler<S extends TransferVariant<?>> implements St
             return supplier.get();
         }finally{
             this.popRecurrentCall();
+        }
+    }
+
+    /**
+     * Wraps a storage view to add a check for tesseract transfer state before extracting.
+     */
+    private class WrappedStorageView implements StorageView<S> {
+        private final StorageView<S> view;
+        private final TesseractReference reference;
+
+        private WrappedStorageView(StorageView<S> view, TesseractReference reference){
+            this.view = view;
+            this.reference = reference;
+        }
+
+        @Override
+        public long extract(S resource, long maxAmount, TransactionContext transaction){
+            EnumChannelType type = CombinedResourceHandler.this.channel.type;
+            if(!CombinedResourceHandler.this.requester.canReceive(type) || !this.reference.canSend(type))
+                return 0;
+            return this.view.extract(resource, maxAmount, transaction);
+        }
+
+        @Override
+        public boolean isResourceBlank(){
+            return this.view.isResourceBlank();
+        }
+
+        @Override
+        public S getResource(){
+            return this.view.getResource();
+        }
+
+        @Override
+        public long getAmount(){
+            return this.view.getAmount();
+        }
+
+        @Override
+        public long getCapacity(){
+            return this.view.getCapacity();
+        }
+
+        @Override
+        public StorageView<S> getUnderlyingView(){
+            return this.view.getUnderlyingView();
         }
     }
 }
