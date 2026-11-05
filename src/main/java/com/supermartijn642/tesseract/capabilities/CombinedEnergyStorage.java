@@ -33,6 +33,8 @@ public class CombinedEnergyStorage implements EnergyHandler {
                         long handlerAmount = handler.getAmountAsLong();
                         if(handlerAmount < 0)
                             throw new IllegalStateException("Energy handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + handlerAmount + "' for #getAmountAsLong()!");
+                        if(handlerAmount > Long.MAX_VALUE - amount)
+                            return Long.MAX_VALUE;
                         amount += handlerAmount;
                     }
                 }
@@ -52,6 +54,8 @@ public class CombinedEnergyStorage implements EnergyHandler {
                         long handlerCapacity = handler.getCapacityAsLong();
                         if(handlerCapacity < 0)
                             throw new IllegalStateException("Energy handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + handlerCapacity + "' for #getCapacityAsLong()!");
+                        if(handlerCapacity > Long.MAX_VALUE - capacity)
+                            return Long.MAX_VALUE;
                         capacity += handlerCapacity;
                     }
                 }
