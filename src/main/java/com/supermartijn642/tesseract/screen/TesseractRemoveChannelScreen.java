@@ -62,7 +62,7 @@ public class TesseractRemoveChannelScreen extends BlockEntityBaseWidget<Tesserac
         // Render player head and channel name
         int nameWidth = ClientUtils.getFontRenderer().width(channel.name);
         int x = 72 - (9 + 3 + nameWidth + 3 + 9) / 2;
-        PlayerRenderer.renderPlayerHead(channel.creator, graphics, x, 24, 9, 9);
+        graphics.submitPlayerHead(channel.creator, x, 24, 9, 9, true);
         graphics.submitText(channel.name, x + 12, 25, p -> p.color(0xffffffff));
         if(channel.creator.equals(ClientUtils.getPlayer().getUUID())){
             Identifier texture = channel.isPrivate ? TesseractScreen.LOCK_ON : TesseractScreen.LOCK_OFF;
