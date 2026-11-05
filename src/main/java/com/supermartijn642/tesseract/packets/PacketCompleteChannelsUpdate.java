@@ -47,9 +47,7 @@ public class PacketCompleteChannelsUpdate implements BasePacket {
     @Override
     public void read(PacketBuffer buffer){
         int channels = buffer.readInt();
-        if(channels > 500)
-            throw new IllegalStateException("Too many channels!");
-        this.channels = new ArrayList<>(channels);
+        this.channels = new ArrayList<>(Math.min(channels, 256));
         for(int i = 0; i < channels; i++)
             this.channels.add(Channel.readClientChannel(buffer));
     }
