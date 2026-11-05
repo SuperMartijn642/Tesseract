@@ -24,7 +24,7 @@ public class CombinedEnergyStorage implements IEnergyStorage {
     @Override
     public int getEnergyStored(){
         return this.runSafe(0, () -> {
-            int amount = 0;
+            long amount = 0;
             for(TesseractReference reference : this.channel.tesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
@@ -33,17 +33,19 @@ public class CombinedEnergyStorage implements IEnergyStorage {
                         if(handlerAmount < 0)
                             throw new IllegalStateException("Energy storage of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + handlerAmount + "' for #getEnergyStored()!");
                         amount += handlerAmount;
+                        if(amount >= Integer.MAX_VALUE)
+                            return Integer.MAX_VALUE;
                     }
                 }
             }
-            return amount;
+            return (int)amount;
         });
     }
 
     @Override
     public int getMaxEnergyStored(){
         return this.runSafe(0, () -> {
-            int capacity = 0;
+            long capacity = 0;
             for(TesseractReference reference : this.channel.tesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
@@ -52,10 +54,12 @@ public class CombinedEnergyStorage implements IEnergyStorage {
                         if(handlerCapacity < 0)
                             throw new IllegalStateException("Energy storage of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + handlerCapacity + "' for #getMaxEnergyStored()!");
                         capacity += handlerCapacity;
+                        if(capacity >= Integer.MAX_VALUE)
+                            return Integer.MAX_VALUE;
                     }
                 }
             }
-            return capacity;
+            return (int)capacity;
         });
     }
 
