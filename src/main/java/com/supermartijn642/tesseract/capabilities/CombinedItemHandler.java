@@ -97,7 +97,7 @@ public class CombinedItemHandler implements IItemHandler {
                     TesseractBlockEntity entity = reference.getTesseract();
                     for(IItemHandler handler : entity.getSurroundingItemCapabilities()){
                         if(index - counter < handler.getSlots())
-                            return handler.isItemValid(index, stack);
+                            return handler.isItemValid(index - counter, stack);
                         else
                             counter += handler.getSlots();
                     }
