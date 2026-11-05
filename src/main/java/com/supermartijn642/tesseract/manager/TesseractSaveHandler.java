@@ -22,6 +22,7 @@ public class TesseractSaveHandler {
         TickEvent.LevelTickEvent.Post.BUS.addListener(TesseractSaveHandler::tick);
         LevelEvent.Save.BUS.addListener(TesseractSaveHandler::save);
         LevelEvent.Load.BUS.addListener(TesseractSaveHandler::load);
+        LevelEvent.Unload.BUS.addListener(TesseractSaveHandler::unload);
     }
 
     private static void onJoin(PlayerEvent.PlayerLoggedInEvent e){
@@ -62,5 +63,14 @@ public class TesseractSaveHandler {
         TesseractTracker.loadReferences(saveDirectory);
         TesseractChannelManager.loadChannels(saveDirectory);
         lastSaveTime = System.currentTimeMillis();
+    }
+
+    private static void unload(LevelEvent.Unload e){
+        if(e.getLevel().isClientSide() || !(e.getLevel() instanceof Level) || ((Level)e.getLevel()).dimension() != Level.OVERWORLD)
+            return;
+
+        // Clear all references and channels when the server stops
+        TesseractTracker.unloadReferences();
+        TesseractChannelManager.SERVER.clear();
     }
 }
