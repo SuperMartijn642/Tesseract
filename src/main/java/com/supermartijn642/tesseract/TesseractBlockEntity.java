@@ -16,6 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import team.reborn.energy.api.EnergyStorage;
@@ -115,6 +116,10 @@ public class TesseractBlockEntity extends BaseBlockEntity {
         }
         //noinspection unchecked
         return (List<T>)capabilities;
+    }
+
+    public boolean isInInteractionRange(Player player){
+        return player.level() == this.level && player.distanceToSqr(this.worldPosition.getX() + 0.5, this.worldPosition.getY() + 0.5, this.worldPosition.getZ() + 0.5) <= 16 * 16;
     }
 
     public boolean canSend(EnumChannelType type){
