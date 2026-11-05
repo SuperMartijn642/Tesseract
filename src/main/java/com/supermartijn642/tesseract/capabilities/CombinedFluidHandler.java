@@ -68,8 +68,10 @@ public class CombinedFluidHandler implements IFluidHandler {
                             leftOverAmount -= inserted;
                             if(leftOverAmount <= 0)
                                 return resource.amount;
-                            if(!copied)
+                            if(!copied){
                                 leftOver = leftOver.copy();
+                                copied = true;
+                            }
                             leftOver.amount = leftOverAmount;
                         }
                     }
@@ -107,8 +109,10 @@ public class CombinedFluidHandler implements IFluidHandler {
                                 leftOverAmount -= extracted.amount;
                                 if(leftOverAmount <= 0)
                                     return resource.copy();
-                                if(!copied)
+                                if(!copied){
                                     leftOver = leftOver.copy();
+                                    copied = true;
+                                }
                                 leftOver.amount = leftOverAmount;
                             }
                         }
