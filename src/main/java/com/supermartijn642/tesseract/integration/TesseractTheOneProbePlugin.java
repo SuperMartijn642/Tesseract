@@ -48,16 +48,18 @@ public class TesseractTheOneProbePlugin {
                 TesseractBlockEntity tesseract = (TesseractBlockEntity)entity;
 
                 probeInfo.text(TextComponents.translation("tesseract.tesseract.highlight.channels").format());
-                probeInfo.text(formatChannelInfo(EnumChannelType.ITEMS, tesseract.getChannelId(EnumChannelType.ITEMS)));
-                probeInfo.text(formatChannelInfo(EnumChannelType.ENERGY, tesseract.getChannelId(EnumChannelType.ENERGY)));
-                probeInfo.text(formatChannelInfo(EnumChannelType.FLUID, tesseract.getChannelId(EnumChannelType.FLUID)));
+                probeInfo.text(formatChannelInfo(level, player, EnumChannelType.ITEMS, tesseract.getChannelId(EnumChannelType.ITEMS)));
+                probeInfo.text(formatChannelInfo(level, player, EnumChannelType.ENERGY, tesseract.getChannelId(EnumChannelType.ENERGY)));
+                probeInfo.text(formatChannelInfo(level, player, EnumChannelType.FLUID, tesseract.getChannelId(EnumChannelType.FLUID)));
                 if(tesseract.isBlockedByRedstone())
                     probeInfo.text(TextComponents.string(TextStyleClass.ERROR.toString()).translation("tesseract.tesseract.highlight.redstone_blocked").format());
             }
         }
 
-        private static String formatChannelInfo(EnumChannelType type, int channelId){
-            Channel channel = TesseractChannelManager.CLIENT.getChannelById(type, channelId);
+        private static String formatChannelInfo(World level, PlayerEntity player, EnumChannelType type, int channelId){
+            Channel channel = TesseractChannelManager.getInstance(level).getChannelById(type, channelId);
+            if(channel != null && channel.isPrivate && !channel.creator.equals(player.getUUID()))
+                channel = null;
             ITextComponent channelType = TextComponents.string(TextStyleClass.WARNING.toString()).get().append(type.getTranslation());
             ITextComponent separator = TextComponents.string(TextStyleClass.INFO.toString()).translation("tesseract.tesseract.highlight.channel_info.separator").get();
             ITextComponent channelName = channel == null ? TextComponents.string(TextStyleClass.LABEL.toString()).translation("tesseract.tesseract.highlight.channel_info.inactive").get() : TextComponents.string(TextStyleClass.INFO.toString()).string(channel.name).get();
