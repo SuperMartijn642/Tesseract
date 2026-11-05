@@ -56,6 +56,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
 
     private int selectedChannel = -1;
     private int scrollOffset = 0;
+    private double scrollProgress = 0;
 
     public int offsetLeft, offsetTop;
 
@@ -332,8 +333,10 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
     protected boolean mouseScrolled(int mouseX, int mouseY, double scrollAmount, boolean hasBeenHandled, TesseractBlockEntity entity){
         if(!hasBeenHandled){
             if(TesseractChannelManager.CLIENT.getChannels(type).size() > MAX_DISPLAYED_CHANNELS){
-                this.scrollOffset = Math.max(this.scrollOffset - (int)scrollAmount, 0);
-                this.scrollOffset = Math.min(this.scrollOffset, TesseractChannelManager.CLIENT.getChannels(type).size() - MAX_DISPLAYED_CHANNELS);
+                this.scrollProgress += scrollAmount;
+                int scrolled = (int)this.scrollProgress;
+                this.scrollProgress -= scrolled;
+                this.scrollOffset = Math.max(this.scrollOffset - scrolled, 0);
             }else
                 this.scrollOffset = 0;
         }
