@@ -19,6 +19,8 @@ public class PacketScreenCycleRedstoneState extends BlockEntityBasePacket<Tesser
 
     @Override
     protected void handle(TesseractBlockEntity entity, PacketContext context){
+        if(!entity.isInInteractionRange(context.getPlayer()))
+            return;
         entity.cycleRedstoneState();
     }
 }
