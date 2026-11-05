@@ -86,7 +86,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
             Channel channel = this.getChannel(EnumChannelType.ENERGY);
             if(channel == null)
                 return LazyOptional.empty();
-            return this.capabilities.computeIfAbsent(EnumChannelType.FLUID, () -> LazyOptional.of(() -> channel.getEnergyStorage(this))).cast();
+            return this.capabilities.computeIfAbsent(EnumChannelType.ENERGY, () -> LazyOptional.of(() -> channel.getEnergyStorage(this))).cast();
         }
         return super.getCapability(capability, side);
     }
