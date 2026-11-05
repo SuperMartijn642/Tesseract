@@ -63,7 +63,7 @@ public class TesseractRemoveChannelScreen extends BlockEntityBaseWidget<Tesserac
         // Render player head and channel name
         int nameWidth = ClientUtils.getFontRenderer().getStringWidth(channel.name);
         int x = 72 - (9 + 3 + nameWidth + 3 + 9) / 2;
-        PlayerRenderer.renderPlayerHead(channel.creator, x, 24, 9, 9);
+        ScreenUtils.drawPlayerHead(channel.creator, x, 24, 9, 9, true);
         ScreenUtils.drawString(channel.name, x + 12, 25, 0xffffffff);
         if(channel.creator.equals(ClientUtils.getPlayer().getUniqueID())){
             GlStateManager.enableAlpha();
