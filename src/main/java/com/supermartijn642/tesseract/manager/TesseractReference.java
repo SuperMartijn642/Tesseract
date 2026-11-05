@@ -101,7 +101,7 @@ public final class TesseractReference {
 
     @Nullable
     public TesseractBlockEntity getTesseract(){
-        if(this.entity != null && (this.entity.isInvalid() || !this.entity.getPos().equals(this.pos)))
+        if(this.entity != null && (this.entity.isInvalid() || !this.entity.getPos().equals(this.pos) || !this.entity.getWorld().isBlockLoaded(this.pos)))
             this.entity = null;
         return this.entity;
     }
