@@ -4,6 +4,8 @@ import com.supermartijn642.core.network.BlockEntityBasePacket;
 import com.supermartijn642.core.network.PacketContext;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
+import com.supermartijn642.tesseract.manager.Channel;
+import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 
@@ -40,6 +42,14 @@ public class PacketScreenSetChannel extends BlockEntityBasePacket<TesseractBlock
 
     @Override
     protected void handle(TesseractBlockEntity entity, PacketContext context){
+        if(this.id < 0){
+            entity.getReference().setChannel(this.type, -1);
+            return;
+        }
+        // Check player has access to channel
+        Channel channel = TesseractChannelManager.SERVER.getChannelById(this.type, this.id);
+        if(channel == null || (channel.isPrivate && !channel.creator.equals(context.getSendingPlayer().getUUID())))
+            return;
         entity.getReference().setChannel(this.type, this.id);
     }
 }
