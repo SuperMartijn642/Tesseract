@@ -105,8 +105,8 @@ public class CombinedFluidHandler implements IFluidHandler {
                                 throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned different fluid than was requested from #drain()!");
                             if(extracted.amount > 0){
                                 leftOverAmount -= extracted.amount;
-                                if(leftOverAmount < 0)
-                                    return resource;
+                                if(leftOverAmount <= 0)
+                                    return resource.copy();
                                 if(!copied)
                                     leftOver = leftOver.copy();
                                 leftOver.amount = leftOverAmount;
@@ -144,7 +144,7 @@ public class CombinedFluidHandler implements IFluidHandler {
                                     throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned fluid stack with negative amount for #drain()!");
                                 if(extracted.amount > 0){
                                     leftOverAmount -= extracted.amount;
-                                    if(leftOverAmount < 0)
+                                    if(leftOverAmount <= 0)
                                         return extracted;
                                     resource = extracted;
                                     leftOver = resource.copy();
@@ -162,7 +162,7 @@ public class CombinedFluidHandler implements IFluidHandler {
                                     throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned different fluid than was requested from #drain()!");
                                 if(extracted.amount > 0){
                                     leftOverAmount -= extracted.amount;
-                                    if(leftOverAmount < 0){
+                                    if(leftOverAmount <= 0){
                                         leftOver.amount = amount;
                                         return leftOver;
                                     }
