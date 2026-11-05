@@ -5,7 +5,6 @@ import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractReference;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.TransferPreconditions;
-import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.resource.Resource;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
@@ -36,7 +35,7 @@ public class CombinedResourceHandler<S extends Resource> implements ResourceHand
             for(TesseractReference reference : this.channel.tesseracts){
                 if(reference != this.requester && reference.canBeAccessed()){
                     TesseractBlockEntity entity = reference.getTesseract();
-                    for(ResourceHandler<ItemResource> handler : entity.getSurroundingItemCapabilities()){
+                    for(ResourceHandler<S> handler : this.getSurroundingCapabilities.apply(entity)){
                         int handlerSize = handler.size();
                         if(handlerSize < 0)
                             throw new IllegalStateException("Resource handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned '" + handlerSize + "' for #size()!");
