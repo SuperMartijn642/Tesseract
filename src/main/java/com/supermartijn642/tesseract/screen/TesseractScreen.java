@@ -12,7 +12,6 @@ import com.supermartijn642.tesseract.TesseractBlockEntity;
 import com.supermartijn642.tesseract.manager.Channel;
 import com.supermartijn642.tesseract.manager.TesseractChannelManager;
 import com.supermartijn642.tesseract.packets.PacketScreenSetChannel;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -81,7 +80,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         this.removeButton = this.addWidget(new TesseractButton(210, 185, 61, 18, TextComponents.translation("gui.tesseract.remove").get(),
             () -> {
                 Channel channel = TesseractChannelManager.CLIENT.getChannelById(type, this.selectedChannel);
-                if(channel != null && (channel.creator.equals(ClientUtils.getPlayer().getUUID()) || (ClientUtils.getPlayer().hasPermissions(2)) && Minecraft.getInstance().hasShiftDown()))
+                if(channel != null && this.canRemoveChannel(channel))
                     ClientUtils.displayScreen(WidgetScreen.of(new TesseractRemoveChannelScreen(this.blockEntityLevel, this.blockEntityPos, type, this.selectedChannel)));
             }
         ));
@@ -105,8 +104,15 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
     protected void update(TesseractBlockEntity entity){
         this.transferButton.update(entity, type);
         this.redstoneButton.update(entity);
+        Channel channel = TesseractChannelManager.CLIENT.getChannelById(type, this.selectedChannel);
+        this.removeButton.active = channel != null && this.canRemoveChannel(channel);
 
         super.update(entity);
+    }
+
+    private boolean canRemoveChannel(Channel channel){
+        return channel.creator.equals(ClientUtils.getPlayer().getUUID())
+            || (ClientUtils.getPlayer().hasPermissions(2) && ClientUtils.getMinecraft().hasShiftDown());
     }
 
     @Override
@@ -144,6 +150,10 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
                     graphics.submitTooltip(c -> c.literal(creatorName), mouseX, mouseY);
             }
         }
+
+        Channel channel = TesseractChannelManager.CLIENT.getChannelById(type, this.selectedChannel);
+        if(this.removeButton.isFocused() && channel != null && !channel.creator.equals(ClientUtils.getPlayer().getUUID()) && ClientUtils.getPlayer().hasPermissions(2))
+            graphics.submitTooltip(c -> c.text(TextComponents.translation("gui.tesseract.remove.shift").get()), mouseX, mouseY);
 
         if(mouseX >= 39 && mouseX < 61 && mouseY >= (type == EnumChannelType.ITEMS ? 2 : 4) && mouseY < 28)
             graphics.submitTooltip(c -> c.text(EnumChannelType.ITEMS.getTranslation()), mouseX, mouseY);
@@ -289,7 +299,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
                     this.selectedChannel = channels.get(index).id;
                     this.setButton.setText(TextComponents.translation("gui.tesseract." + (entity.getChannelId(type) == this.selectedChannel ? "unset" : "set")).get());
                     this.setButton.active = true;
-                    this.removeButton.active = channels.get(index).creator.equals(Minecraft.getInstance().player.getUUID());
+                    this.removeButton.active = this.canRemoveChannel(channels.get(index));
                 }else{
                     this.selectedChannel = -1;
                     this.setButton.active = false;
