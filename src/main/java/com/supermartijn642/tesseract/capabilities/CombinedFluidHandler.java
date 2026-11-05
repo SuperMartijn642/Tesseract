@@ -127,8 +127,10 @@ public class CombinedFluidHandler implements IFluidHandler {
                             leftOverAmount -= inserted;
                             if(leftOverAmount <= 0)
                                 return resource.getAmount();
-                            if(!copied)
+                            if(!copied){
                                 leftOver = leftOver.copy();
+                                copied = true;
+                            }
                             leftOver.shrink(inserted);
                         }
                     }
@@ -162,8 +164,10 @@ public class CombinedFluidHandler implements IFluidHandler {
                             leftOverAmount -= extracted.getAmount();
                             if(leftOverAmount <= 0)
                                 return resource.copy();
-                            if(!copied)
+                            if(!copied){
                                 leftOver = leftOver.copy();
+                                copied = true;
+                            }
                             leftOver.setAmount(leftOverAmount);
                         }
                     }
