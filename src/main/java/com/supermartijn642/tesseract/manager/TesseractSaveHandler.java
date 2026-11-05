@@ -64,4 +64,13 @@ public class TesseractSaveHandler {
         TesseractChannelManager.loadChannels(saveDirectory);
         lastSaveTime = System.currentTimeMillis();
     }
+
+    @SubscribeEvent
+    public static void unload(WorldEvent.Unload e){
+        if(e.getWorld().isRemote || e.getWorld().provider.getDimension() != 0)
+            return;
+        // Clear all references and channels when the server stops, such that they don't keep any tesseracts in memory
+        TesseractTracker.unloadReferences();
+        TesseractChannelManager.SERVER.clear();
+    }
 }
