@@ -42,6 +42,8 @@ public class PacketScreenSetChannel extends BlockEntityBasePacket<TesseractBlock
 
     @Override
     protected void handle(TesseractBlockEntity entity, PacketContext context){
+        if(!entity.isInInteractionRange(context.getPlayer()))
+            return;
         if(this.id < 0){
             entity.getReference().setChannel(this.type, -1);
             return;
