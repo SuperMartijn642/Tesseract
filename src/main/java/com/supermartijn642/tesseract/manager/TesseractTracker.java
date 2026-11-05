@@ -210,6 +210,14 @@ public class TesseractTracker {
         System.out.println("Loaded " + SERVER.tesseracts.values().stream().map(Map::values).mapToLong(Collection::size).sum() + " tesseract references!");
     }
 
+    public static void unloadReferences(){
+        SERVER.tesseracts.clear();
+        SERVER.dirtyReferences.clear();
+        SERVER.referencesToBeRemoved.clear();
+        SERVER.referencesToBeSaved.clear();
+        SERVER.referencesToBeUnsaved.clear();
+    }
+
     public static void sendReferences(Player player){
         Collection<TesseractReference> references = SERVER.tesseracts.values().stream().map(Map::values).flatMap(Collection::stream).collect(Collectors.toList());
         Tesseract.CHANNEL.sendToPlayer(player, new PacketAddTesseractReferences(references, true));
