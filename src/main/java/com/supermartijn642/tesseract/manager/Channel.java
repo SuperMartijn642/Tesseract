@@ -108,22 +108,16 @@ public class Channel {
         this.tesseracts.clear();
         this.sendingTesseracts.clear();
         this.receivingTesseracts.clear();
-        CompoundTag tesseractCompound = compound.getCompoundOrEmpty("references");
-        for(String key : tesseractCompound.keySet()){
-            TesseractReference reference = TesseractTracker.SERVER.fromKey(tesseractCompound.getCompoundOrEmpty(key));
-            if(reference != null)
-                this.addTesseract(reference);
-        }
 
         if(compound.contains("tesseracts")){ // for older versions
-            tesseractCompound = compound.getCompoundOrEmpty("tesseracts");
+            CompoundTag tesseractCompound = compound.getCompoundOrEmpty("tesseracts");
             for(String key : tesseractCompound.keySet()){
                 CompoundTag compound2 = tesseractCompound.getCompoundOrEmpty(key);
                 Identifier dimension = Identifier.parse(compound2.getStringOr("dim", ""));
                 BlockPos pos = new BlockPos(compound2.getIntOr("posx", 0), compound2.getIntOr("posy", 0), compound2.getIntOr("posz", 0));
                 TesseractReference reference = TesseractTracker.SERVER.getReference(dimension, pos);
                 if(reference != null)
-                    this.addTesseract(reference);
+                    reference.setChannelWhileLoading(this.type, this.id);
             }
         }
     }
