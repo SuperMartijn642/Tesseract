@@ -238,8 +238,20 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     @Override
     public void onChunkUnloaded(){
         super.onChunkUnloaded();
-        // Invalidate capabilities
-        this.capabilities.values().forEach(LazyOptional::invalidate);
+        this.invalidateOwnCapabilities();
+    }
+
+    @Override
+    public void setRemoved(){
+        super.setRemoved();
+        this.invalidateOwnCapabilities();
+    }
+
+    private void invalidateOwnCapabilities(){
+        for(LazyOptional<?> capability : this.capabilities.values()){
+            if(capability != null)
+                capability.invalidate();
+        }
         this.capabilities.reset();
     }
 }
