@@ -90,7 +90,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
             Channel channel = this.getChannel(EnumChannelType.ENERGY);
             if(channel == null)
                 return null;
-            return (T)this.capabilities.computeIfAbsent(EnumChannelType.FLUID, () -> channel.getEnergyStorage(this));
+            return (T)this.capabilities.computeIfAbsent(EnumChannelType.ENERGY, () -> channel.getEnergyStorage(this));
         }
         return super.getCapability(capability, side);
     }
