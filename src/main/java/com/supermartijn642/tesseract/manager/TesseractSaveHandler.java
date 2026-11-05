@@ -23,6 +23,7 @@ public class TesseractSaveHandler {
         MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::tick);
         MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::save);
         MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::load);
+        MinecraftForge.EVENT_BUS.addListener(TesseractSaveHandler::unload);
     }
 
     private static void onJoin(PlayerEvent.PlayerLoggedInEvent e){
@@ -63,5 +64,14 @@ public class TesseractSaveHandler {
         TesseractTracker.loadReferences(saveDirectory);
         TesseractChannelManager.loadChannels(saveDirectory);
         lastSaveTime = System.currentTimeMillis();
+    }
+
+    private static void unload(LevelEvent.Unload e){
+        if(e.getLevel().isClientSide() || !(e.getLevel() instanceof Level) || ((Level)e.getLevel()).dimension() != Level.OVERWORLD)
+            return;
+
+        // Clear all references and channels when the server stops
+        TesseractTracker.unloadReferences();
+        TesseractChannelManager.SERVER.clear();
     }
 }
