@@ -160,8 +160,8 @@ public class CombinedFluidHandler implements IFluidHandler {
                             if(!FluidStack.isSameFluidSameComponents(resource, extracted))
                                 throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned different fluid than was requested from #drain()!");
                             leftOverAmount -= extracted.getAmount();
-                            if(leftOverAmount < 0)
-                                return resource;
+                            if(leftOverAmount <= 0)
+                                return resource.copy();
                             if(!copied)
                                 leftOver = leftOver.copy();
                             leftOver.setAmount(leftOverAmount);
@@ -196,7 +196,7 @@ public class CombinedFluidHandler implements IFluidHandler {
                             FluidStack extracted = handler.drain(leftOverAmount, action);
                             if(!extracted.isEmpty()){
                                 leftOverAmount -= extracted.getAmount();
-                                if(leftOverAmount < 0)
+                                if(leftOverAmount <= 0)
                                     return extracted;
                                 resource = extracted;
                                 leftOver = resource.copy();
@@ -210,7 +210,7 @@ public class CombinedFluidHandler implements IFluidHandler {
                                 if(!FluidStack.isSameFluidSameComponents(resource, extracted))
                                     throw new IllegalStateException("Fluid handler of class '" + handler.getClass().getName() + "' obtained from block entity '" + entity.getClass().getName() + "' returned different fluid than was requested from #drain()!");
                                 leftOverAmount -= extracted.getAmount();
-                                if(leftOverAmount < 0){
+                                if(leftOverAmount <= 0){
                                     leftOver.setAmount(amount);
                                     return leftOver;
                                 }
