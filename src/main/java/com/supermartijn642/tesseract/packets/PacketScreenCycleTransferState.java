@@ -36,6 +36,8 @@ public class PacketScreenCycleTransferState extends BlockEntityBasePacket<Tesser
 
     @Override
     protected void handle(TesseractBlockEntity entity, PacketContext context){
+        if(!entity.isInInteractionRange(context.getPlayer()))
+            return;
         entity.cycleTransferState(this.type);
     }
 }
