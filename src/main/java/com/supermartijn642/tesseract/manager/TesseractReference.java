@@ -9,6 +9,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Created 3/22/2020 by SuperMartijn642
  */
@@ -49,7 +51,7 @@ public final class TesseractReference {
     private final PerChannel<Integer> channels = new PerChannel<>(-1);
     private final PerChannel<Boolean> canSend = new PerChannel<>(true);
     private final PerChannel<Boolean> canReceive = new PerChannel<>(true);
-    private @Nullable TesseractBlockEntity entity;
+    private @Nullable WeakReference<TesseractBlockEntity> entity;
 
     private TesseractReference(long index, ResourceLocation dimension, BlockPos pos, boolean isClientSide){
         this.index = index;
@@ -64,7 +66,7 @@ public final class TesseractReference {
             this.canSend.set(type, entity.canSend(type));
             this.canReceive.set(type, entity.canReceive(type));
         }
-        this.entity = entity;
+        this.entity = new WeakReference<>(entity);
     }
 
     public TesseractReference(long index, CompoundTag tag, boolean isClientSide){
@@ -102,9 +104,12 @@ public final class TesseractReference {
 
     @Nullable
     public TesseractBlockEntity getTesseract(){
-        if(this.entity != null && (this.entity.isRemoved() || !this.entity.getBlockPos().equals(this.pos)))
+        TesseractBlockEntity entity = this.entity == null ? null : this.entity.get();
+        if(entity != null && (entity.isRemoved() || !entity.getBlockPos().equals(this.pos))){
             this.entity = null;
-        return this.entity;
+            return null;
+        }
+        return entity;
     }
 
     public CompoundTag write(){
@@ -162,7 +167,7 @@ public final class TesseractReference {
     }
 
     public void update(TesseractBlockEntity entity){
-        this.entity = entity;
+        this.entity = new WeakReference<>(entity);
         for(EnumChannelType type : EnumChannelType.values()){
             boolean changed = false;
             boolean canSend = entity.canSend(type);
