@@ -130,6 +130,14 @@ public class TesseractChannelManager {
             Path folder = saveDirectory.resolve("tesseract").resolve(type.name().toLowerCase(Locale.ENGLISH));
             list.read(folder);
         }
+        // Add all tesseracts to their channels
+        TesseractTracker.SERVER.forEachReference(reference -> {
+            for(EnumChannelType type : EnumChannelType.values()){
+                Channel channel = reference.getChannel(type);
+                if(channel != null)
+                    channel.addTesseract(reference);
+            }
+        });
     }
 
     public static void sendChannels(PlayerEntity player){
