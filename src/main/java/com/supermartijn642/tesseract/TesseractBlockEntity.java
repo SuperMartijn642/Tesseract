@@ -35,7 +35,6 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     private boolean redstone;
 
     private final Map<Direction,PerChannel<BlockApiCache<?,Direction>>> surroundingCapabilities = new EnumMap<>(Direction.class);
-    private final boolean[] surroundingTesseracts = new boolean[Direction.values().length];
 
     public TesseractBlockEntity(BlockPos pos, BlockState state){
         super(Tesseract.tesseract_tile, pos, state);
@@ -106,11 +105,12 @@ public class TesseractBlockEntity extends BaseBlockEntity {
 
         ArrayList<Object> capabilities = new ArrayList<>(6);
         for(Direction side : Direction.values()){
-            if(this.surroundingTesseracts[side.ordinal()])
+            BlockApiCache<?,Direction> cache = this.surroundingCapabilities.get(side)
+                .computeIfAbsent(type, () -> BlockApiCache.create(api, (ServerLevel)this.level, this.worldPosition.relative(side)));
+            // Skip neighboring tesseracts
+            if(cache.getBlockEntity() instanceof TesseractBlockEntity)
                 continue;
-            Object capability = this.surroundingCapabilities.get(side)
-                .computeIfAbsent(type, () -> BlockApiCache.create(api, (ServerLevel)this.level, this.worldPosition.relative(side)))
-                .find(side.getOpposite());
+            Object capability = cache.find(side.getOpposite());
             if(capability != null)
                 capabilities.add(capability);
         }
@@ -169,12 +169,6 @@ public class TesseractBlockEntity extends BaseBlockEntity {
 
     private Channel getChannel(EnumChannelType type){
         return this.getReference().getChannel(type);
-    }
-
-    public void onNeighborChanged(BlockPos neighbor){
-        Direction side = Direction.fromDelta(neighbor.getX() - this.worldPosition.getX(), neighbor.getY() - this.worldPosition.getY(), neighbor.getZ() - this.worldPosition.getZ());
-        BlockState state = this.level.getBlockState(neighbor);
-        this.surroundingTesseracts[side.ordinal()] = state.getBlock() == Tesseract.tesseract;
     }
 
     private void notifyNeighbors(){

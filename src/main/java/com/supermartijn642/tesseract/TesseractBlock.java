@@ -45,10 +45,8 @@ public class TesseractBlock extends BaseBlock implements EntityHoldingBlock {
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving){
         BlockEntity entity = level.getBlockEntity(pos);
-        if(entity instanceof TesseractBlockEntity){
+        if(entity instanceof TesseractBlockEntity)
             ((TesseractBlockEntity)entity).setPowered(level.hasNeighborSignal(pos) || level.hasNeighborSignal(pos.above()));
-            ((TesseractBlockEntity)entity).onNeighborChanged(fromPos);
-        }
     }
 
     @Override
