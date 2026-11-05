@@ -34,6 +34,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     private boolean redstone;
 
     private final Map<EnumFacing,PerChannel<Object>> surroundingCapabilities = new EnumMap<>(EnumFacing.class);
+    private final Map<EnumFacing,TileEntity> surroundingEntities = new EnumMap<>(EnumFacing.class);
 
     public TesseractBlockEntity(){
         super(Tesseract.tesseract_tile);
@@ -114,12 +115,16 @@ public class TesseractBlockEntity extends BaseBlockEntity {
 
         ArrayList<Object> capabilities = new ArrayList<>();
         for(EnumFacing side : EnumFacing.values()){
-            Object capability = this.surroundingCapabilities.get(side).computeIfAbsent(type, () -> {
-                TileEntity entity = this.world.getTileEntity(this.pos.offset(side));
-                if(entity != null && !(entity instanceof TesseractBlockEntity))
-                    return entity.getCapability(api, side.getOpposite());
-                return null;
-            });
+            BlockPos neighbor = this.pos.offset(side);
+            // Block entities are not invalidated when their chunk unloads, so check whether the neighboring block entity is still the same
+            TileEntity entity = this.world.isBlockLoaded(neighbor) ? this.world.getTileEntity(neighbor) : null;
+            if(entity != this.surroundingEntities.get(side)){
+                this.surroundingEntities.put(side, entity);
+                this.surroundingCapabilities.get(side).reset();
+            }
+            if(entity == null || entity instanceof TesseractBlockEntity)
+                continue;
+            Object capability = this.surroundingCapabilities.get(side).computeIfAbsent(type, () -> entity.getCapability(api, side.getOpposite()));
             if(capability != null)
                 capabilities.add(capability);
         }
