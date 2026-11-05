@@ -6,6 +6,7 @@ import com.supermartijn642.core.gui.GuiGraphicsHelper;
 import com.supermartijn642.core.gui.WidgetScreen;
 import com.supermartijn642.core.gui.widget.BlockEntityBaseWidget;
 import com.supermartijn642.core.gui.widget.WidgetRenderContext;
+import com.supermartijn642.core.util.playerprofile.PlayerProfileCache;
 import com.supermartijn642.tesseract.EnumChannelType;
 import com.supermartijn642.tesseract.Tesseract;
 import com.supermartijn642.tesseract.TesseractBlockEntity;
@@ -146,9 +147,8 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
             Channel channel = channels.get(i + this.scrollOffset);
             int x = entity.getChannelId(type) == channel.id ? 47 : 35, y = 31 + i * 13;
             if(mouseX >= x && mouseX < x + 9 && mouseY >= y + 2 && mouseY < y + 11){
-                String creatorName = PlayerRenderer.getPlayerUsername(channel.creator);
-                if(creatorName != null)
-                    graphics.submitTooltip(c -> c.literal(creatorName), mouseX, mouseY);
+                String creatorName = PlayerProfileCache.get(true).getUsernameOr(channel.creator, "Unknown");
+                graphics.submitTooltip(c -> c.literal(creatorName), mouseX, mouseY);
             }
         }
 
@@ -225,7 +225,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
                 graphics.submitSprite(CHECKMARK, x, y + 2, 9, 9);
                 x += 12;
             }
-            PlayerRenderer.renderPlayerHead(channel.creator, graphics, x, y + 2, 9, 9);
+            graphics.submitPlayerHead(channel.creator, x, y + 2, 9, 9, true);
             x += 12;
             boolean isOwnedChannel = channel.creator.equals(ClientUtils.getPlayer().getUUID());
             // trim the channel name to fit
@@ -249,11 +249,10 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         graphics.poseStack().popMatrix();
         // creator
         graphics.submitText(TextComponents.string("Creator:").italic().get(), 147, 55, p -> p.color(0xff666666));
-        PlayerRenderer.renderPlayerHead(channel.creator, graphics, 147, 65, 9, 9);
-        String creatorName = PlayerRenderer.getPlayerUsername(channel.creator);
-        if(creatorName != null)
-            //noinspection Convert2MethodRef
-            graphics.submitText(creatorName, 159, 66, p -> p.activeColor());
+        graphics.submitPlayerHead(channel.creator, 147, 65, 9, 9, true);
+        String creatorName = PlayerProfileCache.get(true).getUsernameOr(channel.creator, "Unknown");
+        //noinspection Convert2MethodRef
+        graphics.submitText(creatorName, 159, 66, p -> p.activeColor());
         // category
         graphics.submitText(TextComponents.string("Category:").italic().get(), 147, 80, p -> p.color(0xff666666));
         graphics.poseStack().pushMatrix();
