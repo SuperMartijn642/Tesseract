@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "tesseract:tesseract"
+    {
+      "id": "tesseract:tesseract",
+      "required": true
+    }
   ]
 }
