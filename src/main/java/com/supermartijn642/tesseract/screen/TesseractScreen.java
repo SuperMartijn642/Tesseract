@@ -214,7 +214,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
                 ScreenUtils.fillRect(matrixStack, x, y + 12, 102, 1, 0xffffffff);
                 ScreenUtils.fillRect(matrixStack, x, y, 1, channelHeight, 0xffffffff);
                 ScreenUtils.fillRect(matrixStack, x + 101, y, 1, channelHeight, 0xffffffff);
-            }else if(mouseX >= x && mouseX < x + 105 && mouseY >= y && mouseY < y + channelHeight){
+            }else if(mouseX >= x && mouseX < x + 102 && mouseY >= y && mouseY < y + channelHeight){
                 ScreenUtils.fillRect(matrixStack, x, y, 102, 1, 0xff666666);
                 ScreenUtils.fillRect(matrixStack, x, y + 12, 102, 1, 0xff666666);
                 ScreenUtils.fillRect(matrixStack, x, y, 1, channelHeight, 0xff666666);
