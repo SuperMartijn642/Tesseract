@@ -70,6 +70,9 @@ tasks.register("deleteSharedBuildOutputs", Delete) {
 tasks.named("compileJava") { dependsOn "deleteSharedBuildOutputs" }
 tasks.named("processResources") { dependsOn "deleteSharedBuildOutputs" }
 
+// The 1.12 runs load the mod from its jar in build/libs rather than from the compiled classes, hence build the jar first
+tasks.matching { it.name in ["runClient", "runServer", "runData"] }.configureEach { dependsOn "jar" }
+
 processResources {
     inputs.property "version", version
 
