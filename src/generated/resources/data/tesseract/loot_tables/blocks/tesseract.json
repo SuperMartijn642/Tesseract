@@ -10,8 +10,8 @@
       ],
       "entries": [
         {
-          "type": "minecraft:item",
-          "name": "tesseract:tesseract"
+          "name": "tesseract:tesseract",
+          "type": "minecraft:item"
         }
       ]
     }
