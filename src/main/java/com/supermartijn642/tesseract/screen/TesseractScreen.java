@@ -254,7 +254,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
         // creator
         ScreenUtils.drawString(matrixStack, TextComponents.string("Creator:").italic().get(), 147, 55, 0xff666666);
         ScreenUtils.drawPlayerHead(channel.creator, matrixStack, 147, 65, 9, 9, true);
-        String creatorName = PlayerProfileCache.get(true).getUsername(channel.creator);
+        String creatorName = PlayerProfileCache.get(true).getUsernameOr(channel.creator, "Unknown");
         ScreenUtils.drawString(matrixStack, creatorName, 159, 66, ScreenUtils.ACTIVE_TEXT_COLOR);
         // category
         ScreenUtils.drawString(matrixStack, TextComponents.string("Category:").italic().get(), 147, 80, 0xff666666);
