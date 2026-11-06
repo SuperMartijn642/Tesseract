@@ -101,7 +101,7 @@ public class TesseractBlockEntity extends BaseBlockEntity {
     }
 
     private <T> List<T> getSurroundingCapabilities(EnumChannelType type, BlockApiLookup<T,Direction> api){
-        if(this.level == null || this.level instanceof ServerLevel)
+        if(!(this.level instanceof ServerLevel))
             return Collections.emptyList();
 
         ArrayList<Object> capabilities = new ArrayList<>(6);
