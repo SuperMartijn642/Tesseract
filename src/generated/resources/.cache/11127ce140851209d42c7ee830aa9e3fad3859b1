@@ -3,7 +3,7 @@
 b88b05eb84195913726b18f84bb7c01ad3556d29 assets/minecraft/atlases/gui.json
 f535424e8cc785231d304390e944ca5483d607c4 assets/tesseract/blockstates/tesseract.json
 f5ef7ae2423078ffbca99038a2735d43272f55d5 assets/tesseract/items/tesseract.json
-105075dcd8e264e34795be16837be447203fe962 assets/tesseract/lang/en_us.json
+d68f2a902211e583a9d9968c4922ea6eeabbda5d assets/tesseract/lang/en_us.json
 ffbe68af05b77979e5a2343cd18eb79f71ae72c7 data/minecraft/tags/block/mineable/pickaxe.json
 6e1bf8cfad3b239d66ff219695656a7b276a6679 data/tesseract/advancement/recipes/misc/tesseract.json
 977e287a3e72c69f906f746e595fa5bd0d5385ab data/tesseract/loot_table/blocks/tesseract.json
