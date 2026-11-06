@@ -1,3 +1,17 @@
+### Tesseract 1.0.40
+- Operators can now remove channels of other players by holding shift
+- Improved loading of channel creator names and heads in the tesseract screen
+- Fixed modified clients being able to connect tesseracts to other players' private channels
+- Fixed modified clients being able to change tesseracts from anywhere
+- Fixed players getting disconnected when joining a server with more than 500 channels
+- Fixed tesseracts reporting the wrong number of fluid tanks
+- Fixed tesseracts losing their settings when placed right after a tesseract was removed at the same position
+- Fixed tesseracts sometimes losing their channels when loading partially saved data
+- Fixed worlds staying in memory after leaving them
+- Fixed stored energy and energy capacity becoming negative with very large energy storages
+- Fixed the channel list not scrolling with touchpads and smooth scrolling mice
+- Fixed the hover highlight of channels in the tesseract screen only covering part of the channel
+
 ### Tesseract 1.0.39a
 - Fixed tesseracts reporting amount stored as capacity
 
