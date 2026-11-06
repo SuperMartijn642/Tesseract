@@ -320,6 +320,7 @@ public class TesseractScreen extends BlockEntityBaseWidget<TesseractBlockEntity>
                 int scrolled = (int)this.scrollProgress;
                 this.scrollProgress -= scrolled;
                 this.scrollOffset = Math.max(this.scrollOffset - scrolled, 0);
+                this.scrollOffset = Math.min(this.scrollOffset, TesseractChannelManager.CLIENT.getChannels(type).size() - MAX_DISPLAYED_CHANNELS);
             }else
                 this.scrollOffset = 0;
         }
